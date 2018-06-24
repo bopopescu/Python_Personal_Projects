@@ -1,5 +1,6 @@
 import os
 
 
-if __name__
+if __name__ == '__main__':
+	os.path()
 

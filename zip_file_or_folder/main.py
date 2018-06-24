@@ -38,30 +38,31 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 
-	print(args.date)
-	print(args.name)
-
 	directory = pathlib.Path(args.pathname)
-	os.chdir(args.pathname)
+	if directory.is_dir():
+		os.chdir(args.pathname)
 
-	# Separa só o que for arquivo
-	files_to_zip = [content for content in directory.iterdir() if content.is_file()]
-	
-	# Separa só o que for da data passada
-	files_to_zip = [content for content in files_to_zip if creation_date(content) == args.date]
+		# Separa só o que for arquivo
+		files_to_zip = [content for content in directory.iterdir() if content.is_file()]
+		
+		# Separa só o que for da data passada
+		files_to_zip = [content for content in files_to_zip if creation_date(content) == args.date]
 
-	zip_file_name = args.name + '.zip'
+		zip_file_name = args.name + '.zip'
 
-	with ZipFile(zip_file_name, 'w', ZIP_DEFLATED) as zip_destination_file:
+		with ZipFile(zip_file_name, 'w', ZIP_DEFLATED) as zip_destination_file:
 
-		for files in files_to_zip:
-			zip_destination_file.write(files, os.path.basename(files))
+			for files in files_to_zip:
+				print('Compactando arquivo: {} dentro do arquivo: {}'.format(files, zip_file_name))
+				zip_destination_file.write(files, os.path.basename(files))
 
-		if args.validate:
-			is_file_ok = zip_destination_file.testzip()
+			if args.validate:
+				is_file_ok = zip_destination_file.testzip()
 
-			if is_file_ok is None: 
-				print('File created successfully and validated')
-				
-		else:
-			print('File created successfully')
+				if is_file_ok is None: 
+					print('Arquivos compactados e validados')
+					
+			else:
+				print('Arquivos compactados com sucesso')
+	else:
+		eprint('O caminho "{}" não é um diretório, favor verificar'.format(args.pathname))
