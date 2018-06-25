@@ -1,6 +1,4 @@
-This script intends to compact a file , a list of them or a folder in .zip format 
+This script intends to compress every file in the directory passed as an argument by creating a file for each day, deciding the last modified date / creation date of the file
 
-This script looks for files from a specific date, if the date is not specified then the current date will be the default 
-Then, the it will zip the files all toget with the name given as a parameter
 
 
