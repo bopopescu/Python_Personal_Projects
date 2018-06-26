@@ -8,48 +8,48 @@ import sys
 # ctrl + shit + p -> Anaconda: Disable linting on this file
 
 DATABASE_CONFIG = {
-	'spnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.21', 'port': 3310, 'database': 'mysql'},
-	'spnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.22', 'port': 3306, 'database': 'mysql'},
-	'recnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.185.8.31', 'port': 3306, 'database': 'mysql'},
-	'recnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.185.8.32', 'port': 3306, 'database': 'mysql'},
-	'poanetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.54.19.51', 'port': 3306, 'database': 'mysql'},
-	'poanetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.54.19.52', 'port': 3306, 'database': 'mysql'},
-	'brinetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.227.1.97', 'port': 3306, 'database': 'mysql'},
-	'brinetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.227.1.98', 'port': 3306, 'database': 'mysql'},
-	'spskybd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.1.120', 'port': 3306, 'database': 'mysql'},
-	'spskybd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.1.121', 'port': 3306, 'database': 'mysql'},
-	'bhznetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.0.132.61', 'port': 3306, 'database': 'mysql'},
-	'bhznetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.0.132.62', 'port': 3306, 'database': 'mysql'},
-	'rjoviabd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.50.72', 'port': 3306, 'database': 'mysql'},
-	'rjoviabd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.50.73', 'port': 3306, 'database': 'mysql'},
-	'bhznetaecbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.226.248', 'port': 3306, 'database': 'mysql'},
-	'bhznetaecbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.226.222', 'port': 3306, 'database': 'mysql'},
-	'frcmlzbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.3.82', 'port': 3306, 'database': 'mysql'},
-	'frcmlzbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.3.83', 'port': 3306, 'database': 'mysql'},
-	'bhzskybd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.2.90', 'port': 3306, 'database': 'mysql'},
-	'bhzskybd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.2.91', 'port': 3306, 'database': 'mysql'},
-	'ajunetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.3.18', 'port': 3306, 'database': 'mysql'},
-	'ajunetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.3.19', 'port': 3306, 'database': 'mysql'},
-	'fecnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.226.1.100', 'port': 3306, 'database': 'mysql'},
-	'fecnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.226.1.101', 'port': 3306, 'database': 'mysql'},
-	'spqlcbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.1.104', 'port': 3306, 'database': 'mysql'},
-	'spqlcbd03': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.1.106', 'port': 3306, 'database': 'mysql'},
-	'rjonetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.4.102', 'port': 3306, 'database': 'mysql'},
-	'rjonetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.4.104', 'port': 3306, 'database': 'mysql'},
-	'jabnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.6.131', 'port': 3306, 'database': 'mysql'},
-	'jabnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.6.161', 'port': 3306, 'database': 'mysql'},
-	'spogolsbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.113', 'port': 3306, 'database': 'mysql'},
-	'spogolsbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.114', 'port': 3306, 'database': 'mysql'},
-	'spogolbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.134', 'port': 3306, 'database': 'mysql'},
-	'spogolbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.135', 'port': 3306, 'database': 'mysql'},
-	'olinetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.5.6', 'port': 3306, 'database': 'mysql'},
-	'olinetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.5.53', 'port': 3306, 'database': 'mysql'},
-	'spjgrbdcentral': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.81.1.56', 'port': 3306, 'database': 'mysql'},
-	'spnetatebd': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.49', 'port': 3306, 'database': 'mysql'},
-	'spnetbdna01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.213', 'port': 3307, 'database': 'mysql'},
-	'spvvjbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.20.107', 'port': 3306, 'database': 'mysql'},
-	'spvvjbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.20.108', 'port': 3306, 'database': 'mysql'},
-	'sppanbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.6.58', 'port': 3306, 'database': 'mysql'},
+	# 'spnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.21', 'port': 3310, 'database': 'mysql'},
+	# 'spnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.22', 'port': 3306, 'database': 'mysql'},
+	# 'recnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.185.8.31', 'port': 3306, 'database': 'mysql'},
+	# 'recnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.185.8.32', 'port': 3306, 'database': 'mysql'},
+	# 'poanetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.54.19.51', 'port': 3306, 'database': 'mysql'},
+	# 'poanetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.54.19.52', 'port': 3306, 'database': 'mysql'},
+	# 'brinetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.227.1.97', 'port': 3306, 'database': 'mysql'},
+	# 'brinetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.227.1.98', 'port': 3306, 'database': 'mysql'},
+	# 'spskybd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.1.120', 'port': 3306, 'database': 'mysql'},
+	# 'spskybd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.1.121', 'port': 3306, 'database': 'mysql'},
+	# 'bhznetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.0.132.61', 'port': 3306, 'database': 'mysql'},
+	# 'bhznetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.0.132.62', 'port': 3306, 'database': 'mysql'},
+	# 'rjoviabd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.50.72', 'port': 3306, 'database': 'mysql'},
+	# 'rjoviabd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.50.73', 'port': 3306, 'database': 'mysql'},
+	# 'bhznetaecbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.226.248', 'port': 3306, 'database': 'mysql'},
+	# 'bhznetaecbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.226.222', 'port': 3306, 'database': 'mysql'},
+	# 'frcmlzbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.3.82', 'port': 3306, 'database': 'mysql'},
+	# 'frcmlzbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.3.83', 'port': 3306, 'database': 'mysql'},
+	# 'bhzskybd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.2.90', 'port': 3306, 'database': 'mysql'},
+	# 'bhzskybd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.228.2.91', 'port': 3306, 'database': 'mysql'},
+	# 'ajunetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.3.18', 'port': 3306, 'database': 'mysql'},
+	# 'ajunetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.3.19', 'port': 3306, 'database': 'mysql'},
+	# 'fecnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.226.1.100', 'port': 3306, 'database': 'mysql'},
+	# 'fecnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.226.1.101', 'port': 3306, 'database': 'mysql'},
+	# 'spqlcbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.1.104', 'port': 3306, 'database': 'mysql'},
+	# 'spqlcbd03': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.230.1.106', 'port': 3306, 'database': 'mysql'},
+	# 'rjonetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.4.102', 'port': 3306, 'database': 'mysql'},
+	# 'rjonetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.4.104', 'port': 3306, 'database': 'mysql'},
+	# 'jabnetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.6.131', 'port': 3306, 'database': 'mysql'},
+	# 'jabnetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.6.161', 'port': 3306, 'database': 'mysql'},
+	# 'spogolsbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.113', 'port': 3306, 'database': 'mysql'},
+	# 'spogolsbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.114', 'port': 3306, 'database': 'mysql'},
+	# 'spogolbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.134', 'port': 3306, 'database': 'mysql'},
+	# 'spogolbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.5.135', 'port': 3306, 'database': 'mysql'},
+	# 'olinetbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.5.6', 'port': 3306, 'database': 'mysql'},
+	# 'olinetbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.5.53', 'port': 3306, 'database': 'mysql'},
+	# 'spjgrbdcentral': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.81.1.56', 'port': 3306, 'database': 'mysql'},
+	# 'spnetatebd': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.49', 'port': 3306, 'database': 'mysql'},
+	# 'spnetbdna01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.229.1.213', 'port': 3307, 'database': 'mysql'},
+	# 'spvvjbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.20.107', 'port': 3306, 'database': 'mysql'},
+	# 'spvvjbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '192.168.20.108', 'port': 3306, 'database': 'mysql'},
+	# 'sppanbd01': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.6.58', 'port': 3306, 'database': 'mysql'},
 	'sppanbd02': { 'user': 'usr_etl', 'password': 'lmsistemas01', 'host': '10.119.6.59', 'port': 3306, 'database': 'mysql'}
 }
 
@@ -83,12 +83,15 @@ def executesql(sql, conn):
 
 	return cr
 
-def mysql_execute_proc(str_prc, conn):
+def mysql_execute_proc(conn, sql_str, *args):
 
 
 	cnx = conn.cursor()
+	print(args)
+	stored_result = cnx.callproc('prc_create_user', args)
+	close(cnx)
 
-	cnx.callproc('prc_create_user', )
+	return stored_result
 
 
 def close(db_obj):
@@ -100,12 +103,18 @@ def parseArguments():
 	parser = argparse.ArgumentParser(description='Programa que cria todos os usuários nas bases dos bancos de dados URA da Mutant')
 	parser.add_argument('-c', '--create', help='Operation to be created', action='store_true', required=True)
 	parser.add_argument('user', help='Usuário a ser criado')
-	parser.add_argument('role', help='Tipo de acesso do usuário')
+	parser.add_argument('role', help="Tipo de acesso do usuário: 'dev', 'prd', 'qa', 'app', 'dba'")
 
 	return parser.parse_args()
 
 class RoleException(Exception):
 	pass
+
+
+DISABLE_SQL_LOG_BIN = "SET SQL_LOG_BIN = 0"
+QUERY_SQL_LOG_BIN = "SELECT @@session.sql_log_bin"
+PROCEDURE_CREATE_USER = "prc_create_user"
+FLUSH_PRIVILEGES = "FLUSH PRIVILEGES"
 
 if __name__ == '__main__':
 
@@ -116,30 +125,29 @@ if __name__ == '__main__':
 	if arguments.role not in ROLES:
 		raise RoleException("Role passada não encontrada")
 
-	if not arguments.create:
+	if arguments.create:
 
 		print(f'User to be created {arguments.user}')
 		pswd = password_generator()
 
 		for host, db in DATABASE_CONFIG.items():
 			cur = None
-			# Here execute the command
+
 			try:
 
 				tmp_con = conn_mysql(db)
-				executesql("SET SQL_LOG_BIN = 0", tmp_con)
-				is_log_bin_off = executesql("SELECT @@session.sql_log_bin", tmp_con).fetchone()
+
+				executesql(DISABLE_SQL_LOG_BIN, tmp_con)
+
+				is_log_bin_off = executesql(QUERY_SQL_LOG_BIN, tmp_con).fetchone()
 
 				if is_log_bin_off[0] == 0 :
 
-					# executesql(f"CREATE USER '{arguments.user}' IDENTIFIED BY '{pswd}'", tmp_con)
+					mysql_execute_proc(tmp_con, PROCEDURE_CREATE_USER, arguments.user, '%', pswd, arguments.role, 'prd')
 
-
-
-					executesql("FLUSH PRIVILEGES", tmp_con)
+					executesql(FLUSH_PRIVILEGES, tmp_con)
 
 					# print(f"{host}: Usuário criado com sucesso: {arguments.user} senha: {pswd}")
-					print(f"{host}: Usuário removido com sucesso: {arguments.user}")
 				else:
 					print(f"sql_log_bin ativo no servidor: {host}")
 
@@ -148,6 +156,10 @@ if __name__ == '__main__':
 				exc_type, exc_obj, exc_tb = sys.exc_info()
 
 				print(f'Linha {exc_tb.tb_lineno}: Erro no {host}: {str(err)}')
+
+			else:
+
+				print(f"{host}: Usuário criado com sucesso com sucesso: {arguments.user}")
 
 			finally:
 
