@@ -1,0 +1,6 @@
+>>> Check the version of the module <<< 
+pip freeze | grep module_name
+
+pip install mysql-connector 				# MySQL Connector Python -> https://dev.mysql.com/doc/connector-python/en/connector-python-introduction.html
+pip install mysql-connector-python 			# MySQL X-Dev API Python -> https://dev.mysql.com/doc/dev/connector-python/8.0/#
+

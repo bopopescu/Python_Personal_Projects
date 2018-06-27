@@ -5,6 +5,7 @@ import argparse
 import string
 import random
 import sys
+
 # ctrl + shit + p -> Anaconda: Disable linting on this file
 
 DATABASE_CONFIG = {
@@ -70,7 +71,7 @@ def password_generator(size=8, chars=string.ascii_letters + string.digits):
 def conn_mysql(db_info):
 
 	con = mysql.connector.connect(user=db_info['user'], password=db_info['password'],
-								port=db_info['port'], host=db_info['host'], database=db_info['database'])
+								port=db_info['port'], host=db_info['host'], database=db_info['database'],connection_timeout=7)
 
 	return con
 
@@ -101,14 +102,13 @@ def close(db_obj):
 def parseArguments():
 
 	parser = argparse.ArgumentParser(description='Programa que cria todos os usuários nas bases dos bancos de dados URA da Mutant')
+
 	parser.add_argument('-c', '--create', help='Operation to be created', action='store_true', required=True)
 	parser.add_argument('user', help='Usuário a ser criado')
 	parser.add_argument('role', help="Tipo de acesso do usuário: 'dev', 'prd', 'qa', 'app', 'dba'")
 
 	return parser.parse_args()
 
-class RoleException(Exception):
-	pass
 
 
 DISABLE_SQL_LOG_BIN = "SET SQL_LOG_BIN = 0"
@@ -123,11 +123,12 @@ if __name__ == '__main__':
 	arguments = parseArguments()
 
 	if arguments.role not in ROLES:
-		raise RoleException("Role passada não encontrada")
+		sys.exit("Role passada não informada. Possiveis roles: 'dev', 'prd', 'qa', 'app', 'dba'")
+
 
 	if arguments.create:
 
-		print(f'User to be created {arguments.user}')
+		print(f'Usuario a ser criado {arguments.user}')
 		pswd = password_generator()
 
 		for host, db in DATABASE_CONFIG.items():
@@ -172,4 +173,4 @@ if __name__ == '__main__':
 					pass
 
 	else:
-		print('Marco idiota')
+		sys.exit("Não foi passada a opção, favor informar a ação. Para mais informações utilize o '--help'")
