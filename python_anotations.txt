@@ -1,0 +1,27 @@
+>>> VIRTUAL ENVIRONMENT<<<
+	Creates a virtual installation of python for a new project so the libraries already installed doesn't have any association with the project. The purpose of the virtual environment is to create an isolate installation of python so it doesn't use the default libraries installed on the computer. By doing that, the project can use the specific version of Python and the external libraries without conflicting with the default installation 
+	This is achieved by installing a module called "virtualenv" 
+
+	To create it:
+
+		1. On command line execute:
+		
+			~/Python/Python_Projects/flask_bootcamp$ virtualenv venv --python=python3.6
+		
+		2. After that (works only for linux and mac): 
+			
+			~/Python/Python_Projects/flask_bootcamp$ source venv/bin/activate
+		
+		{2. for windows: }
+			
+			./venv/Scripts/activate
+
+		The prompt will look like this: 
+
+			(venv) ~/Python/Python_Projects/flask_bootcamp$
+
+		To deactivate:
+
+			~/Python/Python_Projects/flask_bootcamp$ deactivate
+
+###########################################################################################################################################
