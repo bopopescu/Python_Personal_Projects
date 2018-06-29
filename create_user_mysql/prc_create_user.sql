@@ -8,7 +8,7 @@ DROP PROCEDURE IF EXISTS prc_create_user $$
 	Proc para criação de usuários no banco
 
 */
-CREATE PROCEDURE prc_create_user(p_user VARCHAR(40), p_host VARCHAR(30),
+CREATE DEFINER='vyosiura' PROCEDURE prc_create_user(p_user VARCHAR(40), p_host VARCHAR(30),
 								p_password VARCHAR(30), p_role ENUM('dev', 'qa', 'sup', 'app', 'dba'),
 								p_env ENUM('prd', 'dev', 'qa'))
 COMMENT 'Faz a criação do usuário de acordo com a sua função. parametros: \n\t "p_user" - usuário a ser criado: VARCHAR(40)\n\t "p_host" - host do usuário: VARCHAR(30)\n\t "p_password" - senha do novo usuário: VARCHAR(30)\n\t "p_role" - função do usuário: ENUM("dev", "qa", "sup", "app", "dba")\n\t "p_env" - ambiente que será criado: ENUM("prd", "dev", "qa")'

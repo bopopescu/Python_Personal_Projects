@@ -1,5 +1,5 @@
 import mysql.connector
-
+import utility.util as util
 
 def executesql(sql, conn):
 
@@ -9,17 +9,14 @@ def executesql(sql, conn):
 		cr.execute(sql)
 	except mysql.connector.ProgrammingError as e:
 		print(e)
-	else: 
+	else:
 		return cr
 
 
 if __name__ == '__main__':
 
-	con = mysql.connector.connect(user='app_purge', password='Senh@1ndefinid4', host='192.168.33.20', database='confere2')
-
-	cr = executesql('create table te_py(a int)', con)
-
-	for i in cr:
-		print(i)
-
-	con.close()
+		print(util.SQL_DISABLE_LOG_BIN)
+	# con = mysql.connector.connect(user='usr_etl', password='lmsistemas01', host='10.221.1.43', database='netdata')
+	# con.close()
+    #
+	# print(con.is_connected())
