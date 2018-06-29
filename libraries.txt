@@ -15,6 +15,7 @@ pip freeze | grep module_name
 
 -----------------------------------------
 
+pip install Flask-JWT						# Install security module with JWT for FLask
 pip install Flask-RESTful					# Install Flask-RESTful, it also includes Flask 
 pip install virtualenv						# Install virtual environments 
 pip install flask							# Install Flask Web API 
