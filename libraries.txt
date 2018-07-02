@@ -25,6 +25,9 @@ pip install python-ldap                 			# Install first msg through python. M
 													# https://www.python-ldap.org/en/latest/installing.html#installing-from-pypi
                                           			# Usually, some os libraries are needed for use it.
 
+pip install Flask-SQLAlchemy						# Library for ORM in Python to work with Flask. SQLAlchemy is a standalone 
+													# library. This is one is adapted to work with flask
+
 pip install Flask-JWT								# Install security module with JWT for FLask
 
 pip install Flask-RESTful					        # Install Flask-RESTful, it also includes Flask

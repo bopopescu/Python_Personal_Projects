@@ -1,0 +1,1 @@
+-- SQLAlchemy is a library used to map classes to relational tables in the database

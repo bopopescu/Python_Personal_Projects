@@ -30,14 +30,8 @@ class Item(Resource):
 		if row:
 			return {'item': {'name': row[0], 'price': row[1]}}
 
-	def post(self,name):
-
-		if self.find_by_name(name):
-			return {'message': "An item iwth name '{}' already exists".format(name)}, 400
-
-		data = Item.parser.parse_args()
-		item = {'name': name, 'price': data['price']}
-
+	@classmethod
+	def insert(cls, item):
 		conn = sqlite3.connect('data.db')
 		cursor = conn.cursor()
 
@@ -48,16 +42,81 @@ class Item(Resource):
 		conn.commit()
 		conn.close()
 
+	@classmethod
+	def update(cls, item):
+		conn = sqlite3.connect('data.db')
+		cursor = conn.cursor()
+
+		query = "UPDATE items SET price = ? WHERE name = ?"
+
+		cursor.execute(query, (item['price'], item['name']))
+		
+		conn.commit()
+		conn.close()
+
+
+	def post(self,name):
+
+		if self.find_by_name(name):
+			return {'message': "An item iwth name '{}' already exists".format(name)}, 400
+
+		data = Item.parser.parse_args()
+		item = {'name': name, 'price': data['price']}
+
+		try:
+			self.insert(item)
+		except:
+			return {'message': 'An error ocurred inserting the item.'}, 500
+
 		return item, 201
 
 	def delete(self, name):
 
-		pass
+		conn = sqlite3.connect('data.db')
+		cursor = conn.cursor()
+
+		query = "DELETE FROM items WHERE name = ?"
+
+		cursor.execute(query, (name,))
+		
+		conn.commit()
+		conn.close()
+
+		return {'message': 'Item deleted'}
 
 	def put(self,name):
 		
-		pass
+		item = self.find_by_name(name)
 
+		data = Item.parser.parse_args()
+
+		updated_item = {'name': name, 'price': data['price']}
+
+		try:
+			if item is None:
+				self.insert(updated_item)
+			else:
+				self.update(updated_item)
+		except: 
+			return {'message': 'Error while updating the item'}, 500
+
+		return updated_item;
 
 class ItemList(Resource):
-	pass
+	
+	def get(self):
+		conn = sqlite3.connect('data.db')
+		cursor = conn.cursor()
+
+		query = "SELECT * FROM items"
+
+		result = cursor.execute(query)
+		
+		items = []
+
+		for row in result:
+			items.append({'name': row[0], 'price': row[1]})
+
+		conn.close()
+
+		return {'items': items};

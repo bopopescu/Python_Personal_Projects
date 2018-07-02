@@ -1,0 +1,123 @@
+Sistema confere
+
+Objetivo: 
+	
+	Realizar a gestão dos pedidos da empresa Confere, de forma eficaz e produtiva. 
+	
+	
+DESCRIÇÃO:
+	Para realizar a gestão de pedidos o sistema primeiramente deve registrar o pedido com informações:
+		- Nome do cliente - O cliente no caso é a pessoa que comprou o móvel na loja. Essas informações são necessárias pois a Confere faz interação direta com o cliente final
+		- Email do cliente
+		- Telefone do cliente
+		- Endereço do cliente
+		- Loja que solicitou o projeto -> Todos os pedidos têm uma loja que realizou a solicitação do pedido.  
+		- Valor deflacionado -> Ao realizar a consulta na loja, o vendedor utiliza uma aplicação 3d chamada Promob, para gerar o modelo do projeto do móvel planejado. Este software calcula todos os custos do projeto, além dos possíveis descontos que a loja possa oferecer ao cliente. O valor deflacionado é o valor após os descontos que o Vendedor aplicou em cima do projeto do móvel planejado. 
+		- Serviços que serão realizados -> Os serviços que são realizados para entrega do pedido são: Medição, Subir Paredes, Projeto, Atendimento, Liberação, Manual de Montagem
+		- Ambientes -> Estes são os ambientes que um imóvel pode ter, ou seja, os cômodos de um imóvel. Ex.: Banheiro, Lavanderia, cozinha, etc... 
+	Após o registro do pedido, deve-se agendar a data/hora de agendamento da medição, que é um dos serviços realizados pelo sistema. Essa data é utilizada para que medidores, funcionários terceiros, vão a casa do cliente para tirar as métricas do imóvel para que o projeto comece a ser construido. 
+	Realizada a medição e com os dados da medição em mãos, o projetista, que realiza a concepção do projeto 3d, pega as medidas e começa a recriar o ambiente do cliente. Este serviço é chamado de subir paredes. Este projeto é realizado em um software chamado Promob, onde contêm todas funcionalidades necessárias para realizar a criação do projeto 3D. Porém, nessa fase o projetista apenas recria o ambiente onde os móveis serão instalados.
+	Com o término do serviço subir paredes, o projetista começa a realizar a criação dos móveis no projeto 3D, que é onde o serviço Projeto começa. Nesta mesma fase, o projetista deve informar o promob inicial, que é o valor real do projeto. O valor do promob inicial é basicamente o valor deflacionado sem os descontos.  
+	Ao término do serviço Projeto, o projeto 3D está disponível para validação do cliente, com isso o serviço de Atendimento é iniciado. O atendimento deve ter uma data/hora inicial, pois o finalizador realizará a revisão junto ao cliente para que o mesmo possa aprovar e realizar de fato a compra dos materiais para a concepção do móvel planejado. Nesta fase, é possível que o cliente solicite mais móveis planejados, no caso, uma nova venda. Esta nova venda é chamada de complemento, pois gerada a partir de um pedido já existente. Este complemento é tratado como um pedido normal, porém, este complemento deverá ser atrelado ao pedido que o originou pois as comissões devem ser recalculadas com base no valor de ambos os pedidos, caso isso ocorra. 
+	Tendo em mãos a aprovação do cliente, o finalizador irá realizar a revisão do projeto 3D e verificará se há necessidades de inclusão ou remoção de algum item que não estava contemplado no projeto. Com isso, aqui será gerado um novo promob, o final. Este promob é gerado após a revisao do projeto 3D e geralmente deve ter um valor menor ou igual ao inicial. Caso ele tenha um valor maior que o promob inicial, este valor deve ser justificado nesta fase pois tem a possibilidade de gerar um custo adicional à loja. 
+	Com a Liberação finalizada, a ordem de compra dos materiais é emitida à fábrica para que os items dos móveis sejam produzidos, enquanto isso o finalizador deve produzir o manual de montagem, que basicamente é como os móveis devem ser montados de forma detalhada. Este processo leva em torno de 25 dias para ser produzido. 
+	Todos os serviços são comissionados, ou seja, o funcionário que realizou receberá uma comissão de acordo com o valor do serviço, que pode ser baseado em porcentagem ou valor fixo. 
+	
+
+
+
+RF01 -> Cadastrar Funcionários
+RF02 -> Cadastrar Lojas
+RF03 -> Registrar pedidos
+RF04 -> Iniciar serviço
+RF06 -> Finalizar serviço
+RF07 -> Calcular comissão
+RF09 -> Registrar complemento
+RF10 ->
+
+
+
+
+
+Sequência:
+
+RN01 -> Um pedido pertence apenas uma loja, uma loja pode ter vários pedidos
+RN02 -> Um pedido pertence apenas um cliente, um cliente pode ter vários pedidos
+RN03 -> Os serviços "Medição" e "Atendimento" são opcionais em um pedido, os outros serviços não
+RN04 -> Os serviços "Medição" e "Atendimento" devem ter uma data de agendamento antes de serem iniciados.
+RN05 -> Antes de serem finalizados, deve-se informar os promobs iniciais e finais nos serviços "Projeto" e "Liberação" respectivamente 
+RN06 -> Os serviços são executados de formas sequencialmente, não podendo ser iniciado antes de um ser finalizado.
+RN07 -> Os serviços são executados por funcionários que são cadastrados previamente no sistema
+RN08 -> Os funcionários dentro do sistema têm funções de acordo com o que podem realizar e acessar dentro do sistema
+RN09 -> Um pedido pode ter um pedido filho, que é chamado de complemento.
+RN10 -> Caso o pedido tenha um complemento, toda as comissões deve ser recalculadas pois o valor base de cálculo é utilizado com a soma do valor deflacionado de ambos
+RN11 -> O Serviço de medição tem o valor de 120 reais de comissão
+RN12 -> O serviço de Subir Paredes é de 0,001% em relação ao valor deflacionado
+RN13 -> O Serviço de Projeto é de 0,010% em relação ao valor deflacionado
+RN14 -> O Serviço de Atendimento é de 0,030% em relação ao valor deflacionado
+RN15 -> O Serviço de Liberação é de 0,030% em relação ao valor deflacionado
+RN16 -> O Serviço de Manual de montagem é de 0,030% em relação ao valor deflacionado
+RN17 -> O Funcionário pode executar mais de um serviço por vez
+RN19 -> Caso o medidor realize a medição fora do município, deve-se pagar quilometragem e pedágio além do valor do serviço
+
+
+PEDIDO
+	1. Pedido entra com as seguintes informações
+		- *Loja que realizou a solicitação -> Objeto: Loja deve já estar pré-cadastrada, contêm o nome, endereço e CNPJ?
+		- *Valor Deflacionado -> Decimal: Valor enviado do projeto, é gerado em cima do valor do promob inicial mas com descontos aplicados. Utilizado para realizar o cálculo de comissões em cima deste valor
+		- *Data de Entrada -> Data: pode ser maior ou menor que a data corrente 
+		- *Cliente:
+			- *nome  -> Caracteres: máximo de 30 caracteres
+			- *sobrenome -> Caracteres: máximo de 80 caracteres
+			- *endereco:
+				- *Rua -> Caracteres: Nome da rua, avenida, etc
+				- *Cep -> Apenas números
+				- Complemento -> Complemento deve ser flexível 
+				- *Número ->
+				- Referência
+				- *Bairro
+			- *email-> caracter: 
+			- *telefone -> númerico:
+		- *Serviços que serão prestados -> 
+		- *Ambientes em que o serviço serão realizados
+	
+SERVICOS
+	1. Realiza a primeira fase: Medição (Opcional, o cliente pode escolher ou não)
+		1.1. Realiza a data de agendamento		
+		1.2. Inicia a execução
+		1.3. Finaliza a execução
+		1.4. Validação o encerramento da fase
+		1.5. Encerra a fase e realiza o calculo de quanto será pago de comissão, indo pra próxima fase.
+	2. Realiza a segunda fase: Subir Paredes 
+		2.1. Inicia a execução
+		2.2. Finaliza a execução
+		2.3. Validação o encerramento da fase
+		2.4. Encerra a fase e realiza o calculo de quanto será pago de comissão, indo pra próxima fase.
+	3. Realiza a terceira fase: Projeto  
+		3.1. Inicia a execução
+		3.2. Informa o promob inicial
+		3.3. Finaliza a execução
+		3.4. Validação o encerramento da fase
+		3.5. Encerra a fase e realiza o pagamento da comissão, indo pra próxima fase.
+	4. Realiza a quarta fase: Atendimento
+		4.1. Realiza a data de agendamento		
+		4.2. Inicia a execução
+		4.3. Caso haja mais um pedido, adiciona um novo pedido atrelado à este pedido
+		4.4. Finaliza a execução
+		4.5. Validação o encerramento da fase
+	5. Realiza a quinta fase: Liberação
+		5.1. Inicia a execução
+		5.2. Marca o promob final 
+		5.3. Finaliza a execução
+		5.4. Validação o encerramento da fase
+		5.5. Encerra a fase e realiza o pagamento da comissão, indo pra próxima fase.
+		5.6. Encerra a fase e realiza o calculo de quanto será pago de comissão, indo pra próxima fase.
+	6. Realiza a sexta fase: Manual de Montagem
+		6.1. Inicia a execução
+		6.2. Finaliza a execução
+		6.3. Validação o encerramento da fase
+		6.4. Encerra a fase e realiza o pagamento da comissão, indo pra próxima fase.
+		6.5. Marca o pedido como finalizado
+		
+
+	
