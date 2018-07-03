@@ -19,6 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 
+
 # Creates a new endpoint /auth
 # Sends in the body username and password to pass to authenticate function
 # The /auth endpoint returns a token if there is a match
