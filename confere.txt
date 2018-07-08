@@ -25,15 +25,18 @@ DESCRIÇÃO:
 	
 
 
+RF03 -> Registrar pedidos
+	- 
+
 
 RF01 -> Cadastrar Funcionários
 RF02 -> Cadastrar Lojas
-RF03 -> Registrar pedidos
+
 RF04 -> Iniciar serviço
 RF06 -> Finalizar serviço
 RF07 -> Calcular comissão
 RF09 -> Registrar complemento
-RF10 ->
+RF10 -> 
 
 
 
