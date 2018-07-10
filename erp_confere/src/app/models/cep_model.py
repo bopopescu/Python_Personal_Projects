@@ -18,7 +18,10 @@ class CepModel():
 
 		cep = db.query_with_one_result(const.QUERY_CEP_BY_ID, _id)
 
-		return cls(cep[0], cep[1], cep[2], cep[3], cep[4], cep[5])
+		if cep:
+			return cls(cep[0], cep[1], cep[2], cep[3], cep[4], cep[5])
+		
+		return None
 
 	def insert(self):
 

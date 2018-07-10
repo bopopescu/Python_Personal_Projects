@@ -35,3 +35,5 @@ class LojaModel():
 	def update(self):
 
 		db.execute_dml(const.UPDATE_LOJA, self.nome, self.valor_comissao, self.codigo)
+
+		

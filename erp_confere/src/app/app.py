@@ -1,8 +1,12 @@
-from models.loja_model import LojaModel
-from models.servico_model import ServicoModel
+import  services.cliente_service as cliente_service
 
-servico = ServicoModel.get_by_id(1)
 
-servico.valor = 2
+cliente = {
+		"nome": "Vinicius",
+		"sobrenome": "Akiyama Hashizumi Yosiura",
+		"email": "viniahy@gmail.com",
+		"telefone_celular": 979863277
+}
 
-servico.update()
+
+cliente_service.verify_cliente(cliente)

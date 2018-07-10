@@ -14,14 +14,23 @@ class ClienteModel():
 
 	@classmethod
 	def query_by_id(cls, _id):
+		cliente = db.execute_query_with_one_result(const.CLIENTE_LOJA_BY_ID, _id)
 
-		cliente = db.execute_query_with_one_result(CLIENTE_LOJA_BY_ID, _id)
+		if cliente: 
+			return cls(cliente[0], cliente[1], cliente[2], cliente[3],
+				cliente[4], cliente[5])
+		return None
 
-		return cls(cliente[0], cliente[1], cliente[2], cliente[3], 
-			cliente[4], cliente[5])
-
-	def insert():
-
-		db.execute_dml(const.INSERT_CEP, self.nome, self.sobrenome, self.email, 
+	def insert(self):
+		db.execute_dml(const.INSERT_CLIENTE, self.nome, self.sobrenome, self.email, 
 			self.residencial, self.celular)
 
+	@classmethod
+	def query_by_name(cls, nome, sobrenome):
+		cliente = db.query_with_one_result(const.CLIENTE_BY_NOME, nome, sobrenome)
+
+		if cliente: 
+			return cls(cliente[0],cliente[1], cliente[2], cliente[3],
+				cliente[4], cliente[5])
+
+		return None

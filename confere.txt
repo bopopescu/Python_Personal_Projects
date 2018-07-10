@@ -26,7 +26,43 @@ DESCRIÇÃO:
 
 
 RF03 -> Registrar pedidos
-	- 
+	1. Recebe os dados 
+		- numero do pedido
+		- valor deflacionado do pedido 
+		- data entrada
+		- data inicio
+		- data fim 
+		- ambiente (1 ou mais):
+			Quantidade e o ambiente: 
+		- endereco:
+			cep
+			rua
+			numero
+			bairro
+			cidade
+			complemento *
+			referência *
+		- loja: 
+			codigo
+		- cliente:
+			nome
+			sobrenome
+			email
+			telefone cel 
+			telefone res *
+		- servicos selecionados 
+	2. Verifica se o cliente já existe (RF - Consultar cliente)			- CONCLUIDO
+		- Se não existir, cadastrar (RF - Cadastrar cliente)
+	3. Verifica se o cep já existe(RF - Consultar CEP)					- CONCLUÍDO
+		- Se não existir, cadastrar(RF - Cadastrar CEP)
+	4. Cadastrar o pedido
+	5. Cadastrar a primeira fase
+
+	
+
+
+
+
 
 
 RF01 -> Cadastrar Funcionários

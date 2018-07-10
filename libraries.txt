@@ -42,3 +42,6 @@ pip install mysql-connector 				      	# MySQL Connector Python
 pip install mysql-connector-python 			  		# MySQL X-Dev API Python -> https://dev.mysql.com/doc/dev/connector-python/8.0/#
 
 pip install mysqlclient								# Fastest implementation of a mysql api, needs to install libmysqlclient-dev for use install it
+
+pip install requests								# Library to make http requests
+													# http://docs.python-requests.org/en/latest/user/quickstart/#json-response-content

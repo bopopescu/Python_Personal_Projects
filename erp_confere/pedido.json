@@ -1,0 +1,37 @@
+{
+	"numero": "HJN4",
+	"valor": 100000.99,
+	"data_entrada": "2018-07-10",
+	"data_inicio": "2018-07-19",
+	"data_fim": "2018-07-30",
+	"ambiente": [
+		{
+			"nome": "quarto",
+			"quantidade": 10
+		},
+		{
+			"nome": "banheiro",
+			"quantidade": 2
+		},
+		{
+			"nome": "sala",
+			"quantidade": 3
+		}
+	],
+	"endereco": {
+		"cep": "01526000",
+		"rua": "Rua Bueno de Andrade",
+		"numero": 769,
+		"bairro": "Aclimação",
+		"cidade": "São Paulo",
+		"complemento": "apto 44 / Bloco 2"
+	},
+	"loja": 1,
+	"cliente": {
+		"nome": "Vinicius",
+		"sobrenome": "Akiyama Hashizumi Yosiura",
+		"email": "viniahy@gmail.com",
+		"telefone_celular": 979863277
+	},
+	"servicos": [1,2,3,4,5,6]
+}
