@@ -1,5 +1,6 @@
-import  services.cliente_service as cliente_service
-
+import services.cliente_service as cliente_service
+import services.cliente_endereco_service as cliente_endereco
+import services.pedido_service as pedido_service
 
 pedido = {
 	"numero": "HJN4",
@@ -29,15 +30,23 @@ pedido = {
 		"cidade": "São Paulo",
 		"complemento": "apto 44 / Bloco 2"
 	},
-	"loja": 1,
+	"loja": {
+		"codigo": 1
+	},
 	"cliente": {
 		"nome": "Vinicius",
 		"sobrenome": "Akiyama Hashizumi Yosiura",
 		"email": "viniahy@gmail.com",
 		"telefone_celular": 979863277
 	},
-	"servicos": [1,2,3,4,5,6]
+	"servicos": [
+		{"codigo": 1},
+		{"codigo": 2},
+		{"codigo": 3},
+		{"codigo": 4},
+		{"codigo": 5}
+	]
 }
 
 
-cliente_service.verify_cliente(cliente)
+pedido_service.insert_pedido(pedido)

@@ -1,7 +1,6 @@
 import app_util.db as db
 import app_util.constants as const
 
-
 class LojaModel():
 
 
@@ -22,7 +21,7 @@ class LojaModel():
 		cur.execute(QUERY_ALL)
 
 	@classmethod
-	def get_by_id(cls, _id):		
+	def query_by_id(cls, _id):		
 
 		loja = db.query_with_one_result(const.QUERY_LOJA_BY_ID, _id)
 
@@ -35,5 +34,3 @@ class LojaModel():
 	def update(self):
 
 		db.execute_dml(const.UPDATE_LOJA, self.nome, self.valor_comissao, self.codigo)
-
-		

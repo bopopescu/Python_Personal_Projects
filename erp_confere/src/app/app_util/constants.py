@@ -11,7 +11,8 @@ FUNCAO_LOJA_BY_ID = "SELECT * FROM funcao WHERE cd_funcao = %s"
 INSERT_FUNCAO = "INSERT INTO funcao (nome) VALUES(%s)"
 
 
-CLIENTE_LOJA_BY_ID = "SELECT * FROM cliente WHERE cd_cliente = %s"
+CLIENTE_BY_ID = "SELECT cd_cliente, nm_cliente, sobre_nm_cliente, ds_email, nr_telefone_res, nr_telefone_cel " +\
+	"FROM cliente WHERE cd_cliente = %s"
 CLIENTE_BY_NOME = "SELECT cd_cliente, nm_cliente, sobre_nm_cliente, ds_email, nr_telefone_res, nr_telefone_cel" + \
 		 " FROM cliente WHERE client_key = SHA2(CONCAT(TRIM(%s), TRIM(%s)), 256)"
 INSERT_CLIENTE = "INSERT INTO cliente (nm_cliente, sobre_nm_cliente, ds_email, nr_telefone_res, nr_telefone_cel)" + \
@@ -33,4 +34,14 @@ INSERT_USUARIO = "INSERT INTO usuario (cd_usuario, ds_username, ds_password, dt_
 QUERY_FUNCIONARIO_BY_ID = "SELECT * FROM funcionario WHERE cd_funcionario = %s"
 INSERT_FUNCIONARIO = "INSERT INTO funcionario (cd_funcionario, nm_funcionario, sobre_nm_funcionario, dt_admissao, dt_demissao, nr_telefone_res, nr_telefone_cel, ds_cargo) " + \
 	"VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+
+
+INSERT_CLIENTE_ENDERECO = "INSERT INTO cliente_endereco (cep, cd_cliente, nr_endereco, ds_complemento, ds_referencia) VALUES " + \
+	"(%s,%s,%s,%s,%s)"
+SELECT_CLIENTE_ENDERECO = "SELECT * FROM cliente_endereco WHERE cep = %s AND cd_cliente = %s"
+
+
+
+INSERT_PEDIDO = "INSERT INTO pedido(cd_pedido, cep, cd_cliente, cd_loja, cd_pedido_pai, nr_pedido, vl_pedido, dt_entrada, dt_inicio, dt_fim, ambientes)" + \
+	" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 

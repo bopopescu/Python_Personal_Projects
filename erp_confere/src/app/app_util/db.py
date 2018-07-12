@@ -27,7 +27,11 @@ def execute_dml(sql_dml, *args):
 	cur = conn.cursor()
 
 	cur.execute(sql_dml, args)
-	conn.commit()
-
+	conn.commit()	
+	
 	cur.close()
 	conn.close()
+
+	inserted_id = cur.lastrowid
+
+	return inserted_id
