@@ -1,5 +1,6 @@
 import app_util.db as db
 import app_util.constants as const
+import MySQLdb as mysql
 
 class ServicoModel():
 
@@ -19,8 +20,33 @@ class ServicoModel():
 		return cls(servico[0], servico[1], servico[2], servico[3],
 				servico[4])
 
+	@classmethod
+	def get_in_id(cls, servicos_id):
+
+		conn = db.get_connection()
+
+		cx = conn.cursor()
+
+		servicos_in = ','.join(['%s'] * len(servicos_id)) 
+
+		try:
+			cx.execute(const.QUERY_SERVICO_IN_ID % servicos_in, servicos_id)
+			# print(cx._last_executed) # Prints the last SQL executed
+			servicos = cx.fetchall()
+			servicos_object = [cls(servico[0], servico[1], servico[2], 
+				servico[3], servico[4])for servico in servicos]
+		except mysql.Error as e:
+			raise
+		else:
+			if len(servicos_object) == 0:
+				return None
+
+			return servicos_object
+		finally:
+			conn.close()
+			cx.close()
+
 	def update(self):
 
 		db.execute_dml(const.UPDATE_SERVICO, self.nome, self.valor, 
 			self.sequencia, self.tipo_valor_servico, self.codigo)
-

@@ -4,16 +4,17 @@ from models.cliente_endereco_model import ClienteEnderecoModel
 from models.cep_model import CepModel
 from models.cliente_model import ClienteModel
 
-def cliente_endereco_service(dic):
+def cliente_endereco_handler(dic):
 
 	if 'endereco' in dic and 'cliente' in dic:
 		
 		numero_endereco = dic['endereco']['numero']
 		complemento = dic['endereco']['complemento']
 		referencia = dic['endereco']['referencia'] if 'referencia' in dic['endereco'] else None
+		numero_cep = dic['endereco']['cep']
 		
-		cep = cep_service.verify_cep(dic['endereco']['cep'])
-		cliente = cliente_service.insert_cliente(dic['cliente'])
+		cep = cep_service.cep_handler(numero_cep)
+		cliente = cliente_service.cliente_handler(dic['cliente'])
 
 		cliente_endereco = ClienteEnderecoModel.query_by_id(cep.cep, cliente.codigo)
 
@@ -32,4 +33,3 @@ def cliente_endereco_service(dic):
 		return cliente_endereco
 	else:
 		return None
-

@@ -35,3 +35,4 @@ def execute_dml(sql_dml, *args):
 	inserted_id = cur.lastrowid
 
 	return inserted_id
+

@@ -1,6 +1,9 @@
 import services.cliente_service as cliente_service
 import services.cliente_endereco_service as cliente_endereco
 import services.pedido_service as pedido_service
+import services.servico_service as servico_service
+from models.servico_model import ServicoModel
+
 
 pedido = {
 	"numero": "HJN4",
@@ -48,5 +51,10 @@ pedido = {
 	]
 }
 
+servicos = [servico['codigo'] for servico in pedido['servicos']]
 
-pedido_service.insert_pedido(pedido)
+
+servicos_escolhidos = servico_service.get_servicos(servicos)
+
+for servico in servicos_escolhidos:
+	print(servico.nome)

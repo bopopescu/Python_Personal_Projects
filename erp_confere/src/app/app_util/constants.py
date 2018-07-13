@@ -5,6 +5,8 @@ UPDATE_LOJA = "UPDATE loja SET nm_loja = %s, vl_comissao = %s WHERE cd_loja = %s
 
 QUERY_SERVICO_BY_ID = "SELECT * FROM servico WHERE cd_servico = %s"
 UPDATE_SERVICO = "UPDATE servico SET nm_servico = %s, vl_servico = %s, nr_sequencia = %s, tp_vl_servico = %s WHERE cd_servico = %s"
+QUERY_SERVICO_IN_ID = "SELECT * FROM servico WHERE cd_servico IN (%s)"
+
 
 
 FUNCAO_LOJA_BY_ID = "SELECT * FROM funcao WHERE cd_funcao = %s"

@@ -1,7 +1,7 @@
 from models.cep_model import CepModel
 import app_util.cep_request as viacep
 
-def verify_cep(cep_from_client):
+def cep_handler(cep_from_client):
 
 	num_cep = cep_from_client.replace('-', '')
 
