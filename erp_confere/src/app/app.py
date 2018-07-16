@@ -2,7 +2,9 @@ import services.cliente_service as cliente_service
 import services.cliente_endereco_service as cliente_endereco
 import services.pedido_service as pedido_service
 import services.servico_service as servico_service
+import services.pedido_servico_service as pedido_servico_service
 from models.servico_model import ServicoModel
+import services.pedido_service as pedido_service
 
 
 pedido = {
@@ -51,10 +53,27 @@ pedido = {
 	]
 }
 
-servicos = [servico['codigo'] for servico in pedido['servicos']]
+pedido_servico = {
+	"codigo": 1,
+	"funcionario": {
+		"codigo": 1
+	},
+	"valor_comissao": 1000,
+	"data_inicio": "2018-07-20",
+	"data_fim": "2018-07-30",
+	"props": {"status": "novo", "data_agendamento": "2018-08-01"}
+}
+
+# servicos = [servico['codigo'] for servico in pedido['servicos']]
 
 
-servicos_escolhidos = servico_service.get_servicos(servicos)
+# servicos_escolhidos = servico_service.get_servicos(servicos)
 
-for servico in servicos_escolhidos:
-	print(servico.nome)
+# for servico in servicos_escolhidos:
+# 	print(servico.nome)
+
+
+# pedido_servico_service.update_pedido_servico(pedido_servico)
+pedido_service.create_pedido_handler(pedido)
+
+# cliente_service.query_cliente('Vinicius', 'Akiyama Hashizumi Yosiura')

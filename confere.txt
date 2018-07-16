@@ -65,16 +65,26 @@ RF03 -> Registrar pedidos
 
 
 
-RF01 -> Cadastrar Funcionários
-RF02 -> Cadastrar Lojas
+RF01 -> Cadastrar Funcionários 
+RF02 -> Cadastrar Lojas 
+
 RF04 -> Iniciar serviço
 RF06 -> Finalizar serviço
 RF07 -> Calcular comissão
 RF09 -> Registrar complemento
-RF10 -> Cadastrar cliente
-RF11 -> Consultar cliente
-RF12 -> Registar pedido
-	- Valida as informações de endereco, cliente, loja, numero, 
+
+RF10 -> Cadastrar cliente -> CONCLUIDO
+RF11 -> Consultar cliente -> CONCLUIDO
+RF12 -> Registar pedido -> CONCLUIDO
+RF13 -> Registra pedido_servico -> CONCLUIDO
+	- Valida as informações de endereco, cliente, loja, numero
+RF14 -> Iniciar fase
+
+
+
+Iniciar fase
+	- Fase é iniciada quando o funcionário é atribuido à fase
+
 
 
 

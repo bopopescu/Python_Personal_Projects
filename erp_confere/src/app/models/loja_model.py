@@ -14,9 +14,9 @@ class LojaModel():
 
 		QUERY_ALL = "SELECT * FROM lojas" 
 
-		cnx = db.get_connection()
+		cnx, cur = db.get_connection()
 
-		cur = cnx.cursor()
+		 
 
 		cur.execute(QUERY_ALL)
 

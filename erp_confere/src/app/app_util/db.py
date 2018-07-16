@@ -1,18 +1,19 @@
 import MySQLdb
 
 
-def get_connection():
+def get_db_resources():
 
-	cnx = MySQLdb.connect(host='192.168.33.50', port=3306,user='python'
+	conn = MySQLdb.connect(host='192.168.33.50', port=3306,user='python'
 		,password='Senh@1ndefinid4', db='erp',autocommit=False)
 
-	return cnx
+	cr = conn.cursor()
+
+	return conn, cr
 
 def query_with_one_result(sql_query, *args):
 
-	conn = get_connection()
-	cur = conn.cursor()
-
+	conn, cur = get_db_resources()
+	
 	cur.execute(sql_query, args)
 	returno = cur.fetchone()
 
@@ -23,9 +24,8 @@ def query_with_one_result(sql_query, *args):
 
 def execute_dml(sql_dml, *args):
 
-	conn  = get_connection()
-	cur = conn.cursor()
-
+	conn, cur = get_db_resources()
+	
 	cur.execute(sql_dml, args)
 	conn.commit()	
 	

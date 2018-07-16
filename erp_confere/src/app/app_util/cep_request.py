@@ -32,9 +32,8 @@ def cep_to_model(dict):
 	return CepModel(cep, logradouro, complemento, bairro, cidade, uf)
 
 def insert_cep(object_cep):
-	conn = db.get_connection()
+	conn, cx  = db.get_db_resources()
 
-	cx = conn.cursor()
 	try:	
 		cx.execute(const.INSERT_CEP, (object_cep.cep, object_cep.logradouro, object_cep.complemento,
 			object_cep.bairro, object_cep.cidade, object_cep.uf))

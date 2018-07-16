@@ -23,11 +23,8 @@ class ServicoModel():
 	@classmethod
 	def get_in_id(cls, servicos_id):
 
-		conn = db.get_connection()
-
-		cx = conn.cursor()
-
-		servicos_in = ','.join(['%s'] * len(servicos_id)) 
+		servicos_in = ','.join(['%s'] * len(servicos_id))
+		conn, cx = db.get_db_resources()
 
 		try:
 			cx.execute(const.QUERY_SERVICO_IN_ID % servicos_in, servicos_id)

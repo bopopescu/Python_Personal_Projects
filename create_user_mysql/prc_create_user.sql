@@ -4,10 +4,6 @@ USE mysql $$
 
 DROP PROCEDURE IF EXISTS prc_create_user $$
 
-/*
-	Proc para criação de usuários no banco
-
-*/
 CREATE DEFINER='vyosiura' PROCEDURE prc_create_user(p_user VARCHAR(40), p_host VARCHAR(30),
 								p_password VARCHAR(30), p_role ENUM('dev', 'qa', 'sup', 'app', 'dba'),
 								p_env ENUM('prd', 'dev', 'qa'))

@@ -10,7 +10,7 @@ def cliente_handler(dic):
 		return cliente
 
 	# If it doesn't exist, transforms the dictionary into ClienteModel object
-	cliente = cliente_to_model(dic)
+	cliente = json_to_model(dic)
 	insert_cliente(cliente)
 
 	return cliente
@@ -23,7 +23,7 @@ def verify_cliente(dic):
 
 	return None
 
-def cliente_to_model(dic):
+def json_to_model(dic):
 
 	nome = dic['nome']
 	sobrenome = dic['sobrenome']
@@ -34,12 +34,12 @@ def cliente_to_model(dic):
 	return ClienteModel(None, nome, sobrenome, email, residencial, celular)
 
 def insert_cliente(cliente):
-	conn = db.get_connection()
-	cx = conn.cursor()
-
+	conn, cx = db.get_db_resources()
+	
 	try:
 		cx.execute(const.INSERT_CLIENTE, (cliente.nome, cliente.sobrenome, cliente.email, 
 			cliente.residencial, cliente.celular))
+		cliente.codigo = cx.lastrowid
 	except mysql.Error as e:
 		conn.rollback()
 	else:
@@ -47,3 +47,26 @@ def insert_cliente(cliente):
 	finally:
 		cx.close()
 		conn.close()
+
+
+def query_cliente(nome, sobrenome):
+
+	conn, cr = db.get_db_resources()
+
+	cr.execute('call prc_get_cliente_by_name(%s, %s)', (nome, sobrenome))
+	
+	result_set = cr.fetchone()
+
+	if result_set:
+		cliente = db_to_model(result_set)
+	else:
+		cliente = result_set
+
+	cr.close()
+	conn.close()
+
+	return cliente
+
+def db_to_model(db_row):
+
+	return ClienteModel(db_row[0], db_row[1], db_row[2], db_row[3], db_row[4], db_row[5])
