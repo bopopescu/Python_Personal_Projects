@@ -9,6 +9,6 @@ con = Connection(mutant,user='LMCORP\\usr_bd', password='RD3Wd61@', authenticati
 
 con.bind()
 
-con.search('ou=Suporte,dc=LMCORP,dc=LOCAL', '(&(ou=Financeiro))')
+con.search('ou=Suporte,dc=LMCORP,dc=LOCAL','(object=Personal)')
 
 print(con.entries)
