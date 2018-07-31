@@ -13,5 +13,3 @@ class PedidoServicoModel():
 		self.valor_comissao = valor_comissao
 		self.data_fim = data_fim
 		self.servico_props = servico_props
-
-	

@@ -1,0 +1,59 @@
+Request - Every action that browser takes sends a "request" to a server for a resource
+
+Response - The resource that the server "responds" to the client, usually is the browser
+
+
+>>> HTTP <<< 
+
+	Web server 
+		-> A piece of software designed to accept incoming web requests 
+
+	Example of a request:
+		GET / HTTP/1.1
+		Host: www.google.com
+
+	Breaking down the example		
+		
+		GET 		-> Verb 
+		/ 			-> Path
+		HTTP/1.1 	->  Protocol
+
+		In addition, the data also goes together with the request. 
+
+	*The server decides what it is going to respond*
+
+	### HTTP VERBS ###
+
+
+
+		Get 		-> Retrieve something.					
+			
+		Post		-> For the serverm receive data, and use it.
+
+		Delete		-> Remove something.
+
+		Put			-> Make sure something is there. 
+
+		Options		-> Update it asap.
+		
+		Head 		-> Update it asap.
+
+		and many more...
+
+>>> REST Principles <<< 
+
+	REST 	
+		-> It's a way of thinking about how a web server responds to your requests.
+		-> It's not just data.
+		-> It's a resource! (Similar to object oriented programming).
+
+		-> Rest is stateless, which means, one request cannot depend on any other requests.
+		-> So the server only knows about the current request, and not about any previous
+		-> request.
+
+	
+
+Test-first API design
+
+	Design the resources first
+	

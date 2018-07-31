@@ -9,11 +9,21 @@ import json
 import app_util.db as db
 import app_util.constants as const
 
+# def create_pedido_handler(jason):
 
-def create_pedido_handler(jason):
+# 	pedido = jason_to_model(jason)
+# 	servicos = jason['servicos'] if 'servicos' in jason else None
+# 	servicos_to_create = servico_service.get_servicos(servicos)
+# 	pedido_servicos = [pedido_servico_service.json_to_model(pedido, servico) for servico in servicos_to_create]
 
-	pedido = jason_to_model(jason)
-	servicos = jason['servicos'] if 'servicos' in jason else None
+# 	insert_pedido(pedido, pedido_servicos)
+
+# 	return pedido
+
+def create_pedido_handler(dic):
+		
+	pedido = jason_to_model(dic)
+	servicos = dic['servicos'] if 'servicos' in dic else None
 	servicos_to_create = servico_service.get_servicos(servicos)
 	pedido_servicos = [pedido_servico_service.json_to_model(pedido, servico) for servico in servicos_to_create]
 
@@ -24,45 +34,41 @@ def create_pedido_handler(jason):
 def insert_pedido(pedido, pedido_servicos):
 
 	conn, cursor = db.get_db_resources()
+	
+	try:
+		pedido_props = (pedido.codigo, pedido.cep.cep, pedido.cliente.codigo, pedido.loja.codigo, 
+				pedido.pedido_pai, pedido.numero_pedido, pedido.valor_pedido, pedido.data_entrada, 
+				pedido.data_inicio, pedido.data_fim, pedido.ambiente)	
+		cursor.execute(const.INSERT_PEDIDO, pedido_props)
+		pedido.codigo = cursor.lastrowid
 
-	cursor.execute(const.INSERT_PEDIDO, (pedido.codigo, pedido.cep.cep, pedido.cliente.codigo, pedido.loja.codigo, 
-			pedido.pedido_pai, pedido.numero_pedido, pedido.valor_pedido, pedido.data_entrada, 
-			pedido.data_inicio, pedido.data_fim, pedido.ambiente))
-	pedido.codigo = cursor.lastrowid
+		for pedido_servico in pedido_servicos:
 
-	for pedido_servico in pedido_servicos:
-		properties = (pedido.codigo, pedido_servico.servico.codigo, pedido_servico.funcionario, 
-			pedido_servico.valor_comissao, pedido_servico.data_inicio, pedido_servico.data_fim,
-			pedido_servico.servico_props)
-		cursor.execute("call prc_insert_pedido_servico(%s, %s, %s, %s, %s, %s, %s)", properties)
+			pedido_servico_props = (pedido.codigo, pedido_servico.servico.codigo, pedido_servico.funcionario, 
+				pedido_servico.valor_comissao, pedido_servico.data_inicio, pedido_servico.data_fim,
+				pedido_servico.servico_props)
+			cursor.execute("call prc_insert_pedido_servico(%s, %s, %s, %s, %s, %s, %s)", pedido_servico_props)
+	except:
+		raise Exception;
+	else:
+		conn.commit()
+	finally:
+		cursor.close()
+		conn.close()
 
-	conn.commit()
+def jason_to_model(dic):
 
-	cursor.close()
-	conn.close()
-
-def jason_to_model(jason):
-
-	numero_pedido = jason['numero']
-	ambiente = json.dumps(jason['ambiente']) if 'ambiente' in jason else None 
-	endereco = jason['endereco']
-	cliente = jason['cliente']
-	loja = jason['loja']
-	pedido_pai = jason['pedido_pai'] if 'pedido_pai' in jason else None
-	valor_pedido = jason['valor']
-	data_entrada = jason['data_entrada']
-	data_inicio = jason['data_inicio'] if 'data_inicio' in jason else None
-	data_fim = jason['data_fim'] if 'data_fim' in jason else None
+	numero_pedido = dic['numero_pedido']
+	ambiente = json.dumps(dic['ambientes']) if 'ambiente' in dic else None
+	loja = dic['loja']
+	pedido_pai = dic['pedido_pai'] if 'pedido_pai' in dic else None
+	valor_pedido = dic['valor_pedido']
+	data_entrada = dic['data_entrada']
+	data_inicio = dic['data_inicio'] if 'data_inicio' in dic else None
+	data_fim = dic['data_fim'] if 'data_fim' in dic else None
 
 	loja = loja_service.query_loja(loja)
-	cliente_endereco = cliente_endereco_service.cliente_endereco_handler(jason)
-	
+	cliente_endereco = cliente_endereco_service.cliente_endereco_handler(dic)
+
 	return PedidoModel(None, cliente_endereco.cep, cliente_endereco.cliente, loja, pedido_pai, 
 		numero_pedido, valor_pedido, data_entrada, data_inicio, data_fim, ambiente)
-
-
-
-
-
-
-

@@ -1,0 +1,21 @@
+
+
+# Steps to create mysql in a development environment 8.0.11:
+
+
+1. sudo yum install wget vim
+2. wget https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm
+3. sudo yum update
+4. sudo yum install mysql-community-server.x86_64 
+5. sudo vim /etc/my.cnf
+	5.1 add the sys variable lower_case_table_names = 1 before starting the mysql service
+
+6. Login to mysql server using mysql client 
+	6.1 SET PASSWORD = 'Senh@1ndefinid4'
+	6.2 CREATE USER python IDENTIFIED WITH mysql_native_password BY 'Senh@1ndefinid4' PASSWORD EXPIRE NEVER;
+	6.3 CREATE ROLE sysadmin;
+	6.4 GRANT ALL ON *.* TO sysadmin WITH GRANT OPTION;
+	6.5 GRANT sysadmin TO python;
+	6.6 FLUSH PRIVILEGES;
+
+7. Run forward engineering in MySQL Workbench and you are good to go!

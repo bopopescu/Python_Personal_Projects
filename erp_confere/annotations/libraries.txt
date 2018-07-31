@@ -1,0 +1,47 @@
+
+
+pip - Allow us to easily install external libraries to use in Python
+
+
+>>> Check the version of pip <<<
+
+pip --version 						# Be aware of the corresponding python version in use or installed
+
+>>> Check the version of the module <<<
+
+
+pip freeze | grep module_name
+
+
+-----------------------------------------
+
+
+
+pip install ldap3                        			# This is the one I'm currently using 
+													# Install library to access ldap through python:
+													# http://ldap3.readthedocs.io/installation.html
+													
+pip install python-ldap                 			# Install first msg through python. More information:
+													# https://www.python-ldap.org/en/latest/installing.html#installing-from-pypi
+                                          			# Usually, some os libraries are needed for use it.
+
+pip install Flask-SQLAlchemy						# Library for ORM in Python to work with Flask. SQLAlchemy is a standalone 
+													# library. This is one is adapted to work with flask
+
+pip install Flask-JWT								# Install security module with JWT for FLask
+
+pip install Flask-RESTful					        # Install Flask-RESTful, it also includes Flask
+
+pip install flask							        # Install Flask Web API
+
+pip install virtualenv						        # Install virtual environments
+
+pip install mysql-connector 				      	# MySQL Connector Python
+													# https://dev.mysql.com/doc/connector-python/en/connector-python-introduction.html
+
+pip install mysql-connector-python 			  		# MySQL X-Dev API Python -> https://dev.mysql.com/doc/dev/connector-python/8.0/#
+
+pip install mysqlclient								# Fastest implementation of a mysql api, needs to install libmysqlclient-dev for use install it
+
+pip install requests								# Library to make http requests
+													# http://docs.python-requests.org/en/latest/user/quickstart/#json-response-content

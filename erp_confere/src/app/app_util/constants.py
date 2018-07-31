@@ -48,7 +48,6 @@ INSERT_PEDIDO = "INSERT INTO pedido(cd_pedido, cep, cd_cliente, cd_loja, cd_pedi
 	" VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
 
-
 INSERT_PEDIDO_SERVICO = "INSERT INTO pedido_servico(cd_pedido, cd_servico, cd_funcionario, dt_inicio,  vl_comissao, dt_fim, servico_props) " + \
 	" VALUES (%s,%s,%s,%s,%s,%s,%s)" 
 UPDATE_PEDIDO_SERVICO = "UPDATE pedido_servico SET cd_pedido = %s, cd_servico = %s, cd_funcionario = %s, vl_comissao = %s, dt_inicio = %s, dt_fim = %s, servico_props = %s "+\
