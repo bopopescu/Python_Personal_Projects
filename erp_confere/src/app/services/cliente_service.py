@@ -28,7 +28,7 @@ def json_to_model(dic):
 	nome = dic['nome']
 	sobrenome = dic['sobrenome']
 	email = dic['email']
-	residencial = dic['tel_residencial'] if 'tel_residencial' in dic else None
+	residencial = dic['tel_residencial'] if 'tel_residencial' in dic and dic['tel_residencial'] != '' else None
 	celular = dic['tel_celular']
 
 	return ClienteModel(None, nome, sobrenome, email, residencial, celular)
@@ -37,13 +37,14 @@ def insert_cliente(cliente):
 	conn, cx = db.get_db_resources()
 	
 	try:
-		cx.execute('CALL prc_insert_cliente(%s, %s, %s, %s, %s)', (cliente.nome, cliente.sobrenome, cliente.email, 
-			cliente.residencial, cliente.celular))
+		cx.callproc('prc_insert_cliente', (cliente.codigo, cliente.nome, cliente.sobrenome, 
+			cliente.email, cliente.residencial, cliente.celular))
+		cx.execute('SELECT @_prc_insert_cliente_0')
 		cliente.codigo = cx.fetchone()[0]
+
+		print(cliente.codigo)
 	except mysql.Error as e:
-		conn.rollback()
-	else:
-		conn.commit()
+		raise
 	finally:
 		cx.close()
 		conn.close()

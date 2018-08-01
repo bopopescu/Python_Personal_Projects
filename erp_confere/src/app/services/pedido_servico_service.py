@@ -13,6 +13,12 @@ def json_to_model(pedido, servico):
 
 	return PedidoServicoModel(pedido, servico, None, None, 0, None, status)
 
+def generate_pedido_servico(pedido, servico):
+	
+	status = json_util.dict_to_str({'status': 'novo'})
+
+	return PedidoServicoModel(pedido, servico, None, None, 0, None, status)	
+
 
 def update_pedido_servico(pedido_servico):
 

@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
 	
-	$('.datepicker').datepicker()
+	$('.datepicker').datepicker({dateFormat: 'dd/mm/yy'})
 	
 	$('#cep').focusout(function(){
 		if ($(this).val() != '' && $(this).val().length == 8){

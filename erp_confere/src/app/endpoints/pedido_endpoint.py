@@ -3,6 +3,7 @@ from services import servico_service
 from services import ambiente_service
 from services import loja_service
 from services import pedido_service
+from app_util import date_util
 
 # Blueprint
 bp = Blueprint('pedido', __name__, url_prefix='/pedido')
@@ -19,8 +20,8 @@ def cadastrar():
 		# Pedido
 		pedido = {}
 		pedido['numero_pedido'] = request.form['numero-pedido']
-		pedido['valor_pedido'] = request.form['valor-pedido']
-		pedido['data_entrada'] = request.form['data-entrada']
+		pedido['valor_pedido'] = float(request.form['valor-pedido'].replace(',', '.'))
+		pedido['data_entrada'] = date_util.convert_form_date_to_date(request.form['data-entrada'])
 		pedido['loja'] = request.form['loja']
 		# Cliente
 		pedido['nome'] = request.form['nome-cliente']

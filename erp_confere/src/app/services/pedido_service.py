@@ -25,7 +25,7 @@ def create_pedido_handler(dic):
 	pedido = jason_to_model(dic)
 	servicos = dic['servicos'] if 'servicos' in dic else None
 	servicos_to_create = servico_service.get_servicos(servicos)
-	pedido_servicos = [pedido_servico_service.json_to_model(pedido, servico) for servico in servicos_to_create]
+	pedido_servicos = [pedido_servico_service.generate_pedido_servico(pedido, servico) for servico in servicos_to_create]
 
 	insert_pedido(pedido, pedido_servicos)
 
@@ -35,21 +35,24 @@ def insert_pedido(pedido, pedido_servicos):
 
 	conn, cursor = db.get_db_resources()
 	
+	print(pedido.ambiente)
+
 	try:
 		pedido_props = (pedido.codigo, pedido.cep.cep, pedido.cliente.codigo, pedido.loja.codigo, 
 				pedido.pedido_pai, pedido.numero_pedido, pedido.valor_pedido, pedido.data_entrada, 
 				pedido.data_inicio, pedido.data_fim, pedido.ambiente)	
-		cursor.execute(const.INSERT_PEDIDO, pedido_props)
-		pedido.codigo = cursor.lastrowid
+		cursor.callproc('prc_insert_pedido', pedido_props)
+		cursor.execute('SELECT @_prc_insert_pedido_0')
+		pedido.codigo = cursor.fetchone()[0]
 
 		for pedido_servico in pedido_servicos:
 
 			pedido_servico_props = (pedido.codigo, pedido_servico.servico.codigo, pedido_servico.funcionario, 
 				pedido_servico.valor_comissao, pedido_servico.data_inicio, pedido_servico.data_fim,
 				pedido_servico.servico_props)
-			cursor.execute("call prc_insert_pedido_servico(%s, %s, %s, %s, %s, %s, %s)", pedido_servico_props)
+			cursor.callproc("prc_insert_pedido_servico", pedido_servico_props)
 	except:
-		raise Exception;
+		raise
 	else:
 		conn.commit()
 	finally:
@@ -59,7 +62,7 @@ def insert_pedido(pedido, pedido_servicos):
 def jason_to_model(dic):
 
 	numero_pedido = dic['numero_pedido']
-	ambiente = json.dumps(dic['ambientes']) if 'ambiente' in dic else None
+	ambiente = json.dumps(dic['ambientes']) if 'ambientes' in dic else None
 	loja = dic['loja']
 	pedido_pai = dic['pedido_pai'] if 'pedido_pai' in dic else None
 	valor_pedido = dic['valor_pedido']
