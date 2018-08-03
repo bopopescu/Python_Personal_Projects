@@ -1,0 +1,15 @@
+{
+	"role": "dba",
+	"application": [
+		{
+			"name": "espanha",
+			"environment": {
+				"name": "production",
+				"privilege": [
+					{"type": "global", "definition": "all"},
+					{"type": "global", "definition": "role"}
+				]
+			}
+		}
+	]
+}

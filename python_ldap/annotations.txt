@@ -1,0 +1,52 @@
+
+
+Ambientes
+	
+	Dev
+
+	Hom
+
+	Prd
+
+
+Roles 
+	
+	DBA 
+		- ALL PRIVILEGES in all environments
+
+	Servico
+
+
+	Aplicacao
+
+	Dev
+
+	Supp
+
+	BI
+
+	ETL
+
+	Ciencia de dados
+
+	DashBoard
+
+	QA
+
+	MIS
+
+
+Aplicações
+
+	Espanha
+
+	URA 1.0
+
+	URA 2.0
+
+	VG
+
+
+
+
+
