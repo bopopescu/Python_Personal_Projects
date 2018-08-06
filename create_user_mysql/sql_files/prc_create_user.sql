@@ -5,78 +5,85 @@ USE mysql $$
 DROP PROCEDURE IF EXISTS prc_create_user $$
 
 CREATE DEFINER='vyosiura' PROCEDURE prc_create_user(p_user VARCHAR(40), p_host VARCHAR(30),
-								p_password VARCHAR(30), p_role ENUM('dev', 'qa', 'sup', 'app', 'dba'),
+								p_password VARCHAR(30), p_role ENUM('dev', 'qa', 'sup', 'app', 'dba', 'bi'),
 								p_env ENUM('prd', 'dev', 'qa'), p_execute TINYINT(1))
 COMMENT 'Faz a criação do usuário de acordo com a sua função. parametros: \n\t "p_user" - usuário a ser criado: VARCHAR(40)\n\t "p_host" - host do usuário: VARCHAR(30)\n\t "p_password" - senha do novo usuário: VARCHAR(30)\n\t "p_role" - função do usuário: ENUM("dev", "qa", "sup", "app", "dba")\n\t "p_env" - ambiente que será criado: ENUM("prd", "dev", "qa")'
 BEGIN
 
 	-- DECLARE C_SQL_CREATE_USER VARCHAR(1000) DEFAULT "CREATE USER '#user'@'#host' IDENTIFIED BY '#password' WITH MAX_USER_CONNECTIONS 1";
 	DECLARE C_SQL_CREATE_USER VARCHAR(1000) DEFAULT "CREATE USER '#user'@'#host' IDENTIFIED BY '#password'";
-	DECLARE C_SQL_DROP_USER VARCHAR(1000) DEFAULT "DROP USER '#user'@'#host'";
+	DECLARE C_SQL_DROP_USER VARCHAR(1000) DEFAULT "DROP USER IF EXISTS '#user'@'#host'";
 	DECLARE C_SQL_PERMISSION_DATABASE_LEVEL_DML VARCHAR(1000) DEFAULT "GRANT INSERT, UPDATE, DELETE, SELECT, EXECUTE, SHOW VIEW ON #schema.* TO '#user'@'#host'";
 	DECLARE C_SQL_PERMISSION_DATABASE_LEVEL_DQL VARCHAR(1000) DEFAULT "GRANT SELECT, SHOW VIEW ON #schema.* TO '#user'@'#host'";
+	DECLARE C_SQL_PERMISSION_DATABASE_LEVEL_DDL_DML VARCHAR(1000) DEFAULT "GRANT INSERT, UPDATE, DELETE, SELECT, CREATE, ALTER, DROP, CREATE VIEW, LOCK TABLES, CREATE TEMPORARY TABLES, CREATE ROUTINE, ALTER ROUTINE, EXECUTE, REFERENCES, INDEX ON #schema.* TO '#user'@'#host'";
 	DECLARE C_SQL_PERSMISSION_OBJECT_TABLE_LEVEL_DML VARCHAR(1000) DEFAULT "GRANT INSERT, UPDATE, DELETE, SELECT, SHOW VIEW ON #schema.#table TO '#user'@'#host'";
-	DECLARE C_SQL_PERMISSION_DATABASE_LEVEL_DDL_DML VARCHAR(1000) DEFAULT "GRANT INSERT, UPDATE, DELETE, SELECT, CREATE, ALTER, DROP, CREATE VIEW, LOCK TABLES, CREATE TEMPORARY TABLES, CREATE ROUTINE, ALTER ROUTINE, DROP ROUTINE, EXECUTE, REFERENCES, INDEX ON #schema.#table TO '#user'@'#host'";
-	-- DBA
-	DECLARE C_SQL_PERMISSION_GLOBAL_LEVEL_SUPER VARCHAR(1000) DEFAULT "GRANT ALL ON *.* TO '#user'@'#host' WITH GRANT OPTIONS";
+	DECLARE C_SQL_PERMISSION_OBJECT_LEVEL_DQL VARCHAR(1000) DEFAULT "GRANT SELECT, SHOW VIEW ON #schema.#table TO '#user'@'#host'";	
+	DECLARE C_SQL_PERMISSION_GLOBAL_LEVEL_SUPER VARCHAR(1000) DEFAULT "GRANT ALL ON *.* TO '#user'@'#host' WITH GRANT OPTION";
 
 	DECLARE v_user_exists INT;
+
+	DECLARE C_PROD_ENV_CONDITION_TO_CREATE TINYINT(1) DEFAULT p_env = 'prd' AND p_role != 'dba';
+	DECLARE C_DEV_ENV_CONDITION_TO_CREATE TINYINT(1) DEFAULT p_env = 'dev' AND p_role NOT IN ('dba', 'sup', 'bi');
+	DECLARE C_QA_ENV_CONDITION_TO_CREATE TINYINT(1) DEFAULT p_env = 'qa' AND p_role NOT IN ('dba', 'sup');
 
 	SET sql_log_bin = 0;
 	-- Drop o usuário para recriar novamente com as devidas permissões --
 
-	-- Drop all ocurrences of the current user----------------------------------------------------------------------
-	BEGIN 
-		DECLARE v_user_to_drop VARCHAR(30);
-		DECLARE v_host_to_drop VARCHAR(30);
-		DECLARE v_done_user_to_drop TINYINT(1) DEFAULT FALSE;
-		DECLARE cr_user CURSOR FOR
-		SELECT
-			user,
-			host
-		FROM
-			mysql.user 
-		WHERE
-			user = p_user;
-		DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done_user_to_drop = TRUE;
+	IF C_PROD_ENV_CONDITION_TO_CREATE OR C_DEV_ENV_CONDITION_TO_CREATE OR C_QA_ENV_CONDITION_TO_CREATE THEN
+		-- Drop all ocurrences of the current user----------------------------------------------------------------------
+		BEGIN 
+			DECLARE v_user_to_drop VARCHAR(30);
+			DECLARE v_host_to_drop VARCHAR(30);
+			DECLARE v_done_user_to_drop TINYINT(1) DEFAULT FALSE;
+			DECLARE cr_user CURSOR FOR
+			SELECT
+				user,
+				host
+			FROM
+				mysql.user 
+			WHERE
+				user = p_user;
+			DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done_user_to_drop = TRUE;
 
-		OPEN cr_user;
+			 
+			OPEN cr_user;
 
-		loop_drop_user: LOOP 
-			IF v_done_user_to_drop THEN
-				LEAVE loop_drop_user;
-			END IF;
-
-			FETCH cr_user INTO v_user_to_drop, v_host_to_drop;
-
-			IF v_user_to_drop = p_user THEN 
-				SET @sql_drop_user = REPLACE(C_SQL_DROP_USER, '#user', v_user_to_drop);
-				SET @sql_drop_user = REPLACE(@sql_drop_user, '#host', v_host_to_drop);
-
-				IF p_execute = 1 THEN
-					PREPARE stmt FROM @sql_drop_user;
-					EXECUTE stmt;
-					DEALLOCATE PREPARE stmt;
-				ELSE 
-					SELECT @sql_drop_user;
+			loop_drop_user: LOOP 
+				IF v_done_user_to_drop THEN
+					LEAVE loop_drop_user;
 				END IF;
-			END IF;
-		END LOOP; 
 
-		CLOSE cr_user;
-	END ;
+				FETCH cr_user INTO v_user_to_drop, v_host_to_drop;
 
-	SET @sql_create_user = REPLACE(REPLACE(REPLACE(C_SQL_CREATE_USER, '#user', p_user), '#host', p_host), '#password', p_password);
+				IF v_user_to_drop = p_user THEN 
+					SET @sql_drop_user = REPLACE(C_SQL_DROP_USER, '#user', v_user_to_drop);
+					SET @sql_drop_user = REPLACE(@sql_drop_user, '#host', v_host_to_drop);
 
-	IF p_execute THEN
-		PREPARE stmt_create_user FROM @sql_create_user;
-		EXECUTE stmt_create_user;
-		DEALLOCATE PREPARE stmt_create_user;
-	ELSE 
-		SELECT @sql_create_user;
+					IF p_execute = 1 THEN
+						PREPARE stmt FROM @sql_drop_user;
+						EXECUTE stmt;
+						DEALLOCATE PREPARE stmt;
+					ELSE 
+						SELECT @sql_drop_user;
+					END IF;
+				END IF;
+			END LOOP; 
+
+			CLOSE cr_user;
+		END;
+
+		SET @sql_create_user = REPLACE(REPLACE(REPLACE(C_SQL_CREATE_USER, '#user', p_user), '#host', p_host), '#password', p_password);
+
+		IF p_execute THEN
+			PREPARE stmt_create_user FROM @sql_create_user;
+			EXECUTE stmt_create_user;
+			DEALLOCATE PREPARE stmt_create_user;
+		ELSE 
+			SELECT @sql_create_user;
+		END IF;
 	END IF;
 
-	IF p_env = 'prd' THEN
+	IF C_PROD_ENV_CONDITION_TO_CREATE THEN
 		-- Parte em que aplica as permissões.
 		IF p_role IN('dev', 'qa', 'app') THEN
 			-- Aplica permissão por database: %log, %data, %atende
@@ -127,8 +134,83 @@ BEGIN
 				END LOOP;
 				CLOSE cr_schema_only;
 			END;
+		ELSEIF p_role = 'bi' THEN
 
-		ELSEIF p_role IN ('sup') THEN
+			-- Read 
+			BEGIN
+				DECLARE v_schema_name VARCHAR(30);
+				DECLARE v_done TINYINT(1) DEFAULT FALSE;
+				DECLARE cr_bi_read_permissions CURSOR FOR
+				SELECT 
+					schema_name
+				FROM
+					information_schema.schemata
+				WHERE
+					schema_name NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys', 'bi_estudos', 'bi_work', 'etl_controle', 'lm_base_de_dados', 'metadata_microstrategy', 'nodes_poa',
+						'monitoria', 'monitoria_alarmes', 'monitoria_net', 'temporario', 'tables_to_purge', 'cd_work', 'cd_estudos');
+				DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
+
+				OPEN cr_bi_read_permissions;
+
+				bi_prd_loop: LOOP
+					
+					FETCH cr_bi_read_permissions INTO v_schema_name;
+
+					IF v_done THEN
+						LEAVE bi_prd_loop;
+					END IF;
+
+					SET @sql_grant_schema_priv = REPLACE(REPLACE(REPLACE(C_SQL_PERMISSION_DATABASE_LEVEL_DQL, '#user', p_user), '#host', p_host), '#schema', v_schema_name);
+
+					IF p_execute THEN
+						PREPARE stmt_bi FROM @sql_grant_schema_priv;
+						EXECUTE stmt_bi;
+						DEALLOCATE PREPARE stmt_bi;
+					ELSE
+						SELECT @sql_grant_schema_priv;
+					END IF;
+				END LOOP;
+
+				CLOSE cr_bi_read_permissions; 
+			END;
+
+			BEGIN 
+				DECLARE v_schema_name VARCHAR(30);
+				DECLARE v_done TINYINT(1) DEFAULT FALSE;
+				DECLARE cr_bi_write_permissions CURSOR FOR
+				SELECT 
+					schema_name
+				FROM
+					information_schema.schemata
+				WHERE
+					schema_name IN ('bi_estudos', 'bi_work');
+				DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
+
+				OPEN cr_bi_write_permissions;
+
+				bi_prd_loop: LOOP
+					
+					FETCH cr_bi_write_permissions INTO v_schema_name;
+
+					IF v_done THEN
+						LEAVE bi_prd_loop;
+					END IF;
+
+					SET @sql_grant_schema_priv = REPLACE(REPLACE(REPLACE(C_SQL_PERMISSION_DATABASE_LEVEL_DDL_DML, '#user', p_user), '#host', p_host), '#schema', v_schema_name);
+
+					IF p_execute THEN
+						PREPARE stmt_bi FROM @sql_grant_schema_priv;
+						EXECUTE stmt_bi;
+						DEALLOCATE PREPARE stmt_bi;
+					ELSE
+						SELECT @sql_grant_schema_priv;
+					END IF;
+				END LOOP;
+
+				CLOSE cr_bi_write_permissions; 
+			END;
+
+		ELSEIF p_role = 'sup' THEN
 
 			-- Por schema: data e log
 			BEGIN
@@ -178,7 +260,6 @@ BEGIN
 				CLOSE cr_schema;
 			END;
 
-			-- Por tabela atende: DML
 			BEGIN
 				DECLARE v_schema_name VARCHAR(50);
 				DECLARE v_table_name VARCHAR(50);
@@ -224,38 +305,32 @@ BEGIN
 				CLOSE cr_schema_table;
 			END;
 
-			-- Por tabela atende: Consulta
 			BEGIN
 
 				DECLARE v_schema_name VARCHAR(50);
-				DECLARE v_table_name VARCHAR(50);
 				DECLARE v_fim TINYINT(1) DEFAULT FALSE;
 
 				DECLARE cr_schema_table CURSOR FOR
 				SELECT
-					table_schema,
-					table_name
+					schema_name
 				FROM
-					information_schema.tables
+					information_schema.schemata
 				WHERE
-					table_schema LIKE '%atende'
-				AND
-					table_name NOT IN ('configuracao', 'configuracao_condicao_ura', 'controle_configuracao', 'mensagem_ura', 'mensagem_web', 'grupo_funcionalidade',
-						'mapa_navegacao_ura', 'mapa_navegacao_web', 'tipo_automacao_ura', 'transferencia_ura', 'configuracao_condicao_cliente', 'cliente_alto_valor',
-					'tipo_atendimento_ura', 'chave_configuracao', 'cliente_aniblacklist', 'aeroportos');
+					schema_name LIKE '%atende';
 
 				DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_fim = TRUE;
 
 				OPEN cr_schema_table;
+
 				loop_schema_table : LOOP
 
-					FETCH cr_schema_table INTO v_schema_name, v_table_name;
+					FETCH cr_schema_table INTO v_schema_name;
 
 					IF v_fim THEN
 						LEAVE loop_schema_table;
 					END IF;
 
-					SET @sql_grant_supp_priv = REPLACE(REPLACE(REPLACE(REPLACE(C_SQL_PERMISSION_DATABASE_LEVEL_DQL, '#schema', v_schema_name), '#user', p_user), '#host', p_host), '#table', v_table_name);
+					SET @sql_grant_supp_priv = REPLACE(REPLACE(REPLACE(C_SQL_PERMISSION_DATABASE_LEVEL_DQL, '#schema', v_schema_name), '#user', p_user), '#host', p_host);
 
 					IF p_execute THEN 
 						PREPARE stmt_grant_dml_priv FROM @sql_grant_supp_priv;
@@ -266,20 +341,23 @@ BEGIN
 					END IF;
 
 				END LOOP;
-			END;
-	ELSEIF p_env = 'qa' THEN
 
-		IF p_role IN ('qa', 'dev') THEN
+				CLOSE cr_schema_table;
+			END;
+		END IF;
+	ELSEIF C_QA_ENV_CONDITION_TO_CREATE THEN
+
+		IF p_role IN ('qa', 'dev', 'bi') THEN
 			BEGIN 
 				DECLARE v_schema_name VARCHAR(40);
 				DECLARE v_done TINYINT(1) DEFAULT FALSE;
 				DECLARE cr_cursor CURSOR FOR 
 				SELECT
-					v_schema_name
+					schema_name
 				FROM
-					information_schema.tables
+					information_schema.schemata
 				WHERE	
-					table_name NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys');
+					schema_name NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys');
 				DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
 
 				OPEN cr_cursor;
@@ -294,14 +372,14 @@ BEGIN
 
 					IF p_role = 'qa' THEN
 						SET @sql_grant_privs_hom = REPLACE(REPLACE(REPLACE(C_SQL_PERMISSION_DATABASE_LEVEL_DML, '#user', p_user), '#host', p_host), '#schema', v_schema_name);
-					ELSEIF p_role  ='dev' THEN
+					ELSEIF p_role  IN ('dev', 'bi') THEN
 						SET @sql_grant_privs_hom = REPLACE(REPLACE(REPLACE(C_SQL_PERMISSION_DATABASE_LEVEL_DQL, '#user', p_user), '#host', p_host), '#schema', v_schema_name);
 					END IF;	
 
 					IF p_execute THEN
 						PREPARE stmt_grant_priv_hom FROM @sql_grant_privs_hom;
 						EXECUTE stmt_grant_priv_hom;
-						DEALLOCATE PREPARE stmt_grant_priv_hom; 
+						DEALLOCATE PREPARE stmt_grant_priv_hom;
 					ELSE
 						SELECT @sql_grant_privs_hom;
 					END IF;
@@ -311,7 +389,7 @@ BEGIN
 				CLOSE cr_cursor;
 			END;
 		END IF;
-	ELSEIF p_env = 'dev' THEN
+	ELSEIF C_DEV_ENV_CONDITION_TO_CREATE THEN
 		BEGIN
 			IF p_role IN ('qa', 'dev') THEN
 				BEGIN 
@@ -319,11 +397,11 @@ BEGIN
 					DECLARE v_done TINYINT(1) DEFAULT FALSE;
 					DECLARE cr_cursor CURSOR FOR 
 					SELECT
-						v_schema_name
+						schema_name
 					FROM
-						information_schema.tables
+						information_schema.schemata
 					WHERE	
-						table_name NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys');
+						schema_name NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys');
 					DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
 
 					OPEN cr_cursor;
@@ -353,8 +431,8 @@ BEGIN
 
 					CLOSE cr_cursor;
 				END;
-			END IF;			
-		END;	
+			END IF;
+		END;
 	ELSEIF p_role = 'dba' THEN
 
 		SET @sql_grant_all = REPLACE(REPLACE(C_SQL_PERMISSION_GLOBAL_LEVEL_SUPER, '#user', p_user), '#host', p_host);
@@ -371,7 +449,9 @@ BEGIN
 	FLUSH PRIVILEGES;
 	FLUSH PRIVILEGES;
 
-	SET sql_log_bin = 1;
+	BEGIN 
+		SET sql_log_bin = 1;
+	END;
 
 END $$
 
