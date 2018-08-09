@@ -38,7 +38,7 @@ def insert_pedido(pedido, pedido_servicos):
 	print(pedido.ambiente)
 
 	try:
-		pedido_props = (pedido.codigo, pedido.cep.cep, pedido.cliente.codigo, pedido.loja.codigo, 
+		pedido_props = (pedido.codigo, pedido.cliente_endereco.codigo, pedido.loja.codigo, 
 				pedido.pedido_pai, pedido.numero_pedido, pedido.valor_pedido, pedido.data_entrada, 
 				pedido.data_inicio, pedido.data_fim, pedido.ambiente)	
 		cursor.callproc('prc_insert_pedido', pedido_props)
@@ -73,5 +73,59 @@ def jason_to_model(dic):
 	loja = loja_service.query_loja(loja)
 	cliente_endereco = cliente_endereco_service.cliente_endereco_handler(dic)
 
-	return PedidoModel(None, cliente_endereco.cep, cliente_endereco.cliente, loja, pedido_pai, 
+	return PedidoModel(None, cliente_endereco, loja, pedido_pai, 
 		numero_pedido, valor_pedido, data_entrada, data_inicio, data_fim, ambiente)
+
+
+def query_pedido_by_id(codigo):
+
+	conn, cr = db.get_db_resources()
+
+	try:
+		cr.callproc('prc_get_pedido_by_id', (codigo,))
+	except:
+		raise
+	else:
+		row = cr.fetchone()
+	finally:
+		cr.close()
+		conn.close()
+
+	pedido = compose_pedido(row)
+
+	return pedido
+
+
+def query_pedidos():
+	conn, cr = db.get_db_resources()
+
+	try:
+		cr.callproc('prc_get_pedidos')
+	except:
+		raise
+	else:
+		rows = cr.fetchall()
+	finally:
+		cr.close()
+		conn.close()
+
+	pedidos = []
+	for row in rows:
+		pedidos.append(compose_pedido(row))
+
+	return pedidos
+
+def compose_pedido(db_row):
+	pedido = db_to_model(db_row)
+	codigo_cliente_endereco = pedido.cliente_endereco
+	
+	pedido.cliente_endereco = cliente_endereco_service.get_cliente_endereco(codigo_cliente_endereco)
+	pedido.loja = loja_service.query_loja_by_id(pedido.loja)
+	return pedido
+
+
+
+
+def db_to_model(db_row):
+	return PedidoModel(db_row[0], db_row[1], db_row[2], db_row[3], db_row[4], db_row[5], 
+		db_row[6], db_row[7], db_row[8], db_row[9])

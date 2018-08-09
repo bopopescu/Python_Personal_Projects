@@ -21,3 +21,19 @@ def get_all_servicos():
 	conn.close()
 
 	return servicos
+
+def query_servico_by_id(codigo_servico):
+
+	conn, cr = db.get_db_resources()
+
+	try:
+		cr.callproc('prc_get_servico_by_id', (codigo_servico,))
+	except:
+		raise
+	else:
+		db_row = cr.fetchone()
+	finally:
+		cr.close()
+		conn.close()
+
+	return ServicoModel(db_row[0],db_row[1],db_row[2],db_row[3],db_row[4])	

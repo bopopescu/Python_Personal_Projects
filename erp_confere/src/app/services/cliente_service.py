@@ -67,6 +67,22 @@ def query_cliente(nome, sobrenome):
 
 	return cliente
 
+def query_cliente_by_id(codigo):
+
+	conn, cr = db.get_db_resources()
+
+	try:
+		cr.callproc('prc_get_cliente_by_id', (codigo,))
+	except:
+		raise
+	else:
+		cliente = cr.fetchone()
+	finally:
+		cr.close()
+		conn.close()
+
+	return db_to_model(cliente)
+
 def db_to_model(db_row):
 
 	return ClienteModel(db_row[0], db_row[1], db_row[2], db_row[3], db_row[4], db_row[5])

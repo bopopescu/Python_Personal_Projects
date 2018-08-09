@@ -5,7 +5,7 @@ import app_util.constants as const
 class FuncionarioModel():
 
 	def __init__(self, codigo, nome, sobrenome, data_admissao, data_demissao, 
-		telefone_residencial, telefone_celular, cargo)
+		telefone_residencial, telefone_celular, cargo):
 
 		self.codigo = codigo
 		self.nome = nome
@@ -14,8 +14,9 @@ class FuncionarioModel():
 		self.data_demissao = data_demissao
 		self.telefone_residencial = telefone_residencial
 		self.telefone_celular = telefone_celular
+		self.cargo = cargo
 
 	@classmethod
 	def query_by_id(cls, _id):
-
+		pass
 		

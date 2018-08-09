@@ -1,9 +1,13 @@
-from flask import Blueprint, render_template, url_for, request, redirect
+from flask import Blueprint, render_template, url_for, request, jsonify,redirect
 from services import servico_service
 from services import ambiente_service
 from services import loja_service
 from services import pedido_service
 from app_util import date_util
+from services import pedido_servico_service
+import jsonpickle 
+import json
+
 
 # Blueprint
 bp = Blueprint('pedido', __name__, url_prefix='/pedido')
@@ -11,6 +15,23 @@ bp = Blueprint('pedido', __name__, url_prefix='/pedido')
 @bp.route('/')
 def pedido():
 	return render_template('pedido.html')
+
+@bp.route('/pedidos', methods=['GET', 'POST'])
+def pedidos():
+	'''
+		Carregar os pedidos com os objetos necessários
+	'''
+	pedidos = pedido_service.query_pedidos()
+	return render_template('pedido/pedidos.html', pedidos=pedidos)
+
+@bp.route('/<int:codigo_pedido>/pedido_servico')
+def pedido_servicos(codigo_pedido):
+	
+	pedido_servicos = pedido_servico_service.get_pedido_servico_by_servico(codigo_pedido)
+	jason = [jsonpickle.encode(pedido_servico, unpicklable=False) for pedido_servico in pedido_servicos]
+	print(jason)
+
+	return jsonify(jason)
 
 @bp.route('/cadastrar', methods=["GET", "POST"])
 def cadastrar():
@@ -42,13 +63,13 @@ def cadastrar():
 		pedido_service.create_pedido_handler(pedido)
 
 		return redirect(url_for('pedido.cadastrar'))
-
 	else:
 		servicos = servico_service.get_all_servicos()
 		ambientes = ambiente_service.get_all_ambientes()
 		lojas = loja_service.query_all_lojas()
 
 		return render_template('pedido/cadastrar.html', servicos=servicos, ambientes=ambientes, lojas=lojas)
+
 
 
 def ambientes_to_dict(form):

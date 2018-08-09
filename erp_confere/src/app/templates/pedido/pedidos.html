@@ -1,0 +1,41 @@
+{% extends 'template.html' %}
+
+{% block title %} Pedidos  {% endblock %}
+
+{% block header %} <h3>Pedidos available</h3> {% endblock %}
+
+{% block section %}
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Loja</th>
+				<th>Numero</th>
+				<th>Cliente</th>
+				<th>Valor</th>
+				<th>Data Entrada</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pedido in pedidos %}
+				<tr>
+					<td>{{ pedido.loja.nome }}</td>
+					<td>{{ pedido.numero_pedido }}</td>
+					<td>{{ pedido.cliente_endereco.cliente.nome + ' ' +  pedido.cliente_endereco.cliente.sobrenome}}</td>
+					<td>{{ pedido.valor_pedido }}</td>
+					<td>{{ pedido.data_entrada }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
+{% block script %} 
+<script type="text/javascript">
+	jQuery(document).ready(function($) {
+		$.get(SCRIPT_ROOT + '/pedido/2/pedido_servico', function(data) {
+			console.log(data)
+			var data1 = JSON.parse(data[0])
+			console.log(data1)
+		});
+	});
+</script>
+{% endblock %}

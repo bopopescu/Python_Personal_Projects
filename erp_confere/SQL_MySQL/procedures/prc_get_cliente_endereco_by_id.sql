@@ -5,8 +5,8 @@ USE erp $$
 
 DROP PROCEDURE IF EXISTS prc_get_cliente_endereco_by_id $$
 
-CREATE PROCEDURE prc_get_cliente_endereco_by_id(p_cep CHAR(8), p_cd_cliente INT)
-COMMENT 'Query cliente_endereco table by cep and cd_cliente as arguments'
+CREATE PROCEDURE prc_get_cliente_endereco_by_id(p_cd_cliente_endereco INT)
+COMMENT 'Query cliente_endereco table by ID'
 BEGIN
 
 	SELECT
@@ -14,9 +14,7 @@ BEGIN
 	FROM
 		erp.cliente_endereco
 	WHERE
-		cep = p_cep
-	AND 
-		p_cd_cliente = p_cd_cliente;
+		cd_cliente_endereco = p_cd_cliente_endereco;
 
 END $$
 

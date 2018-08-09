@@ -1,0 +1,15 @@
+[
+	{
+	"role": "dba",
+	"environment": [
+		{
+			"type": "production",
+			"application": "IVR-1.0"
+			"privileges": {
+				{""}
+				
+			}
+		}
+	]
+	}
+]

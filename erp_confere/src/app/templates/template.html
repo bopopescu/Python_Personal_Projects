@@ -30,6 +30,11 @@
 			href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
+  <script type="text/javascript">
+    console.log('{{ request.script_root }}')
+    var SCRIPT_ROOT = {{ request.script_root|tojson|safe }}
+    console.log(SCRIPT_ROOT)
+  </script>
 <div class="wrapper">
 
   <!-- Main Header -->
