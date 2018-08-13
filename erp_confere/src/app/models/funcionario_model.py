@@ -2,7 +2,7 @@ import app_util.db as db
 import app_util.constants as const
 
 
-class FuncionarioModel():
+class FuncionarioModel(object):
 
 	def __init__(self, codigo, nome, sobrenome, data_admissao, data_demissao, 
 		telefone_residencial, telefone_celular, cargo):

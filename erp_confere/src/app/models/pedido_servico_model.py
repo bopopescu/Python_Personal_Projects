@@ -3,8 +3,8 @@ import app_util.constants as const
 
 class PedidoServicoModel(object):
 
-	def __init__(self, pedido, servico, funcionario, data_inicio,
-		valor_comissao, data_fim, servico_props):
+	def __init__(self, pedido, servico, funcionario, valor_comissao, data_inicio,
+		data_fim, servico_props):
 
 		self.pedido = pedido
 		self.servico = servico

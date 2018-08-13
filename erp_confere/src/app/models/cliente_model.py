@@ -1,7 +1,7 @@
 import app_util.db as db
 import app_util.constants as const
 
-class ClienteModel():
+class ClienteModel(object):
 
 	def __init__(self, codigo, nome, sobrenome, email, residencial, celular):
 

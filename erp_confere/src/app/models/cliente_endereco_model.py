@@ -1,7 +1,7 @@
 import app_util.db as db
 import app_util.constants as const
 
-class ClienteEnderecoModel():
+class ClienteEnderecoModel(object):
 
 	def __init__(self, codigo, cep, cliente, numero_endereco, complemento,
 		referencia):

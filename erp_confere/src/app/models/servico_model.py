@@ -2,7 +2,7 @@ import app_util.db as db
 import app_util.constants as const
 import MySQLdb as mysql
 
-class ServicoModel():
+class ServicoModel(object):
 
 	def __init__(self, codigo, nome, valor, sequencia, tipo_valor_servico):
 

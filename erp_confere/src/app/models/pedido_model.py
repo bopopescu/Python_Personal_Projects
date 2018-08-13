@@ -1,7 +1,7 @@
 import app_util.db as db
 import app_util.constants as const
 
-class PedidoModel():
+class PedidoModel(object):
 
 	def __init__(self, codigo, cliente_endereco, loja, pedido_pai, numero_pedido, 
 		valor_pedido, data_entrada, data_inicio, data_fim, ambiente):

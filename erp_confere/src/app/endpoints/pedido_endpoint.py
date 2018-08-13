@@ -6,6 +6,7 @@ from services import pedido_service
 from app_util import date_util
 from services import pedido_servico_service
 import jsonpickle 
+import app_util.jsonpickle_handler 
 import json
 
 
@@ -29,7 +30,7 @@ def pedido_servicos(codigo_pedido):
 	
 	pedido_servicos = pedido_servico_service.get_pedido_servico_by_servico(codigo_pedido)
 	jason = [jsonpickle.encode(pedido_servico, unpicklable=False) for pedido_servico in pedido_servicos]
-	print(jason)
+	print(type(pedido_servicos[0].data_inicio))
 
 	return jsonify(jason)
 

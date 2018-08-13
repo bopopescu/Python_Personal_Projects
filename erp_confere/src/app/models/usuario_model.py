@@ -1,7 +1,7 @@
 import app_util.db as db
 import app_util.constants as const
 
-class UsuarioModel():
+class UsuarioModel(object):
 
 	def __init__(self, codigo, username, password, data_criacao, 
 		data_alteracao, funcao):

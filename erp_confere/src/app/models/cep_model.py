@@ -2,7 +2,7 @@ import app_util.db as db
 import app_util.constants as const
 
 
-class CepModel():
+class CepModel(object):
 
 	def __init__(self, cep, logradouro, complemento, bairro, cidade, uf):
 
