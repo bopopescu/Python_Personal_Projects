@@ -5,6 +5,7 @@ from services import loja_service
 from services import pedido_service
 from app_util import date_util
 from services import pedido_servico_service
+from flask_paginate import Pagination, get_page_args
 import jsonpickle 
 import app_util.jsonpickle_handler 
 import json
@@ -13,17 +14,35 @@ import json
 # Blueprint
 bp = Blueprint('pedido', __name__, url_prefix='/pedido')
 
+@bp.route('/pedido/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET'])
+def pedido_servico(codigo_pedido, codigo_servico):
+	return redirect(url_for('pedido.cadastrar'))
+
 @bp.route('/')
 def pedido():
 	return render_template('pedido.html')
 
 @bp.route('/pedidos', methods=['GET', 'POST'])
 def pedidos():
-	'''
-		Carregar os pedidos com os objetos necessários
-	'''
+	search = False
+
+	page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='page_parameter')
+
+	print('Page: {} | Per page: {} | Offset: {}'.format(page, per_page, offset))
+
+	q = request.args.get('q')
+	if q:
+		search = True
+
+	
 	pedidos = pedido_service.query_pedidos()
-	return render_template('pedido/pedidos.html', pedidos=pedidos)
+
+	print('List size: {}'.format(len(pedidos)))
+
+	pagination = Pagination(page=page, total=len(pedidos), per_page=per_page, search=search, record_name='pedidos',
+		css_framework='bootstrap4') 
+
+	return render_template('pedido/pedidos.html', pedidos=pedidos, pagination=pagination)
 
 @bp.route('/<int:codigo_pedido>/pedido_servico')
 def pedido_servicos(codigo_pedido):

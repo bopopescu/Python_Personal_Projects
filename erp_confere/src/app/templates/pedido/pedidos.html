@@ -5,6 +5,8 @@
 {% block header %} <h3>Pedidos available</h3> {% endblock %}
 
 {% block section %}
+	
+	{{ pagination.info }}
 	<table class="table table-hover" id="pedidos">
 		<thead>
 			<tr>
@@ -18,6 +20,7 @@
 		<tbody>
 			{% for pedido in pedidos %}
 				<tr class="pedido">
+					<td>{{ loop.index + (pagination.page - 1) * pagination.per_page}}</td>
 					<td class="pedido-codigo">{{ pedido.codigo }}</td>
 					<td class="loja-nome">{{ pedido.loja.nome }}</td>
 					<td class="pedido-numero">{{ pedido.numero_pedido }}</td>
@@ -28,7 +31,9 @@
 			{% endfor %}
 		</tbody>
 	</table>
+	{{ pagination.links }}
 {% endblock %}
+
 {% block script %} 
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
@@ -75,16 +80,31 @@
 						pedidos.map(function(elem) {
 							
 							var tRow= $('<tr></tr>');
-							var tDataServicoNome = $('<td></td>',{text: elem.servico.nome});
+							var tDataCodigoPedido = $('<td></td>', {text: elem.pedido, hidden: true, class: 'codigo-pedido'})
+							var tDataCodigoServico = $('<td></td>', {text: elem.servico.codigo, hidden: true,
+							 class: 'codigo-servico'})
+ 							var tDataServicoNome = $('<td></td>',{text: elem.servico.nome});
 							var tDataServicoProps = $('<td></td>', {text: elem.servico_props.status});
-							
+							var tDataButton = $('<td></td>')
+							var tButton = $('<button></button>', {
+								text: 'atualizar', 
+								class: 'btn btn-outline-primary btn-small btn-pedido-servico', 
+								type: 'button'
+							})
+
+							tRow.append(tDataCodigoPedido);
+							tRow.append(tDataCodigoServico)
 							tRow.append(tDataServicoNome);
 							tRow.append(tDataServicoProps);
+							tRow.append(tDataButton)
+							tDataButton.append(tButton)
 							tBody.append(tRow);
 						});
 						
 						workingElem.after(tbl);
 					}
+					
+
 					
 				});
 			} else {
@@ -94,7 +114,34 @@
 					workingElem.next().hide('fast');	
 				}
 			}
-		});		
+		});
+
+		$('#pedidos tbody').on('click', '.btn-pedido-servico', function(event) {
+			event.preventDefault();
+			/* Act on the event */
+			console.log($(this).parent().siblings());
+
+			var pedido_servico = {
+				pedido: null,
+				servico: null
+			};
+
+			$(this).parent().siblings().each(function(idx, el) {
+				console.log(el)
+				var element = $(this)
+
+				if (element.hasClass('codigo-pedido')){
+					pedido_servico.pedido = element.text();
+				} else if(element.hasClass('codigo-servico')){
+					pedido_servico.servico = element.text();
+				}
+			});
+			console.log(pedido_servico.pedidlo);
+			console.log(pedido_servico.servico);
+			$.get(SCRIPT_ROOT + '/pedido/'+ pedido_servico.codigo+ '/servico' + pedido_servico.servico);
+		});
+
+
 
 	});
 </script>
