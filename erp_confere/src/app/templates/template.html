@@ -19,6 +19,7 @@
 	  <link rel="stylesheet" href="{{ url_for('static', filename='css/skin-blue.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery-ui.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/pagination-style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.datetimepicker.css') }}">
 	  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	  <!--[if lt IE 9]>
@@ -214,7 +215,7 @@
     <section class="sidebar">
 
       <!-- Sidebar user panel (optional) -->
-      <div class="user-panel">
+      {# <div class="user-panel">
         <div class="pull-left image">
           <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
         </div>
@@ -223,7 +224,7 @@
           <!-- Status -->
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
         </div>
-      </div>
+      </div> #}
 
       {# <!-- search form (Optional) -->
       <form action="#" method="get" class="sidebar-form">
@@ -373,13 +374,14 @@
 <!-- ./wrapper -->
 
 <!-- REQUIRED JS SCRIPTS -->
+  {{ flask_util_js.js }}
 	<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.numeric.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 	<!-- AdminLTE App -->
 	<script src="{{ url_for('static', filename='js/adminlte.min.js') }}"></script>
-
+  <script src="{{ url_for('static', filename='js/jquery.datetimepicker.full.min.js') }}"></script>
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
      user experience. -->

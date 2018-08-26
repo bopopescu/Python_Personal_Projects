@@ -1,9 +1,11 @@
 from flask import Flask, render_template
 import endpoints.pedido_endpoint as pedido_endpoint
 import endpoints.loja_endpoint as loja_endpoint
+from app_util.flask_util import FlaskUtilJs
 
 
 app = Flask(__name__)
+fujs = FlaskUtilJs(app)
 
 app.secret_key = '123'
 

@@ -117,7 +117,7 @@
 		});
 
 		$('#pedidos tbody').on('click', '.btn-pedido-servico', function(event) {
-			event.preventDefault();
+			// event.preventDefault();
 			/* Act on the event */
 			console.log($(this).parent().siblings());
 
@@ -136,12 +136,13 @@
 					pedido_servico.servico = element.text();
 				}
 			});
-			console.log(pedido_servico.pedidlo);
+			console.log(pedido_servico.pedido);
 			console.log(pedido_servico.servico);
-			$.get(SCRIPT_ROOT + '/pedido/'+ pedido_servico.codigo+ '/servico' + pedido_servico.servico);
+			var urls = flask_util.url_for('pedido.pedido_servico', {codigo_pedido: pedido_servico.pedido, codigo_servico: pedido_servico.servico});
+			alert(urls)
+			window.location = urls;
+			// $.get(SCRIPT_ROOT + '/pedido/'+ pedido_servico.pedido+ '/servico/' + pedido_servico.servico);
 		});
-
-
 
 	});
 </script>

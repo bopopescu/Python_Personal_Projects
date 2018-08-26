@@ -5,6 +5,7 @@ import app_util.json_util as json_util
 import services.servico_service as servico_service
 from services import funcionario_service
 import json
+from services import pedido_service
 
 def insert_pedido_servico(pedido_servico):
 	pass
@@ -67,3 +68,28 @@ def get_pedido_servico_by_servico(codigo_pedido):
 
 
 	return pedido_servicos
+
+def get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
+
+	pedido = pedido_service.query_pedido_by_id(codigo_pedido)
+
+	servico = servico_service.query_servico_by_id(codigo_servico)
+
+	conn, cr = db.get_db_resources()
+	try:
+		cr.callproc('prc_get_pedido_servico_by_id', (codigo_pedido, codigo_servico))
+	except:
+		raise
+	else:
+		row = cr.fetchone()
+	finally:
+		cr.close()
+		conn.close()
+
+	pedido_servico = PedidoServicoModel(pedido, servico, row[2], row[3], row[4], row[5], json.loads(row[6]))
+
+	pedido_servico.funcionario = funcionario_service.query_funcionario_by_id(pedido_servico.funcionario)
+
+	return pedido_servico
+
+

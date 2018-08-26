@@ -4,10 +4,11 @@ import MySQLdb as mysql
 
 class ServicoModel(object):
 
-	def __init__(self, codigo, nome, valor, sequencia, tipo_valor_servico):
+	def __init__(self, codigo, nome, nome_real, valor, sequencia, tipo_valor_servico):
 
 		self.codigo = codigo
 		self.nome = nome
+		self.nome_real = nome_real
 		self.valor = valor
 		self.sequencia = sequencia
 		self.tipo_valor_servico = tipo_valor_servico
@@ -18,7 +19,7 @@ class ServicoModel(object):
 		servico = db.query_with_one_result(const.QUERY_SERVICO_BY_ID, _id)
 
 		return cls(servico[0], servico[1], servico[2], servico[3],
-				servico[4])
+				servico[4], servico[5])
 
 	@classmethod
 	def get_in_id(cls, servicos_id):
@@ -31,7 +32,7 @@ class ServicoModel(object):
 			# print(cx._last_executed) # Prints the last SQL executed
 			servicos = cx.fetchall()
 			servicos_object = [cls(servico[0], servico[1], servico[2], 
-				servico[3], servico[4])for servico in servicos]
+				servico[3], servico[4], servico[5])for servico in servicos]
 		except mysql.Error as e:
 			raise
 		else:
@@ -45,5 +46,5 @@ class ServicoModel(object):
 
 	def update(self):
 
-		db.execute_dml(const.UPDATE_SERVICO, self.nome, self.valor, 
+		db.execute_dml(const.UPDATE_SERVICO, self.nome, self.nome_real, self.valor, 
 			self.sequencia, self.tipo_valor_servico, self.codigo)

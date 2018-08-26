@@ -1,0 +1,152 @@
+{% extends 'template.html' %}
+
+{% block title %} Servico: {{ pedido_servico.servico.nome_real }} {% endblock %}
+
+
+{% block section %}
+	<form id="pedido-servico" method="post">
+
+
+		<fieldset>
+			<legend>Número do pedido: {{ pedido_servico.pedido.numero_pedido }}</legend>
+			<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
+			
+			<div class="form-row">
+				<div class="form-group col-sm-2">
+					<label>Data Inicio</label>
+					<input class="form-control datepicker" type="text" name="data-inicio" 
+					value="{{pedido_servico.data_inicio.strftime('%d/%m/%Y') if pedido_servico.data_inicio is not none}}">
+				</div>
+				<div class="form-group col-sm-2">
+					<label>Data Final</label>
+					<input class="form-control datepicker" type="text" name="data-final" 
+					{# value="{{pedido_servico.data_fim.strftime('%d/%m/%Y') if pedido_servico.data_fim is not none}}" #}>
+				</div>
+
+			</div>
+			<div class="form-row">
+				<div class="form-group col-sm-4">
+					<label>Funcionario</label>
+					<select class="form-control" form="pedido-servico">
+						{% for funcionario in funcionarios %}
+							<option value="{{funcionario.codigo}}" {{ 'selected' if pedido_servico.funcionario is not none and pedido_servico.funcionario.codigo == funcionario.codigo else '' }}}>
+								{{funcionario.nome + ' ' + funcionario.sobrenome}}
+							</option>
+						{% endfor %}
+						<option value="" {{'selected' if pedido_servico.funcionario is none else ''}}>
+						</option>
+					</select>
+				</div>
+			</div>
+
+			{% if pedido_servico.servico_props['status'] != 'novo' %}
+				<div class="form-row">
+					{% set list_size = pedido_servico.servico_props['agendamento']|length %}
+					{% if 'agendamento' in pedido_servico.servico_props %}
+						{% if list_size > 0 %}
+								{% for agendamento in pedido_servico.servico_props['agendamento'] %}
+									<div class="form-group col-sm-2">
+											<label>{{ loop.index }}<sup><small>a</small></sup> Medição </label>
+											<input type="text" name="medicao-{{ loop.index }}" 
+											class="form-control" value="{{agendamento}}"
+											{{ 'disabled' if list_size > 1 and list_size != loop.index else '' }}>
+									</div>
+								{% endfor %}
+						{% endif %}
+					{% endif %}
+				</div>
+				<div class="form-row add-medicao">
+					<div class="form-group">
+						<button class="form-control btn btn-info add-input">Adicionar agendamento</button>
+					</div>
+				</div>
+			{% elif pedido_servico.servico_props['status'] == 'novo' %}
+				<div class="form-row add-medicao">
+					<div class="form-group">
+						<button class="form-control btn btn-info add-input">Adicionar agendamento</button>
+					</div>
+				</div>
+			{% endif %}
+			<div class="form-row">
+				<div class="form-group col-sm-4">
+					<label>Comentario</label>
+					<textarea class="form-control" rows="3" name="comentario" form="pedido-servico" id="comentario">
+						{{ pedido_servico.servico_props['comentario'] if 'comentario' in pedido_servico.servico_props}}
+					</textarea>
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group">
+					{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
+					<input type="submit" value="{{action_type}}" class="form-control btn btn-success">
+					
+				</div>
+			</div>
+		</fieldset>
+		
+		{# novo => em atendimento 
+		em atendimento => concluido
+		concluido => liberado #}
+		{# If status == 'novo', add a new medicao #}
+
+		{# Servico pode ter mais de uma data de agendamento 
+
+		novo -> Configuracao de funcinoario, data de agendamento
+		agendado -> 
+		em liberacao -> 
+		liberado -> 
+		finalizado -> /	 #}	
+
+		
+	</form>
+{% endblock %}
+
+{% block script %}
+	<script type="text/javascript">
+		jQuery(document).ready(function($) {
+
+			$('#pedido-servico').on('click', '.add-input', function(event) {
+				event.preventDefault();
+
+				if( !$('#data-agendamento').length ){
+					var divRow = $('<div></div>', {class : 'form-row novo-agendamento'});
+					var divGroupInput = $('<div></div>', {class : 'form-group col-sm-2'});
+					var labelDate = $('<label></label>', {text: 'Data de Agendamento'})
+					var inputDate = $('<input/>', {class: 'form-control datetimepicker', type: 'text', 
+						name: 'medicao-date', id: 'data-agendamento'})
+					var btnRemove = $('<button></button>', {class: 'btn btn-danger remove-input', text: 'Remove'})
+					var btnLabelGamb = $('<label></label>', {text: 'ss'})
+					var spanBtn = $('<span></span>', {class: 'input-group-btn'})
+
+					var divInputGroup = $('<div></div>', {class : 'input-group'});
+
+					divRow.append(divGroupInput)
+
+					divGroupInput.append(labelDate)
+					divGroupInput.append(divInputGroup)
+					divInputGroup.append(inputDate)
+					/*divGroupInput.append(inputDate)*/
+					
+					spanBtn.append(btnRemove)
+					divInputGroup.append(spanBtn)
+					
+					$('.add-medicao').after(divRow)		
+				} 
+
+				$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5});
+
+			});
+
+			$('#pedido-servico').on('click', '.remove-input', function(event) {
+				event.preventDefault();
+				
+				$('.novo-agendamento').remove()
+
+			});
+			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false})
+			var removeWhitespace = $('#comentario').val().trim()
+			$('#comentario').val(removeWhitespace)
+
+		});
+	</script>
+{% endblock %}

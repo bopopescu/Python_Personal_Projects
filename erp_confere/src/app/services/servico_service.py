@@ -15,7 +15,7 @@ def get_all_servicos():
 	cr.execute("CALL prc_get_servicos()")
 	rows = cr.fetchall()
 
-	servicos =  [ServicoModel(row[0], row[1], row[2], row[3], row[4]) for row in rows]
+	servicos =  [ServicoModel(row[0], row[1], row[2], row[3], row[4], row[5]) for row in rows]
 
 	cr.close()
 	conn.close()
@@ -36,4 +36,4 @@ def query_servico_by_id(codigo_servico):
 		cr.close()
 		conn.close()
 
-	return ServicoModel(db_row[0],db_row[1],db_row[2],db_row[3],db_row[4])	
+	return ServicoModel(db_row[0],db_row[1],db_row[2],db_row[3],db_row[4], db_row[5])	

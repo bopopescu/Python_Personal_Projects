@@ -3,6 +3,7 @@ from services import servico_service
 from services import ambiente_service
 from services import loja_service
 from services import pedido_service
+from services import funcionario_service
 from app_util import date_util
 from services import pedido_servico_service
 from flask_paginate import Pagination, get_page_args
@@ -14,9 +15,14 @@ import json
 # Blueprint
 bp = Blueprint('pedido', __name__, url_prefix='/pedido')
 
-@bp.route('/pedido/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET'])
+@bp.route('/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET'])
 def pedido_servico(codigo_pedido, codigo_servico):
-	return redirect(url_for('pedido.cadastrar'))
+
+	pedido_servico = pedido_servico_service.get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
+
+	funcionarios = funcionario_service.query_funcionarios()
+
+	return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
 
 @bp.route('/')
 def pedido():
@@ -28,7 +34,7 @@ def pedidos():
 
 	page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='page_parameter')
 
-	print('Page: {} | Per page: {} | Offset: {}'.format(page, per_page, offset))
+	# print('Page: {} | Per page: {} | Offset: {}'.format(page, per_page, offset))
 
 	q = request.args.get('q')
 	if q:
