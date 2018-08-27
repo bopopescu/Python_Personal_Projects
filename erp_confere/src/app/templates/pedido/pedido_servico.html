@@ -1,16 +1,25 @@
 {% extends 'template.html' %}
 
-{% block title %} Servico: {{ pedido_servico.servico.nome_real }} {% endblock %}
+{% block title %} <h2>Servico: {{ pedido_servico.servico.nome_real }}</h2> {% endblock %}
 
 
 {% block section %}
 	<form id="pedido-servico" method="post">
 
-
+		<h3>Número do pedido: {{ pedido_servico.pedido.numero_pedido }}</h3>
 		<fieldset>
-			<legend>Número do pedido: {{ pedido_servico.pedido.numero_pedido }}</legend>
 			<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
 			
+			{% if pedido_servico.servico.nome == 'subir_paredes' or pedido_servico.servico.nome == 'liberacao' %}
+				{% set promob_nome = 'inicial' if  pedido_servico.servico.nome == 'subir_paredes' else 'final' %}
+				<div class="form-row">
+					<div class="form-group col-sm-2">
+						<label>Promob {{ promob_nome }}</label>
+						<input type="text" name="promob-{{promob_nome}}" class="form-control real-value">
+					</div>
+				</div>
+			{% endif %}
+
 			<div class="form-row">
 				<div class="form-group col-sm-2">
 					<label>Data Inicio</label>
@@ -39,14 +48,14 @@
 				</div>
 			</div>
 
-			{% if pedido_servico.servico_props['status'] != 'novo' %}
+			{% if pedido_servico.servico_props['status'] != 'novo' and (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento') %}
 				<div class="form-row">
 					{% set list_size = pedido_servico.servico_props['agendamento']|length %}
 					{% if 'agendamento' in pedido_servico.servico_props %}
 						{% if list_size > 0 %}
 								{% for agendamento in pedido_servico.servico_props['agendamento'] %}
 									<div class="form-group col-sm-2">
-											<label>{{ loop.index }}<sup><small>a</small></sup> Medição </label>
+											<label>{{ loop.index }}<sup><small>a</small></sup> Medição</label>
 											<input type="text" name="medicao-{{ loop.index }}" 
 											class="form-control" value="{{agendamento}}"
 											{{ 'disabled' if list_size > 1 and list_size != loop.index else '' }}>
@@ -60,7 +69,7 @@
 						<button class="form-control btn btn-info add-input">Adicionar agendamento</button>
 					</div>
 				</div>
-			{% elif pedido_servico.servico_props['status'] == 'novo' %}
+			{% elif pedido_servico.servico_props['status'] == 'novo' and (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento') %}
 				<div class="form-row add-medicao">
 					<div class="form-group">
 						<button class="form-control btn btn-info add-input">Adicionar agendamento</button>
@@ -79,7 +88,6 @@
 				<div class="form-group">
 					{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
 					<input type="submit" value="{{action_type}}" class="form-control btn btn-success">
-					
 				</div>
 			</div>
 		</fieldset>
@@ -105,6 +113,8 @@
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
 
+			$('.real-value').numeric({decimalPlaces:2, altDecimal: '.', decimal:',', negative: false});
+
 			$('#pedido-servico').on('click', '.add-input', function(event) {
 				event.preventDefault();
 
@@ -113,7 +123,7 @@
 					var divGroupInput = $('<div></div>', {class : 'form-group col-sm-2'});
 					var labelDate = $('<label></label>', {text: 'Data de Agendamento'})
 					var inputDate = $('<input/>', {class: 'form-control datetimepicker', type: 'text', 
-						name: 'medicao-date', id: 'data-agendamento'})
+						name: 'data-medicao-agendada', id: 'data-agendamento'})
 					var btnRemove = $('<button></button>', {class: 'btn btn-danger remove-input', text: 'Remove'})
 					var btnLabelGamb = $('<label></label>', {text: 'ss'})
 					var spanBtn = $('<span></span>', {class: 'input-group-btn'})
@@ -125,7 +135,6 @@
 					divGroupInput.append(labelDate)
 					divGroupInput.append(divInputGroup)
 					divInputGroup.append(inputDate)
-					/*divGroupInput.append(inputDate)*/
 					
 					spanBtn.append(btnRemove)
 					divInputGroup.append(spanBtn)
@@ -146,6 +155,7 @@
 			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false})
 			var removeWhitespace = $('#comentario').val().trim()
 			$('#comentario').val(removeWhitespace)
+
 
 		});
 	</script>

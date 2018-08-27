@@ -15,14 +15,15 @@ import json
 # Blueprint
 bp = Blueprint('pedido', __name__, url_prefix='/pedido')
 
-@bp.route('/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET'])
+@bp.route('/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET', 'POST'])
 def pedido_servico(codigo_pedido, codigo_servico):
 
-	pedido_servico = pedido_servico_service.get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
-
-	funcionarios = funcionario_service.query_funcionarios()
-
-	return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
+	if request.method == 'GET':
+		pedido_servico = pedido_servico_service.get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
+		funcionarios = funcionario_service.query_funcionarios()
+		return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
+	elif request.method == 'POST':
+		print(request.form)
 
 @bp.route('/')
 def pedido():
@@ -39,7 +40,6 @@ def pedidos():
 	q = request.args.get('q')
 	if q:
 		search = True
-
 	
 	pedidos = pedido_service.query_pedidos()
 
