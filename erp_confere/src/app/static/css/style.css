@@ -1,3 +1,7 @@
 html,body{
 	height: 100%;
 }
+
+.btn-margin{
+	margin-left: 20px;
+}

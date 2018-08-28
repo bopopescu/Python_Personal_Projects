@@ -9,6 +9,11 @@
 		<h3>Número do pedido: {{ pedido_servico.pedido.numero_pedido }}</h3>
 		<fieldset>
 			<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
+
+			<input type="hidden" name="nome-servico" value="{{ pedido_servico.servico.nome }}">
+			<input type="hidden" name="codigo-servico" value="{{ pedido_servico.servico.codigo }}">
+			<input type="hidden" name="codigo-pedido" value="{{ pedido_servico.pedido.codigo }}">
+			<input type="hidden" name="status" value="{{ pedido_servico.servico_props['status'] }}">
 			
 			{% if pedido_servico.servico.nome == 'subir_paredes' or pedido_servico.servico.nome == 'liberacao' %}
 				{% set promob_nome = 'inicial' if  pedido_servico.servico.nome == 'subir_paredes' else 'final' %}
@@ -23,20 +28,20 @@
 			<div class="form-row">
 				<div class="form-group col-sm-2">
 					<label>Data Inicio</label>
-					<input class="form-control datepicker" type="text" name="data-inicio" 
+					<input class="form-control datepicker" type="text" name="data-inicio" disabled
 					value="{{pedido_servico.data_inicio.strftime('%d/%m/%Y') if pedido_servico.data_inicio is not none}}">
 				</div>
-				<div class="form-group col-sm-2">
+				{# <div class="form-group col-sm-2">
 					<label>Data Final</label>
 					<input class="form-control datepicker" type="text" name="data-final" 
-					{# value="{{pedido_servico.data_fim.strftime('%d/%m/%Y') if pedido_servico.data_fim is not none}}" #}>
-				</div>
+					value="{{pedido_servico.data_fim.strftime('%d/%m/%Y') if pedido_servico.data_fim is not none}}">
+				</div> #}
 
 			</div>
 			<div class="form-row">
 				<div class="form-group col-sm-4">
 					<label>Funcionario</label>
-					<select class="form-control" form="pedido-servico">
+					<select class="form-control" form="pedido-servico" name="funcionario">
 						{% for funcionario in funcionarios %}
 							<option value="{{funcionario.codigo}}" {{ 'selected' if pedido_servico.funcionario is not none and pedido_servico.funcionario.codigo == funcionario.codigo else '' }}}>
 								{{funcionario.nome + ' ' + funcionario.sobrenome}}
@@ -54,7 +59,7 @@
 					{% if 'agendamento' in pedido_servico.servico_props %}
 						{% if list_size > 0 %}
 								{% for agendamento in pedido_servico.servico_props['agendamento'] %}
-									<div class="form-group col-sm-2">
+									<div class="form-group col-sm-3">
 											<label>{{ loop.index }}<sup><small>a</small></sup> Medição</label>
 											<input type="text" name="medicao-{{ loop.index }}" 
 											class="form-control" value="{{agendamento}}"
@@ -89,6 +94,9 @@
 					{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
 					<input type="submit" value="{{action_type}}" class="form-control btn btn-success">
 				</div>
+				<div class="form-group">
+					<input type="submit" name="btn-atualizar" value="Atualizar" class="btn btn-primary btn-margin">
+				</div>
 			</div>
 		</fieldset>
 		
@@ -120,7 +128,7 @@
 
 				if( !$('#data-agendamento').length ){
 					var divRow = $('<div></div>', {class : 'form-row novo-agendamento'});
-					var divGroupInput = $('<div></div>', {class : 'form-group col-sm-2'});
+					var divGroupInput = $('<div></div>', {class : 'form-group col-sm-3'});
 					var labelDate = $('<label></label>', {text: 'Data de Agendamento'})
 					var inputDate = $('<input/>', {class: 'form-control datetimepicker', type: 'text', 
 						name: 'data-medicao-agendada', id: 'data-agendamento'})
@@ -142,7 +150,7 @@
 					$('.add-medicao').after(divRow)		
 				} 
 
-				$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5});
+				$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05'});
 
 			});
 

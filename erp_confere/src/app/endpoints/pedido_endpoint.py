@@ -23,7 +23,47 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		funcionarios = funcionario_service.query_funcionarios()
 		return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
 	elif request.method == 'POST':
+		
+		# Construct a new and clean object to send to pedido_servico_service
+		servico_form = {}
+		if 'data-medicao-agendada' in request.form:
+			servico_form['agendamento'] = None if request.form['data-medicao-agendada'] = '' else request.form['data-medicao-agendada']
+		if 'funcionario' in request.form:
+			servico_form['funcionario'] = None if request.form['funcionario'] == '' else request.form['funcionario']
+		if 'comentario' in request.form:
+			servico_form['comentario'] = None if request.form['comentario'] == '' else request.form['comentario']
+		if 'codigo-pedido' in request.form:
+			servico_form['codigo_pedido'] = request.form['codigo-pedido']
+		if 'codigo-servico' in request.form:
+			servico_form['codigo_servico'] = request.form['codigo-servico']
+		if 'promob-inicial' in request.form:
+			servico_form['promob_inicial'] = None if request.form['promob-inicial'] == '' else request.form['promob-inicial']
+		if 'promob_final' in request.form:
+			servico_form['promob_final'] = None if request.form['promob-final'] == '' else request.form['promob-final']
+		if 'status' in request.form:
+			servico_form['status'] = request.form['status']
+
+		print(servico_form)
 		print(request.form)
+		# Decide which service type is and its status 
+		if 'btn-atualizar' in request.form:
+			pedido_servico_service.update_pedido_servico(**servico_form)	
+		else:
+			if request.form['nome-servico'] == 'medicao':
+				pass
+			elif request.form['nome-servico'] == 'subir_paredes':
+				pass
+			elif request.form['nome-servico'] == 'projeto':
+				pass
+			elif request.form['nome-servico'] == 'atendimento':
+				pass
+			elif request.form['nome-servico'] == 'liberacao':
+				pass
+			elif request.form['nome-servico'] == 'manual_de_montagem':
+				pass
+
+
+ 
 
 @bp.route('/')
 def pedido():

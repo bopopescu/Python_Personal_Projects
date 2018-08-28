@@ -93,3 +93,39 @@ def get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
 	return pedido_servico
 
 
+def update_pedido_servico(**kwargs):
+
+	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+
+	if kwargs['comentario']:
+		if 'comentario' in pedido_servico.servico_props:
+			if kwargs['comentario'] != pedido_servico.servico_props['comentario']:
+				pedido_servico.servico_props['comentario'] = kwargs['comentario']
+		else:
+			pedido_servico.servico_props['comentario'] = kwargs['comentario']	
+
+	if kwargs['funcionario']:
+		if pedido_servico.funcionario:
+			if kwargs['funcionario'] != pedido_servico.funcionario.codigo:
+				pedido_servico.funcionario.codigo
+		else:
+			pedido_servico.funcionario = kwargs['funcionario']
+
+	if kwargs['promob_inicial']:
+		if 'promob_inicial' in pedido_servico.servico_props:
+			if kwargs['promob_inicial'] != pedido_servico.servico_props['promob_inicial']:
+				pedido_servico.servico_props['promob_inicial']
+		else:
+			pedido_servico.servico_props['promob_inicial'] = kwargs['promob_inicial']
+
+	if kwargs['promob_final']:
+		if 'promob_final' in pedido_servico.servico_props:
+			if kwargs['promob_final'] != pedido_servico.servico_props['promob_final']:
+				pedido_servico.servico_props['promob_final']
+		else:
+			pedido_servico.servico_props['promob_final'] = kwargs['promob_final']
+
+	if kwargs['agendamento']:
+		if ''
+
+
