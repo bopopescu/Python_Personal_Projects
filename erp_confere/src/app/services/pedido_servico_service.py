@@ -97,35 +97,64 @@ def update_pedido_servico(**kwargs):
 
 	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 
-	if kwargs['comentario']:
-		if 'comentario' in pedido_servico.servico_props:
-			if kwargs['comentario'] != pedido_servico.servico_props['comentario']:
-				pedido_servico.servico_props['comentario'] = kwargs['comentario']
-		else:
-			pedido_servico.servico_props['comentario'] = kwargs['comentario']	
+	set_pedido_servico(pedido_servico, **kwargs)
 
-	if kwargs['funcionario']:
-		if pedido_servico.funcionario:
-			if kwargs['funcionario'] != pedido_servico.funcionario.codigo:
-				pedido_servico.funcionario.codigo
-		else:
+	conn, cr = db.get_db_resources()
+
+	try:
+		cr.callproc('prc_update_pedido_servico', (pedido_servico.pedido.codigo, pedido_servico.servico.codigo, pedido_servico.funcionario,
+			pedido_servico.valor_comissao, pedido_servico.data_inicio, pedido_servico.data_fim, json_util.dict_to_str(pedido_servico.servico_props)))
+	except:
+		raise
+	else:
+		conn.commit()
+	finally:
+		cr.close()
+		conn.close()
+
+def set_pedido_servico(pedido_servico, **kwargs):
+
+	if 'comentario' in kwargs:
+		if kwargs['comentario']:
+			if 'comentario' in pedido_servico.servico_props:
+				if kwargs['comentario'] != pedido_servico.servico_props['comentario']:
+					pedido_servico.servico_props['comentario'] = kwargs['comentario']
+			else:
+				pedido_servico.servico_props['comentario'] = kwargs['comentario']	
+
+	if 'funcionario' in kwargs:
+		if kwargs['funcionario']:
+			if pedido_servico.funcionario:
+				if kwargs['funcionario'] != pedido_servico.funcionario.codigo:
+					pedido_servico.funcionario = kwargs['funcionario']
+			else:
+				pedido_servico.funcionario = kwargs['funcionario']
+		elif kwargs['status'] == 'novo' and not kwargs['funcionario']:
 			pedido_servico.funcionario = kwargs['funcionario']
-
-	if kwargs['promob_inicial']:
-		if 'promob_inicial' in pedido_servico.servico_props:
-			if kwargs['promob_inicial'] != pedido_servico.servico_props['promob_inicial']:
-				pedido_servico.servico_props['promob_inicial']
 		else:
-			pedido_servico.servico_props['promob_inicial'] = kwargs['promob_inicial']
+			raise ValueError('Não é permitido ficar sem responsável quando já foi iniciado ')
 
-	if kwargs['promob_final']:
-		if 'promob_final' in pedido_servico.servico_props:
-			if kwargs['promob_final'] != pedido_servico.servico_props['promob_final']:
-				pedido_servico.servico_props['promob_final']
-		else:
-			pedido_servico.servico_props['promob_final'] = kwargs['promob_final']
+	if 'promob_inicial' in kwargs:
+		if kwargs['promob_inicial']:
+			if 'promob_inicial' in pedido_servico.servico_props:
+				if kwargs['promob_inicial'] != pedido_servico.servico_props['promob_inicial']:
+					pedido_servico.servico_props['promob_inicial']
+			else:
+				pedido_servico.servico_props['promob_inicial'] = kwargs['promob_inicial']
 
-	if kwargs['agendamento']:
-		if ''
+	if 'promob_final' in kwargs:
+		if kwargs['promob_final']:
+			if 'promob_final' in pedido_servico.servico_props:
+				if kwargs['promob_final'] != pedido_servico.servico_props['promob_final']:
+					pedido_servico.servico_props['promob_final']
+			else:
+				pedido_servico.servico_props['promob_final'] = kwargs['promob_final']
 
+	if 'agendamento' in kwargs:
+		if kwargs['agendamento']:
+			if 'agendamento' in pedido_servico.servico_props:
+				if kwargs['agendamento'] != pedido_servico.servico_props['agendamento'][-1]:
+					pedido_servico.servico_props['agendamento'][-1] = kwargs['agendamento']
+			else:
+				pedido_servico.servico_props['agendamento'] = [kwargs['agendamento']]
 

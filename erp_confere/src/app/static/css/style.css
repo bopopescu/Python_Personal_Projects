@@ -5,3 +5,8 @@ html,body{
 .btn-margin{
 	margin-left: 20px;
 }
+
+.form-centralization{
+	margin: 0 auto;
+	width: 80%;
+}

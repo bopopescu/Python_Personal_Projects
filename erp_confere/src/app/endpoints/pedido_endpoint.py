@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, request, jsonify,redirect
+from flask import Blueprint, render_template, url_for, request, jsonify,redirect, flash
 from services import servico_service
 from services import ambiente_service
 from services import loja_service
@@ -27,7 +27,7 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		# Construct a new and clean object to send to pedido_servico_service
 		servico_form = {}
 		if 'data-medicao-agendada' in request.form:
-			servico_form['agendamento'] = None if request.form['data-medicao-agendada'] = '' else request.form['data-medicao-agendada']
+			servico_form['agendamento'] = None if request.form['data-medicao-agendada'] == '' else request.form['data-medicao-agendada']
 		if 'funcionario' in request.form:
 			servico_form['funcionario'] = None if request.form['funcionario'] == '' else request.form['funcionario']
 		if 'comentario' in request.form:
@@ -46,23 +46,25 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		print(servico_form)
 		print(request.form)
 		# Decide which service type is and its status 
-		if 'btn-atualizar' in request.form:
-			pedido_servico_service.update_pedido_servico(**servico_form)	
+		if request.form['acao'] == 'Atualizar':
+			pedido_servico_service.update_pedido_servico(**servico_form)
+
+			flash('Atualizando com sucesso', 'success')
+			return redirect(url_for('pedido.pedido_servico', 
+				codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 		else:
-			if request.form['nome-servico'] == 'medicao':
-				pass
-			elif request.form['nome-servico'] == 'subir_paredes':
-				pass
-			elif request.form['nome-servico'] == 'projeto':
-				pass
-			elif request.form['nome-servico'] == 'atendimento':
-				pass
-			elif request.form['nome-servico'] == 'liberacao':
-				pass
-			elif request.form['nome-servico'] == 'manual_de_montagem':
-				pass
-
-
+			if request.form['acao'] == 'Iniciar' or request.form['acao'] == 'Agendar':
+				# Update data_inicio with the current date and can't have funcionario None
+				# If is servico == medicao or servico == atendimento then data_agendamento is
+				# required
+				if validate_form_agendar_iniciar(request):
+					# update
+					print('foi aqui')
+					pass
+				else:
+					flash('Informações necessárias: Funcionário e data de agendamento (Medição e Liberação)', 'error')
+					return redirect(url_for('pedido.pedido_servico', 
+						codigo_pedido=request.form['codigo-pedido'], codigo_servico=request.form['codigo-servico']))
  
 
 @bp.route('/')
@@ -151,3 +153,19 @@ def ambientes_to_dict(form):
 			ambientes_sent.append(amb)
 
 	return ambientes_sent
+
+
+def validate_form_agendar_iniciar(request):
+
+	if request.form['funcionario'] == '':
+		return False
+
+	if request.form['nome-servico'] == 'medicao' or request.form['nome-servico'] == 'atendimento':
+		if 'data-medicao-agendada' in request.form:
+			if request.form['data-medicao-agendada'] == '':
+				return False
+		else:
+			return False
+
+	return True
+
