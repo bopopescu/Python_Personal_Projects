@@ -1,10 +1,11 @@
 import app_util.db as db
 import app_util.constants as const
-from models.pedido_servico_model import PedidoServicoModel  
+import json
 import app_util.json_util as json_util
 import services.servico_service as servico_service
+import copy
+from models.pedido_servico_model import PedidoServicoModel  
 from services import funcionario_service
-import json
 from services import pedido_service
 
 def insert_pedido_servico(pedido_servico):
@@ -97,13 +98,13 @@ def update_pedido_servico(**kwargs):
 
 	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 
-	set_pedido_servico(pedido_servico, **kwargs)
+	updated_values = validate_from_form(pedido_servico, **kwargs)
 
 	conn, cr = db.get_db_resources()
 
 	try:
-		cr.callproc('prc_update_pedido_servico', (pedido_servico.pedido.codigo, pedido_servico.servico.codigo, pedido_servico.funcionario,
-			pedido_servico.valor_comissao, pedido_servico.data_inicio, pedido_servico.data_fim, json_util.dict_to_str(pedido_servico.servico_props)))
+		cr.callproc('prc_update_pedido_servico', (updated_values.pedido.codigo, updated_values.servico.codigo, updated_values.funcionario,
+			updated_values.valor_comissao, updated_values.data_inicio, updated_values.data_fim, json_util.dict_to_str(updated_values.servico_props)))
 	except:
 		raise
 	else:
@@ -112,25 +113,26 @@ def update_pedido_servico(**kwargs):
 		cr.close()
 		conn.close()
 
-def set_pedido_servico(pedido_servico, **kwargs):
+def validate_from_form(pedido_servico, **kwargs):
 
+	updated_values = copy.deepcopy(pedido_servico)
 	if 'comentario' in kwargs:
 		if kwargs['comentario']:
 			if 'comentario' in pedido_servico.servico_props:
 				if kwargs['comentario'] != pedido_servico.servico_props['comentario']:
-					pedido_servico.servico_props['comentario'] = kwargs['comentario']
+					updated_values.servico_props['comentario'] = kwargs['comentario']
 			else:
-				pedido_servico.servico_props['comentario'] = kwargs['comentario']	
+				updated_values.servico_props['comentario'] = kwargs['comentario']	
 
 	if 'funcionario' in kwargs:
 		if kwargs['funcionario']:
 			if pedido_servico.funcionario:
 				if kwargs['funcionario'] != pedido_servico.funcionario.codigo:
-					pedido_servico.funcionario = kwargs['funcionario']
+					updated_values.funcionario = kwargs['funcionario']
 			else:
-				pedido_servico.funcionario = kwargs['funcionario']
-		elif kwargs['status'] == 'novo' and not kwargs['funcionario']:
-			pedido_servico.funcionario = kwargs['funcionario']
+				updated_values.funcionario = kwargs['funcionario']
+		elif not kwargs['funcionario'] and kwargs['status'] == 'novo':
+			updated_values.funcionario = None
 		else:
 			raise ValueError('Não é permitido ficar sem responsável quando já foi iniciado ')
 
@@ -138,23 +140,36 @@ def set_pedido_servico(pedido_servico, **kwargs):
 		if kwargs['promob_inicial']:
 			if 'promob_inicial' in pedido_servico.servico_props:
 				if kwargs['promob_inicial'] != pedido_servico.servico_props['promob_inicial']:
-					pedido_servico.servico_props['promob_inicial']
+					updated_values.servico_props['promob_inicial']
 			else:
-				pedido_servico.servico_props['promob_inicial'] = kwargs['promob_inicial']
+				updated_values.servico_props['promob_inicial'] = kwargs['promob_inicial']
 
 	if 'promob_final' in kwargs:
 		if kwargs['promob_final']:
 			if 'promob_final' in pedido_servico.servico_props:
 				if kwargs['promob_final'] != pedido_servico.servico_props['promob_final']:
-					pedido_servico.servico_props['promob_final']
+					updated_values.servico_props['promob_final']
 			else:
-				pedido_servico.servico_props['promob_final'] = kwargs['promob_final']
+				updated_values.servico_props['promob_final'] = kwargs['promob_final']
 
 	if 'agendamento' in kwargs:
 		if kwargs['agendamento']:
 			if 'agendamento' in pedido_servico.servico_props:
 				if kwargs['agendamento'] != pedido_servico.servico_props['agendamento'][-1]:
-					pedido_servico.servico_props['agendamento'][-1] = kwargs['agendamento']
+					print(pedido_servico.servico_props['agendamento'])
+					updated_values.servico_props['agendamento'][-1] = kwargs['agendamento']
 			else:
-				pedido_servico.servico_props['agendamento'] = [kwargs['agendamento']]
+				updated_values.servico_props['agendamento'] = [kwargs['agendamento']]
 
+	for indx in range(3):
+		key_medicao = 'medicao_%s' % indx
+		if key_medicao in kwargs:
+			if kwargs[key_medicao]:
+				if 'agendamento' in pedido_servico.servico_props:
+					if kwargs[key_medicao] != pedido_servico.servico_props['agendamento'][indx]:
+						print(pedido_servico.servico_props['agendamento'])
+						updated_values.servico_props['agendamento'][indx] = kwargs[key_medicao]
+				else:
+					updated_values.servico_props['agendamento'] = [kwargs[key_medicao]]
+
+	return updated_values

@@ -24,27 +24,10 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
 	elif request.method == 'POST':
 		
-		# Construct a new and clean object to send to pedido_servico_service
-		servico_form = {}
-		if 'data-medicao-agendada' in request.form:
-			servico_form['agendamento'] = None if request.form['data-medicao-agendada'] == '' else request.form['data-medicao-agendada']
-		if 'funcionario' in request.form:
-			servico_form['funcionario'] = None if request.form['funcionario'] == '' else request.form['funcionario']
-		if 'comentario' in request.form:
-			servico_form['comentario'] = None if request.form['comentario'] == '' else request.form['comentario']
-		if 'codigo-pedido' in request.form:
-			servico_form['codigo_pedido'] = request.form['codigo-pedido']
-		if 'codigo-servico' in request.form:
-			servico_form['codigo_servico'] = request.form['codigo-servico']
-		if 'promob-inicial' in request.form:
-			servico_form['promob_inicial'] = None if request.form['promob-inicial'] == '' else request.form['promob-inicial']
-		if 'promob_final' in request.form:
-			servico_form['promob_final'] = None if request.form['promob-final'] == '' else request.form['promob-final']
-		if 'status' in request.form:
-			servico_form['status'] = request.form['status']
+		servico_form = parse_form(request.form)
 
-		print(servico_form)
-		print(request.form)
+		# print(servico_form)
+		# print(request.form)
 		# Decide which service type is and its status 
 		if request.form['acao'] == 'Atualizar':
 			pedido_servico_service.update_pedido_servico(**servico_form)
@@ -58,11 +41,11 @@ def pedido_servico(codigo_pedido, codigo_servico):
 				# If is servico == medicao or servico == atendimento then data_agendamento is
 				# required
 				if validate_form_agendar_iniciar(request):
-					# update
+					# update the status and others information
 					print('foi aqui')
 					pass
 				else:
-					flash('Informações necessárias: Funcionário e data de agendamento (Medição e Liberação)', 'error')
+					flash('Informações necessárias: Funcionário e data de agendamento (no caso de Medição e Liberação)', 'error')
 					return redirect(url_for('pedido.pedido_servico', 
 						codigo_pedido=request.form['codigo-pedido'], codigo_servico=request.form['codigo-servico']))
  
@@ -157,15 +140,63 @@ def ambientes_to_dict(form):
 
 def validate_form_agendar_iniciar(request):
 
+	'''
+		Validates if the required informations are present in the request
+		In this case: funcionario and data-medicao|medicao-0|medicao-1|medicao-2 
+	'''
+
+
 	if request.form['funcionario'] == '':
 		return False
 
+	# It has to have at least an appointment to change the 'status' 
 	if request.form['nome-servico'] == 'medicao' or request.form['nome-servico'] == 'atendimento':
-		if 'data-medicao-agendada' in request.form:
+		if 'data-medicao-agendada' in request.form:	
 			if request.form['data-medicao-agendada'] == '':
 				return False
 		else:
+			for indx in range(3):
+				chave = 'medicao-%s' % indx
+				if chave in request.form:
+					if request.form[chave] != '':
+						return True
 			return False
 
 	return True
 
+def parse_form(form):
+
+	parsed_form = {}
+
+	for key in form:
+		parsed_form[key.replace('-', '_')] = None if form[key] == '' else form[key]
+
+	return parsed_form
+
+
+
+#			LEAVING HERE AS A BACKUP - I KNOW IT'S EMBARASSING, BUT I CAN'T HELP IT FOR NOW
+# Construct a new and clean object to send to pedido_servico_service
+# 		servico_form = {}
+# 		if 'data-medicao-agendada' in request.form:
+# 			servico_form['agendamento'] = None if request.form['data-medicao-agendada'] == '' else request.form['data-medicao-agendada']
+# 		if 'funcionario' in request.form:
+# 			servico_form['funcionario'] = None if request.form['funcionario'] == '' else request.form['funcionario']
+# 		if 'comentario' in request.form:
+# 			servico_form['comentario'] = None if request.form['comentario'] == '' else request.form['comentario']
+# 		if 'codigo-pedido' in request.form:
+# 			servico_form['codigo_pedido'] = request.form['codigo-pedido']
+# 		if 'codigo-servico' in request.form:
+# 			servico_form['codigo_servico'] = request.form['codigo-servico']
+# 		if 'promob-inicial' in request.form:
+# 			servico_form['promob_inicial'] = None if request.form['promob-inicial'] == '' else request.form['promob-inicial']
+# 		if 'promob_final' in request.form:
+# 			servico_form['promob_final'] = None if request.form['promob-final'] == '' else request.form['promob-final']
+# 		if 'status' in request.form:
+# 			servico_form['status'] = request.form['status']
+# 		if 'medicao-0' in request.form:
+# 			servico_form['medicao-0'] = request.form['medicao-0']
+# 		if 'medicao-1' in request.form:
+# 			servico_form['medicao-1'] = request.form['medicao-1']
+# 		if 'medicao-2' in request.form:
+# 			servico_form['medicao-2'] = request.form['medicao-2']

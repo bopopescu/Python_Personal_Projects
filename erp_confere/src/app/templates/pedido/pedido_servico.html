@@ -79,36 +79,40 @@
 						</select>
 					</div>
 				</div>
-
-				{% if pedido_servico.servico_props['status'] != 'novo' and (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento') %}
+				{% set agendado_ou_novo = (pedido_servico.servico_props['status'] != 'novo' or pedido_servico.servico_props['status'] != 'agendado')%}
+				{% set medicao_ou_atendimento = (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento')%}
+				{% if agendado_ou_novo and medicao_ou_atendimento%}
 					<div class="form-row">
 						{% set list_size = pedido_servico.servico_props['agendamento']|length %}
 						{% if 'agendamento' in pedido_servico.servico_props %}
 							{% if list_size > 0 %}
 									{% for agendamento in pedido_servico.servico_props['agendamento'] %}
-										<div class="form-group col-sm-6">
+										<div class="form-group col-sm-3">
 												<label>{{ loop.index }}<sup><small>a</small></sup> Medição</label>
-												<input type="text" name="medicao-{{ loop.index }}" 
-												class="form-control form-control-lg" value="{{agendamento}}"
+												<input type="text" name="medicao-{{ loop.index - 1 }}" 
+												class="form-control form-control-lg datetimepicker" 
+												value="{{agendamento}}"
 												{{ 'disabled' if list_size > 1 and list_size != loop.index else '' }}>
 										</div>
 									{% endfor %}
 							{% endif %}
 						{% endif %}
 					</div>
+					{% if pedido_servico.servico_props['agendamento']|length > 1%}
+						<div class="form-row add-medicao">
+							<div class="form-group">
+								<button 
+								class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
+							</div>
+						</div>
+					{% endif %}
+				{# {% elif pedido_servico.servico_props['status'] == 'novo' and (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento') %}
 					<div class="form-row add-medicao">
 						<div class="form-group">
 							<button 
 							class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
 						</div>
-					</div>
-				{% elif pedido_servico.servico_props['status'] == 'novo' and (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento') %}
-					<div class="form-row add-medicao">
-						<div class="form-group">
-							<button 
-							class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
-						</div>
-					</div>
+					</div> #}
 				{% endif %}
 				<div class="form-row">
 					<div class="form-group form-control-lg col-sm-6">
@@ -202,7 +206,7 @@
 			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false})
 			var removeWhitespace = $('#comentario').val().trim()
 			$('#comentario').val(removeWhitespace)
-
+			$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05'});
 
 		});
 	</script>
