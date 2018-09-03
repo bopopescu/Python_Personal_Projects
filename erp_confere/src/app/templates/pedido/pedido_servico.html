@@ -53,16 +53,16 @@
 				{% endif %}
 
 				<div class="form-row">
-					<div class="form-group col-sm-6">
+					<div class="form-group col-sm-3">
 						<label>Data Inicio</label>
 						<input class="form-control form-control-lg datepicker" type="text" name="data-inicio" disabled
 						value="{{pedido_servico.data_inicio.strftime('%d/%m/%Y') if pedido_servico.data_inicio is not none}}">
 					</div>
-					{# <div class="form-group col-sm-2">
+					<div class="form-group col-sm-3">
 						<label>Data Final</label>
-						<input class="form-control datepicker" type="text" name="data-final" 
-						value="{{pedido_servico.data_fim.strftime('%d/%m/%Y') if pedido_servico.data_fim is not none}}">
-					</div> #}
+						<input class="form-control datepicker form-control-lg" type="text" name="data-final" 
+						value="{{pedido_servico.data_fim.strftime('%d/%m/%Y') if pedido_servico.data_fim is not none}}" disabled>
+					</div>
 
 				</div>
 				<div class="form-row">
@@ -98,7 +98,16 @@
 							{% endif %}
 						{% endif %}
 					</div>
-					{% if pedido_servico.servico_props['agendamento']|length > 1%}
+					{% if pedido_servico.servico_props['agendamento']|length == 0 and 
+						pedido_servico.servico_props['status'] == 'novo'%}
+						<div class="form-row add-medicao">
+							<div class="form-group">
+								<button 
+								class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
+							</div>
+						</div>
+					{% elif pedido_servico.servico_props['agendamento']|length < 3 and 
+						pedido_servico.servico_props['status'] == 'agendado'%}
 						<div class="form-row add-medicao">
 							<div class="form-group">
 								<button 
@@ -124,23 +133,32 @@
 				</div>
 				<div class="form-row">
 					<div class="form-group">
+						{% set action_value  = 'Undefined'%}
 						{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
 						{% if pedido_servico.servico_props['status'] == 'novo' and
 								(pedido_servico.servico.nome == 'medicao' or pedido_servico.nome == 'atendimento') %}
-							<input type="submit" value="Agendar" name="acao" 
-							class="form-control form-control-lg btn btn-success">
+							{% set action_value = 'Agendar'%}
+
+							{# <input type="submit" value="Agendar" name="acao" 
+							class="form-control form-control-lg btn btn-success"> #}
 						{% elif pedido_servico.servico_props['status'] == 'novo' and 
-								(pedido_servico.servico.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}
-							<input type="submit" value="Iniciar" name="acao" 
-							class="form-control form-control-lg btn btn-success">
-						{% elif pedido_servico.servico_props['status'] == 'agendado' or pedido_servico.servico_props['status'] == 'em_execucao'%}
-							<input type="submit" value="Concluir" name="concluido" 
-							class="form-control form-control-lg btn btn-success">
+								(pedido_servico.servico.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}	
+							{% set action_value = 'Iniciar'%}
+							{# <input type="submit" value="Iniciar" name="acao" 
+							class="form-control form-control-lg btn btn-success"> #}
+						{% elif pedido_servico.servico_props['status'] == 'agendado' or pedido_servico.servico_props['status'] == 'iniciado'%}
+							{% set action_value = 'Concluir'%}
+							{# <input type="submit" value="Concluir" name="acao" 
+							class="form-control form-control-lg btn btn-success"> #}
 						{% endif %}
+						<input type="submit" value="{{ action_value }}" name="acao" 
+							class="form-control form-control-lg btn btn-success">
 					</div>
-					<div class="form-group">
-						<input type="submit" name="acao" value="Atualizar" class="btn btn-primary btn-margin">
-					</div>
+					{% if pedido_servico.servico_props['status'] != 'concluido' %}
+						<div class="form-group">
+							<input type="submit" name="acao" value="Atualizar" class="btn btn-primary btn-margin">
+						</div>
+					{% endif %}
 				</div>
 			</fieldset>
 			
@@ -171,11 +189,12 @@
 
 				if( !$('#data-agendamento').length ){
 					var divRow = $('<div></div>', {class : 'form-row novo-agendamento'});
-					var divGroupInput = $('<div></div>', {class : 'form-group col-sm-6'});
+					var divGroupInput = $('<div></div>', {class : 'form-group col-sm-4'});
 					var labelDate = $('<label></label>', {text: 'Data de Agendamento'})
-					var inputDate = $('<input/>', {class: 'form-control form-control-lg datetimepicker', type: 'text', 
-						name: 'data-medicao-agendada', id: 'data-agendamento'})
-					var btnRemove = $('<button></button>', {class: 'btn btn-danger remove-input', text: 'Remove'})
+					var inputDate = $('<input/>', {class: 'form-control form-control-lg datetimepicker', 
+						type: 'text', name: 'agendamento', id: 'data-agendamento'})
+					var btnRemove = $('<button></button>', 
+						{class: 'btn form-control-lg btn-danger remove-input', text: 'Remove'})
 					var btnLabelGamb = $('<label></label>', {text: 'ss'})
 					var spanBtn = $('<span></span>', {class: 'input-group-btn'})
 
@@ -203,10 +222,11 @@
 				$('.novo-agendamento').remove()
 
 			});
-			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false})
+			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false, scrollInput: false})
 			var removeWhitespace = $('#comentario').val().trim()
 			$('#comentario').val(removeWhitespace)
-			$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05'});
+			$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05',
+				scrollInput: false});
 
 		});
 	</script>

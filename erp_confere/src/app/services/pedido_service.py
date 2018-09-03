@@ -34,8 +34,6 @@ def create_pedido_handler(dic):
 def insert_pedido(pedido, pedido_servicos):
 
 	conn, cursor = db.get_db_resources()
-	
-	print(pedido.ambiente)
 
 	try:
 		pedido_props = (pedido.codigo, pedido.cliente_endereco.codigo, pedido.loja.codigo, 
@@ -54,6 +52,7 @@ def insert_pedido(pedido, pedido_servicos):
 	except:
 		raise
 	else:
+		cursor._last_executed
 		conn.commit()
 	finally:
 		cursor.close()

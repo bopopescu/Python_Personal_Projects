@@ -7,6 +7,7 @@ from services import funcionario_service
 from app_util import date_util
 from services import pedido_servico_service
 from flask_paginate import Pagination, get_page_args
+import decimal
 import jsonpickle 
 import app_util.jsonpickle_handler 
 import json
@@ -26,9 +27,6 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		
 		servico_form = parse_form(request.form)
 
-		# print(servico_form)
-		# print(request.form)
-		# Decide which service type is and its status 
 		if request.form['acao'] == 'Atualizar':
 			pedido_servico_service.update_pedido_servico(**servico_form)
 
@@ -37,18 +35,37 @@ def pedido_servico(codigo_pedido, codigo_servico):
 				codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 		else:
 			if request.form['acao'] == 'Iniciar' or request.form['acao'] == 'Agendar':
-				# Update data_inicio with the current date and can't have funcionario None
-				# If is servico == medicao or servico == atendimento then data_agendamento is
-				# required
 				if validate_form_agendar_iniciar(request):
 					# update the status and others information
-					print('foi aqui')
-					pass
+					try:
+						pedido_servico_service.agendar_iniciar(**servico_form)
+					except Exception as e:
+						raise
+						msg = str(e)
+						categoria = 'error'
+					else:
+						msg = 'Serviço %s com sucesso' % 'iniciado'
+						categoria = 'success'
+					finally:
+						flash(msg, categoria)
+						return redirect(url_for('pedido.pedido_servico', 
+						codigo_pedido=request.form['codigo-pedido'], codigo_servico=request.form['codigo-servico']))
 				else:
-					flash('Informações necessárias: Funcionário e data de agendamento (no caso de Medição e Liberação)', 'error')
+					flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
 					return redirect(url_for('pedido.pedido_servico', 
 						codigo_pedido=request.form['codigo-pedido'], codigo_servico=request.form['codigo-servico']))
- 
+			if request.form['acao'] == 'Concluir':
+				print('Foi!')
+				pedido_servico_service.concluir(**servico_form)
+				flash('Serviço concluido!')
+				return redirect(url_for('pedido.pedido_servico', 
+					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
+			else:
+				flash('Favor informar o valor do promob para realizar a conclusão do serviço')
+				return redirect(url_for('pedido.pedido_servico', 
+					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
+
+
 
 @bp.route('/')
 def pedido():
@@ -111,8 +128,14 @@ def cadastrar():
 		pedido['servicos'] = request.form.getlist('servicos')
 		pedido['ambientes'] = ambientes_to_dict(request.form)
 
-		pedido_service.create_pedido_handler(pedido)
-
+		try:
+			pedido_service.create_pedido_handler(pedido)
+		except Exception as e: 
+			msg = str(e.message)
+			categoria = 'error'
+		else:
+			msg = 'Pedido cadastrado com sucesso'
+			categoria = 'success'
 		return redirect(url_for('pedido.cadastrar'))
 	else:
 		servicos = servico_service.get_all_servicos()
@@ -141,18 +164,16 @@ def ambientes_to_dict(form):
 def validate_form_agendar_iniciar(request):
 
 	'''
-		Validates if the required informations are present in the request
+		function validates if the required informations are present in the request
 		In this case: funcionario and data-medicao|medicao-0|medicao-1|medicao-2 
 	'''
-
-
 	if request.form['funcionario'] == '':
 		return False
 
 	# It has to have at least an appointment to change the 'status' 
 	if request.form['nome-servico'] == 'medicao' or request.form['nome-servico'] == 'atendimento':
-		if 'data-medicao-agendada' in request.form:	
-			if request.form['data-medicao-agendada'] == '':
+		if 'agendamento' in request.form:
+			if request.form['agendamento'] == '':
 				return False
 		else:
 			for indx in range(3):
@@ -169,34 +190,12 @@ def parse_form(form):
 	parsed_form = {}
 
 	for key in form:
-		parsed_form[key.replace('-', '_')] = None if form[key] == '' else form[key]
+		if form[key] == '':
+			parsed_form[key.replace('-', '_')] = None
+		else:
+			if key == 'promob-inicial' or key == 'promob-final':
+				parsed_form[key.replace('-', '_')] = decimal.Decimal(form[key].replace(',', '.'))
+			else:
+				parsed_form[key.replace('-', '_')] = form[key]
 
 	return parsed_form
-
-
-
-#			LEAVING HERE AS A BACKUP - I KNOW IT'S EMBARASSING, BUT I CAN'T HELP IT FOR NOW
-# Construct a new and clean object to send to pedido_servico_service
-# 		servico_form = {}
-# 		if 'data-medicao-agendada' in request.form:
-# 			servico_form['agendamento'] = None if request.form['data-medicao-agendada'] == '' else request.form['data-medicao-agendada']
-# 		if 'funcionario' in request.form:
-# 			servico_form['funcionario'] = None if request.form['funcionario'] == '' else request.form['funcionario']
-# 		if 'comentario' in request.form:
-# 			servico_form['comentario'] = None if request.form['comentario'] == '' else request.form['comentario']
-# 		if 'codigo-pedido' in request.form:
-# 			servico_form['codigo_pedido'] = request.form['codigo-pedido']
-# 		if 'codigo-servico' in request.form:
-# 			servico_form['codigo_servico'] = request.form['codigo-servico']
-# 		if 'promob-inicial' in request.form:
-# 			servico_form['promob_inicial'] = None if request.form['promob-inicial'] == '' else request.form['promob-inicial']
-# 		if 'promob_final' in request.form:
-# 			servico_form['promob_final'] = None if request.form['promob-final'] == '' else request.form['promob-final']
-# 		if 'status' in request.form:
-# 			servico_form['status'] = request.form['status']
-# 		if 'medicao-0' in request.form:
-# 			servico_form['medicao-0'] = request.form['medicao-0']
-# 		if 'medicao-1' in request.form:
-# 			servico_form['medicao-1'] = request.form['medicao-1']
-# 		if 'medicao-2' in request.form:
-# 			servico_form['medicao-2'] = request.form['medicao-2']
