@@ -133,26 +133,23 @@
 				</div>
 				<div class="form-row">
 					<div class="form-group">
-						{% set action_value  = 'Undefined'%}
 						{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
 						{% if pedido_servico.servico_props['status'] == 'novo' and
 								(pedido_servico.servico.nome == 'medicao' or pedido_servico.nome == 'atendimento') %}
-							{% set action_value = 'Agendar'%}
-
-							{# <input type="submit" value="Agendar" name="acao" 
-							class="form-control form-control-lg btn btn-success"> #}
+							<input type="submit" value="Agendar" name="acao" 
+							class="form-control form-control-lg btn btn-success">
 						{% elif pedido_servico.servico_props['status'] == 'novo' and 
 								(pedido_servico.servico.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}	
-							{% set action_value = 'Iniciar'%}
-							{# <input type="submit" value="Iniciar" name="acao" 
-							class="form-control form-control-lg btn btn-success"> #}
-						{% elif pedido_servico.servico_props['status'] == 'agendado' or pedido_servico.servico_props['status'] == 'iniciado'%}
-							{% set action_value = 'Concluir'%}
-							{# <input type="submit" value="Concluir" name="acao" 
-							class="form-control form-control-lg btn btn-success"> #}
-						{% endif %}
-						<input type="submit" value="{{ action_value }}" name="acao" 
+							
+							<input type="submit" value="Iniciar" name="acao" 
 							class="form-control form-control-lg btn btn-success">
+						{% elif pedido_servico.servico_props['status'] == 'agendado' or pedido_servico.servico_props['status'] == 'iniciado'%}
+							<input type="submit" value="Concluir" name="acao" 
+							class="form-control form-control-lg btn btn-success">
+						{% elif pedido_servico.servico_props['status'] == 'concluido' %}
+							<input type="submit" value="Reabrir" name="acao" 
+							class="form-control form-control-lg btn btn-success">
+						{% endif %}
 					</div>
 					{% if pedido_servico.servico_props['status'] != 'concluido' %}
 						<div class="form-group">
@@ -221,6 +218,25 @@
 				
 				$('.novo-agendamento').remove()
 
+			});
+			if($('input[name=status]').val() == 'concluido'){
+				$(':input').each(function(index,el) {
+					if(el.type != 'submit'){
+						$(this).attr('disabled', 'true');
+					}
+				});
+
+			}
+			$('#pedido-servico').on('click', 'input[type=submit]', function(event) {
+				
+				var status = $('input[name=status]').val()
+				if(status == 'concluido'){
+					$(':input').each(function(index, el) {
+						$(this).removeAttr('disabled')		
+					});
+				} else if(status == 'agendado' || status == 'iniciado'){
+					alert('Você tem certeza de que quer fechar o serviço?')
+				}
 			});
 			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false, scrollInput: false})
 			var removeWhitespace = $('#comentario').val().trim()

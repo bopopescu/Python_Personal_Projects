@@ -192,3 +192,12 @@ Medição e atendimento
 		-> Precisa pelo menos do funcionário e da data/hora de agendamento
 	Agendando
 		-> Caso precise adicionar mais uma data de agendamento
+
+Validate if the previous service is open
+
+How to validate?
+	If the service doesn't have the state of 'concluido' or 'liberado' then it's opened.
+	So, if the previous service is opened then the current service can't be initialized. You can update it though
+
+How can I know if the previous service is opened?
+	

@@ -5,33 +5,23 @@ import app_util.json_util as json_util
 import services.servico_service as servico_service
 import copy
 import datetime
+import contextlib
 from models.pedido_servico_model import PedidoServicoModel  
 from services import funcionario_service
 from services import pedido_service
-
-def insert_pedido_servico(pedido_servico):
-	pass
-
+from models.enums import Status
 
 def json_to_model(pedido, servico):
-
 	status = json_util.dict_to_str({'status': 'novo'})
-
 	return PedidoServicoModel(pedido, servico, None, 0, None, None, status)	
 
 def generate_pedido_servico(pedido, servico):
-	
 	status = json_util.dict_to_str({'status': 'novo'})
-
 	return PedidoServicoModel(pedido, servico, None, 0, None, None, status)	
 
-
 def update_pedido_servico(pedido_servico):
-
 	conn, cr = db.get_db_resources()
-
 	props = json_util.dict_to_str(pedido_servico['props'])
-
 	cr.execute('call prc_update_pedido_servico(%s, %s, %s, %s, %s, %s)', 
 		(pedido_servico['codigo'], pedido_servico['funcionario']['codigo'], 
 		pedido_servico['valor_comissao'], pedido_servico['data_inicio'], pedido_servico['data_fim'],
@@ -42,10 +32,8 @@ def update_pedido_servico(pedido_servico):
 	conn.close()
 
 def query_pedido_servico_by_pedido(codigo_pedido):
-
-	conn, cr = db.get_db_resources()
-
 	try:
+		conn, cr = db.get_db_resources()
 		cr.callproc('prc_get_pedido_servico_by_pedido', (codigo_pedido, ))
 	except:
 		raise
@@ -63,18 +51,15 @@ def query_pedido_servico_by_pedido(codigo_pedido):
 def get_pedido_servico_by_servico(codigo_pedido):
 
 	pedido_servicos = query_pedido_servico_by_pedido(codigo_pedido)
-
 	for pedido_servico in pedido_servicos:
 		pedido_servico.servico = servico_service.query_servico_by_id(pedido_servico.servico)
 		pedido_servico.funcionario = funcionario_service.query_funcionario_by_id(pedido_servico.funcionario)
-
 
 	return pedido_servicos
 
 def get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
 
 	pedido = pedido_service.query_pedido_by_id(codigo_pedido)
-
 	servico = servico_service.query_servico_by_id(codigo_servico)
 
 	conn, cr = db.get_db_resources()
@@ -89,25 +74,18 @@ def get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
 		conn.close()
 
 	pedido_servico = PedidoServicoModel(pedido, servico, row[2], row[3], row[4], row[5], json.loads(row[6]))
-
 	pedido_servico.funcionario = funcionario_service.query_funcionario_by_id(pedido_servico.funcionario)
 
 	return pedido_servico
 
 
 def update_pedido_servico(**kwargs):
-
 	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
-
 	updated_values = validate_from_form(pedido_servico, **kwargs)
-
 	update_model(updated_values)
 
 
 def update_model(pedido_servico):
-
-	conn, cr = db.get_db_resources()
-
 	if not pedido_servico:
 		raise ValueError('Pedido serviço não pode ser nulo')
 	if not pedido_servico.pedido:
@@ -120,6 +98,7 @@ def update_model(pedido_servico):
 		funcionario = pedido_servico.funcionario.codigo
 
 	try:
+		conn, cr = db.get_db_resources()
 		cr.callproc('prc_update_pedido_servico', (pedido_servico.pedido.codigo, pedido_servico.servico.codigo, funcionario,
 			pedido_servico.valor_comissao, pedido_servico.data_inicio, pedido_servico.data_fim, json_util.dict_to_str(pedido_servico.servico_props)))
 	except:
@@ -129,7 +108,6 @@ def update_model(pedido_servico):
 	finally:
 		cr.close()
 		conn.close()
-
 
 
 def agendar_iniciar(**kwargs):
@@ -163,13 +141,12 @@ def agendar_iniciar(**kwargs):
 				update_model(updated_pedido_servico)
 		else:
 			raise ValueError('Favor informar o funcionario')
-
+	else:
+		raise ValueError('Pedido foi solicitado o agendamento/inicialização, porém não está aberto')
 
 
 def concluir(**kwargs):
-
 	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
-
 	if validate_pedido_servico(**kwargs):
 		updated_pedido_servico = validate_from_form(pedido_servico, **kwargs)
 		updated_pedido_servico.servico_props['status'] = 'concluido'
@@ -179,22 +156,20 @@ def concluir(**kwargs):
 		raise ValueError('Não há informações para tratar')
 
 def reabrir(**kwargs):
-
 	nome_servico = kwargs['nome_servico']
 	current_status = kwargs['status']
 	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 
-	if current_status_status == 'agendado' or current_status == 'iniciado':
+	if current_status == Status.CONCLUIDO.value:
 		if nome_servico == 'medicao' or nome_servico == 'atendimento':
-			pedido_servico.servico_props['status'] = 'agendado'
+			pedido_servico.servico_props['status'] = Status.AGENDADO.value
 		else:
-			pedido_servico.servico_props['status'] = 'iniciado'
+			pedido_servico.servico_props['status'] = Status.INICIADO.value
+		update_model(pedido_servico)
 
 
 def validate_pedido_servico(**kwargs):
-
 	nome_servico = kwargs['nome_servico']
-
 	if nome_servico == 'medicao' or nome_servico == 'atendimento':
 		return validate_agendamento(**kwargs)
 	elif nome_servico == 'subir_paredes' or nome_servico == 'liberacao':
@@ -204,6 +179,7 @@ def validate_pedido_servico(**kwargs):
 	else:
 		return False
 
+
 def validate_promob(**kwargs):
 	return 'promob_inicial' in kwargs or 'promob_final' in kwargs
 
@@ -212,13 +188,32 @@ def validate_agendamento(**kwargs):
 
 	if 'agendamento' in kwargs:
 		return True
-
 	for indx in range(3):
 		nome_kwargs = 'medicao_' + str(indx)
 		if nome_kwargs in kwargs:
 			return True
 
 	return False
+
+def is_pedido_servico_status_changeable(pedido_servico):
+	previous_state = None
+	try:
+		conn = db.get_db_resources()
+		with contextlib.closing( conn.cursor() ) as cnx:
+			cnx.callproc('prc_get_previous_status_pedido_servico', (pedido_servico.pedido.codigo, 
+				pedido_servico.servico.codigo, previous_state))
+			cnx.execute('SELECT @_prc_get_previous_status_pedido_servico_2')
+			previous_state = cnx.fetchone()[0]
+	except:
+		raise
+	else:
+		conn.close()
+
+	is_changeable = previous_state == 'concluido' or previous_state == 'liberado' or not previous_state
+	if is_changeable:
+		return True
+	return False
+
 
 
 def validate_from_form(pedido_servico, **kwargs):

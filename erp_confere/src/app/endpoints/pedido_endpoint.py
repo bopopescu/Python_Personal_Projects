@@ -44,25 +44,23 @@ def pedido_servico(codigo_pedido, codigo_servico):
 						msg = str(e)
 						categoria = 'error'
 					else:
-						msg = 'Serviço %s com sucesso' % 'iniciado'
+						msg = 'Serviço iniciado com sucesso' 
 						categoria = 'success'
 					finally:
 						flash(msg, categoria)
-						return redirect(url_for('pedido.pedido_servico', 
-						codigo_pedido=request.form['codigo-pedido'], codigo_servico=request.form['codigo-servico']))
 				else:
 					flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
-					return redirect(url_for('pedido.pedido_servico', 
-						codigo_pedido=request.form['codigo-pedido'], codigo_servico=request.form['codigo-servico']))
-			if request.form['acao'] == 'Concluir':
-				print('Foi!')
+			elif request.form['acao'] == 'Concluir':
 				pedido_servico_service.concluir(**servico_form)
 				flash('Serviço concluido!')
-				return redirect(url_for('pedido.pedido_servico', 
-					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
+			elif request.form['acao'] == 'Reabrir':
+				print(servico_form)
+				pedido_servico_service.reabrir(**servico_form)
+				flash('Serviço reaberto', 'success')
 			else:
 				flash('Favor informar o valor do promob para realizar a conclusão do serviço')
-				return redirect(url_for('pedido.pedido_servico', 
+			
+			return redirect(url_for('pedido.pedido_servico', 
 					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 
 
