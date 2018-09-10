@@ -123,22 +123,26 @@ def agendar_iniciar(**kwargs):
 	print(kwargs)
 	if kwargs['status'] == 'novo':
 		if kwargs['funcionario']:
-			is_medicao_or_atendimento = kwargs['nome_servico'] == 'medicao' or kwargs['nome_servico'] == 'atendimento'
-			if is_medicao_or_atendimento:
-				if 'medicao_0' in kwargs or 'agendamento' in kwargs:
-					pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
-					updated_pedido_servico = validate_from_form(pedido_servico, **kwargs)
-					updated_pedido_servico.servico_props['status'] = 'agendado'
-					updated_pedido_servico.data_inicio = datetime.date.today()
-					update_model(updated_pedido_servico)
-				else:
-					raise ValueError('Favor informar a data de agendamento para Medição e Atendimento')
-			else:
-				pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+			pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+			pedido_serivco_changeable = is_pedido_servico_status_changeable(pedido_servico)
+			
+			if pedido_serivco_changeable:
 				updated_pedido_servico = validate_from_form(pedido_servico, **kwargs)
+				
+				is_medicao_or_atendimento = kwargs['nome_servico'] == 'medicao' or kwargs['nome_servico'] == 'atendimento'
+				if is_medicao_or_atendimento:
+					if 'medicao_0' in kwargs or 'agendamento' in kwargs:
+						updated_pedido_servico.servico_props['status'] = 'agendado'
+					else:
+						raise ValueError('Favor informar a data de agendamento')
+				else:
+					updated_pedido_servico.servico_props['status'] = 'iniciado'
+
 				updated_pedido_servico.servico_props['status'] = 'iniciado'
 				updated_pedido_servico.data_inicio = datetime.date.today()
 				update_model(updated_pedido_servico)
+			else:
+				raise ValueError('Favor encerrar devidamente o serviço anterior')
 		else:
 			raise ValueError('Favor informar o funcionario')
 	else:
@@ -147,13 +151,18 @@ def agendar_iniciar(**kwargs):
 
 def concluir(**kwargs):
 	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
-	if validate_pedido_servico(**kwargs):
-		updated_pedido_servico = validate_from_form(pedido_servico, **kwargs)
-		updated_pedido_servico.servico_props['status'] = 'concluido'
-		updated_pedido_servico.data_fim = datetime.date.today()
-		update_model(updated_pedido_servico)
+	pedido_serivco_changeable = is_pedido_servico_status_changeable(pedido_servico)
+
+	if pedido_serivco_changeable:
+		if validate_pedido_servico(**kwargs):
+			updated_pedido_servico = validate_from_form(pedido_servico, **kwargs)
+			updated_pedido_servico.servico_props['status'] = 'concluido'
+			updated_pedido_servico.data_fim = datetime.date.today()
+			update_model(updated_pedido_servico)
+		else:
+			raise ValueError('Não há informações para tratar')
 	else:
-		raise ValueError('Não há informações para tratar')
+		raise ValueError('Favor encerrar devidamente o serviço anterior')
 
 def reabrir(**kwargs):
 	nome_servico = kwargs['nome_servico']
@@ -185,21 +194,19 @@ def validate_promob(**kwargs):
 
 
 def validate_agendamento(**kwargs):
-
 	if 'agendamento' in kwargs:
 		return True
 	for indx in range(3):
 		nome_kwargs = 'medicao_' + str(indx)
 		if nome_kwargs in kwargs:
 			return True
-
 	return False
 
 def is_pedido_servico_status_changeable(pedido_servico):
 	previous_state = None
 	try:
-		conn = db.get_db_resources()
-		with contextlib.closing( conn.cursor() ) as cnx:
+		conn = db.get_db_connection()
+		with contextlib.closing(conn.cursor()) as cnx:
 			cnx.callproc('prc_get_previous_status_pedido_servico', (pedido_servico.pedido.codigo, 
 				pedido_servico.servico.codigo, previous_state))
 			cnx.execute('SELECT @_prc_get_previous_status_pedido_servico_2')

@@ -51,8 +51,12 @@ def pedido_servico(codigo_pedido, codigo_servico):
 				else:
 					flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
 			elif request.form['acao'] == 'Concluir':
-				pedido_servico_service.concluir(**servico_form)
-				flash('Serviço concluido!')
+				try:
+					pedido_servico_service.concluir(**servico_form)
+				except ValueError as err:
+					flash(str(err), 'error')
+				else:
+					flash('Serviço concluido!')
 			elif request.form['acao'] == 'Reabrir':
 				print(servico_form)
 				pedido_servico_service.reabrir(**servico_form)

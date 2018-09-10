@@ -10,6 +10,13 @@ def get_db_resources():
 
 	return conn, cr
 
+def get_db_connection():
+
+	conn = MySQLdb.connect(host='192.168.33.50', port=3306,user='python'
+		,password='Senh@1ndefinid4', db='erp',autocommit=False,charset='utf8mb4')
+
+	return conn
+
 def query_with_one_result(sql_query, *args):
 
 	conn, cur = get_db_resources()
