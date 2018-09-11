@@ -1,0 +1,4 @@
+export FLASK_ENV=development # Only when testing, otherwise don't set the env variable
+
+python -c 'import os; print(os.urandom(16))' # User the output as a secret key
+

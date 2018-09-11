@@ -10,17 +10,17 @@ from app_util.flask_util import FlaskUtilJs
 
 
 
-app = Flask(__name__)
+app = Flask(__name__, instance_path='/home/config-files')
 fujs = FlaskUtilJs(app)
 
-app.secret_key = '123'
+print(app.secret_key)
 
 @app.route("/")
 def template_test():
 	return render_template('index.html', my_string="Wheeee!", my_list=[0,1,2,3,4,5])
 
-app.register_blueprint(pedido_endpoint.bp)
-app.register_blueprint(loja_endpoint.loja)
+# app.register_blueprint(pedido_endpoint.bp)
+# app.register_blueprint(loja_endpoint.loja)
 
 if __name__ == '__main__':
 

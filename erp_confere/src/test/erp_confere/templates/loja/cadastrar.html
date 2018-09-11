@@ -1,0 +1,22 @@
+{% extends 'template.html' %}
+
+
+{% block title %} Lojas {% endblock %}
+
+{% block header %} <h3>Cadastrar novas lojas</h3> {% endblock %}
+
+{% block section %} 
+
+	<div>
+		<form method="post">
+			<label for="nome">Nome</label>
+			<input type="text" name="nome" id="nome">
+
+			<label for="valor_comissao">Nome</label>
+			<input type="text" name="valor_comissao" id="valor_comissao">
+
+			<input type="submit" name="Cadastrar">
+		</form>
+	</div>
+
+{% endblock %}

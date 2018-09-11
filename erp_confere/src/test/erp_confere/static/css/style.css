@@ -1,0 +1,12 @@
+html,body{
+	height: 100%;
+}
+
+.btn-margin{
+	margin-left: 20px;
+}
+
+.form-centralization{
+	margin: 0 auto;
+	width: 80%;
+}
