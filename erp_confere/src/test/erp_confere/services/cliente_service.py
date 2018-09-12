@@ -8,7 +8,10 @@ def cliente_handler(dic):
 		return cliente
 
 	cliente = json_to_model(dic)
-	insert_cliente(cliente)
+		
+	db.session.add(cliente)
+	db.session.commit()
+
 	return cliente
 
 def verify_cliente(dic):

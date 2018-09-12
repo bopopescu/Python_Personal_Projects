@@ -20,11 +20,11 @@
 		<tbody>
 			{% for pedido in pedidos %}
 				<tr class="pedido">
-					<td>{{ loop.index + (pagination.page - 1) * pagination.per_page}}</td>
-					<td class="pedido-codigo">{{ pedido.codigo }}</td>
-					<td class="loja-nome">{{ pedido.loja.nome }}</td>
-					<td class="pedido-numero">{{ pedido.numero_pedido }}</td>
-					<td class="cliente-nome">{{ pedido.cliente_endereco.cliente.nome + ' ' +  pedido.cliente_endereco.cliente.sobrenome}}</td>
+					<!-- <td>{{ loop.index + (pagination.page - 1) * pagination.per_page}}</td> -->
+					<td class="pedido-codigo hide-tag">{{ pedido.codigo }}</td>
+					<td class="loja-nome">{{ pedido.loja_obj.nome }}</td>
+					<td class="pedido-numero">{{ pedido.numero }}</td>
+					<td class="cliente-nome">{{ pedido.cliente_endereco_obj.cliente_obj.nome + ' ' +  pedido.cliente_endereco_obj.cliente_obj.sobrenome}}</td>
 					<td class="pedido-valor">{{ 'R$ ' + pedido.valor_pedido|string|replace('.', ',') }}</td>
 					<td class="pedido-data">{{ pedido.data_entrada.strftime('%d/%m/%Y') }}</td>
 				</tr>
@@ -48,48 +48,44 @@
 			$(this).hide();
 		});
 
-
 		// Toda vez que clicar em uma linha, expandir os serviços
 		$('#pedidos tbody').on('click', '.pedido', function(event) {
 			event.preventDefault();
 			/* Act on the event */
 			var codigo = $(this).children('.pedido-codigo').text()
-
 			var workingElem = $(this)
-
 			var pedidos = [];
-			
 			var already_loaded = workingElem.next().hasClass('table-detail')
-
 
 			if(!already_loaded){
 				$.get(SCRIPT_ROOT + '/pedido/'+ codigo+ '/pedido_servico', function(data, status) {
 
 					if(status === 'success'){
+						console.log(data)
 						var tbl = $('<table></table>', {class: 'table table-hover table-detail'})
 						var tBody = $('<tbody></tbody>')
 							
 						tbl.append(tBody);
 
-						pedidos = data.map(function(elem) {
+						/*pedidos = data.map(function(elem) {
 							return JSON.parse(elem);
-						})
+						})*/
 
-						console.log(pedidos);
+						/*console.log(pedidos);*/
 
-						pedidos.map(function(elem) {
+						data.map(function(elem) {
 							
 							var tRow= $('<tr></tr>');
 							var tDataCodigoPedido = $('<td></td>', {text: elem.pedido, hidden: true, class: 'codigo-pedido'})
-							var tDataCodigoServico = $('<td></td>', {text: elem.servico.codigo, hidden: true,
+							var tDataCodigoServico = $('<td></td>', {text: elem.servico, hidden: true,
 							 class: 'codigo-servico'})
- 							var tDataServicoNome = $('<td></td>',{text: elem.servico.nome});
+ 							var tDataServicoNome = $('<td></td>',{text: elem.nome});
 							var tDataServicoProps = $('<td></td>', {text: elem.servico_props.status});
 							var tDataButton = $('<td></td>')
-							var tButton = $('<button></button>', {
+							var tButton = $('<a></a>', {
 								text: 'atualizar', 
 								class: 'btn btn-outline-primary btn-small btn-pedido-servico', 
-								type: 'button'
+								href: SCRIPT_ROOT + '/pedido/' + elem.pedido + '/servico/' + elem.servico
 							})
 
 							tRow.append(tDataCodigoPedido);
@@ -104,8 +100,6 @@
 						workingElem.after(tbl);
 					}
 					
-
-					
 				});
 			} else {
 				if(workingElem.next().is(":hidden")){
@@ -116,33 +110,33 @@
 			}
 		});
 
-		$('#pedidos tbody').on('click', '.btn-pedido-servico', function(event) {
+		// $('#pedidos tbody').on('click', '.btn-pedido-servico', function(event) {
 			// event.preventDefault();
 			/* Act on the event */
-			console.log($(this).parent().siblings());
+			// console.log($(this).parent().siblings());
 
-			var pedido_servico = {
-				pedido: null,
-				servico: null
-			};
+			// var pedido_servico = {
+			// 	pedido: null,
+			// 	servico: null
+			// };
 
-			$(this).parent().siblings().each(function(idx, el) {
-				console.log(el)
-				var element = $(this)
+			// $(this).parent().siblings().each(function(idx, el) {
+			// 	console.log(el)
+			// 	var element = $(this)
 
-				if (element.hasClass('codigo-pedido')){
-					pedido_servico.pedido = element.text();
-				} else if(element.hasClass('codigo-servico')){
-					pedido_servico.servico = element.text();
-				}
-			});
-			console.log(pedido_servico.pedido);
-			console.log(pedido_servico.servico);
-			var urls = flask_util.url_for('pedido.pedido_servico', {codigo_pedido: pedido_servico.pedido, codigo_servico: pedido_servico.servico});
-			alert(urls)
-			window.location = urls;
-			// $.get(SCRIPT_ROOT + '/pedido/'+ pedido_servico.pedido+ '/servico/' + pedido_servico.servico);
-		});
+			// 	if (element.hasClass('codigo-pedido')){
+			// 		pedido_servico.pedido = element.text();
+			// 	} else if(element.hasClass('codigo-servico')){
+			// 		pedido_servico.servico = element.text();
+			// 	}
+			// });
+			// console.log(pedido_servico.pedido);
+			// console.log(pedido_servico.servico);
+			// var urls = flask_util.url_for('pedido.pedido_servico', {codigo_pedido: pedido_servico.pedido, codigo_servico: pedido_servico.servico});
+			// alert(urls)
+			// window.location = urls;
+			
+		// });
 
 	});
 </script>

@@ -1,6 +1,6 @@
 {% extends 'template.html' %}
 
-{% block title %} Serviços do pedido: {{pedido_servico.pedido.numero_pedido}}</h2> {% endblock %}
+{% block title %} Serviços do pedido: {{pedido_servico.pedido_obj.numero}}</h2> {% endblock %}
 
 
 {% block section %}
@@ -29,20 +29,20 @@
 			{% endfor %}
 		{% endif %}
 	{% endwith %}
-		<h2 class="form-centralization">Servico: {{ pedido_servico.servico.nome_real }}</h2>
+		<h2 class="form-centralization">Servico: {{ pedido_servico.servico_obj.nome_real }}</h2>
 		<form id="pedido-servico" method="post" class="form-centralization">
 
-			<h3>Número do pedido: {{ pedido_servico.pedido.numero_pedido }}</h3>
+			<h3>Número do pedido: {{ pedido_servico.pedido_obj.numero }}</h3>
 			<fieldset>
 				<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
 
-				<input type="hidden" name="nome-servico" value="{{ pedido_servico.servico.nome }}">
+				<input type="hidden" name="nome-servico" value="{{ pedido_servico.servico_obj.nome }}">
 				<input type="hidden" name="codigo-servico" value="{{ pedido_servico.servico.codigo }}">
 				<input type="hidden" name="codigo-pedido" value="{{ pedido_servico.pedido.codigo }}">
 				<input type="hidden" name="status" value="{{ pedido_servico.servico_props['status'] }}">
 				
-				{% if pedido_servico.servico.nome == 'subir_paredes' or pedido_servico.servico.nome == 'liberacao' %}
-					{% set promob_nome = 'inicial' if  pedido_servico.servico.nome == 'subir_paredes' else 'final' %}
+				{% if pedido_servico.servico_obj.nome == 'subir_paredes' or pedido_servico.servico_obj.nome == 'liberacao' %}
+					{% set promob_nome = 'inicial' if  pedido_servico.servico_obj.nome == 'subir_paredes' else 'final' %}
 					<div class="form-row">
 						<div class="form-group col-sm-6">
 							<label>Promob {{ promob_nome }}</label>
@@ -80,7 +80,7 @@
 					</div>
 				</div>
 				{% set agendado_ou_novo = (pedido_servico.servico_props['status'] != 'novo' or pedido_servico.servico_props['status'] != 'agendado')%}
-				{% set medicao_ou_atendimento = (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento')%}
+				{% set medicao_ou_atendimento = (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento')%}
 				{% if agendado_ou_novo and medicao_ou_atendimento%}
 					<div class="form-row">
 						{% set list_size = pedido_servico.servico_props['agendamento']|length %}
@@ -115,7 +115,7 @@
 							</div>
 						</div>
 					{% endif %}
-				{# {% elif pedido_servico.servico_props['status'] == 'novo' and (pedido_servico.servico.nome == 'medicao' or pedido_servico.servico.nome == 'atendimento') %}
+				{# {% elif pedido_servico.servico_props['status'] == 'novo' and (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento') %}
 					<div class="form-row add-medicao">
 						<div class="form-group">
 							<button 
@@ -135,11 +135,11 @@
 					<div class="form-group">
 						{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
 						{% if pedido_servico.servico_props['status'] == 'novo' and
-								(pedido_servico.servico.nome == 'medicao' or pedido_servico.nome == 'atendimento') %}
+								(pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.nome == 'atendimento') %}
 							<input type="submit" value="Agendar" name="acao" 
 							class="form-control form-control-lg btn btn-success">
 						{% elif pedido_servico.servico_props['status'] == 'novo' and 
-								(pedido_servico.servico.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}	
+								(pedido_servico.servico_obj.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}	
 							
 							<input type="submit" value="Iniciar" name="acao" 
 							class="form-control form-control-lg btn btn-success">

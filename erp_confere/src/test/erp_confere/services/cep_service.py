@@ -12,7 +12,8 @@ def cep_handler(cep_from_client):
 	if cep is None:
 		new_cep = viacep.get_cep(num_cep)
 		
-		insert_cep(new_cep)
+		db.session.add(new_cep)
+		db.session.commit()
 		return new_cep
 
 	return cep

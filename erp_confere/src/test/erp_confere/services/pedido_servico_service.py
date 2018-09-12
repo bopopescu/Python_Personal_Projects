@@ -5,7 +5,7 @@ import services.servico_service as servico_service
 import copy
 import datetime
 import contextlib
-from model.models import PedidoServico  
+from model.models import PedidoServico, Servico 
 from services import funcionario_service
 from services import pedido_service
 from persistence.mysql_persistence import db
@@ -15,45 +15,42 @@ def json_to_model(pedido, servico):
 	return PedidoServicoModel(pedido, servico, None, 0, None, None, status)	
 
 def generate_pedido_servico(pedido, servico):
-	status = json_util.dict_to_str({'status': 'novo'})
-	return PedidoServico(pedido_obj=pedido, servico_obj=servico, funcionario=None, valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)	
-
-def update_pedido_servico(pedido_servico):
-	conn, cr = db.get_db_resources()
-	props = json_util.dict_to_str(pedido_servico['props'])
-	cr.execute('call prc_update_pedido_servico(%s, %s, %s, %s, %s, %s)', 
-		(pedido_servico['codigo'], pedido_servico['funcionario']['codigo'], 
-		pedido_servico['valor_comissao'], pedido_servico['data_inicio'], pedido_servico['data_fim'],
-		props))
-
-	conn.commit()
-
-	conn.close()
+	status = {'status': 'novo'}
+	return PedidoServico(pedido_obj=pedido, servico_obj=servico, funcionario_obj=None, valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)	
 
 def query_pedido_servico_by_pedido(codigo_pedido):
 	return PedidoServico.query.filter_by(pedido=codigo_pedido).all()
 
-
-def get_pedido_servico_by_servico(codigo_pedido):
-
+def query_pedido_servico_by_servico(codigo_pedido):
 	pedido_servicos = query_pedido_servico_by_pedido(codigo_pedido)
-	for pedido_servico in pedido_servicos:
-		pedido_servico.servico = servico_service.query_servico_by_id(pedido_servico.servico)
-		pedido_servico.funcionario = funcionario_service.query_funcionario_by_id(pedido_servico.funcionario)
-
 	return pedido_servicos
 
-def get_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
-	return PedidoServico.query.filter_by(pedido=codigo_pedido, servico=codigo_servico)
+def query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
+	return PedidoServico.query.filter_by(pedido=codigo_pedido, servico=codigo_servico).one()
 
+def query_partial_pedido_servico_by_pedido(codigo_pedido):
+	result_set = (db.session.query(PedidoServico, Servico).join(PedidoServico.servico_obj) \
+		.with_entities(PedidoServico.pedido, PedidoServico.servico, Servico.nome_real, PedidoServico.servico_props) \
+		.filter(PedidoServico.pedido == codigo_pedido).all())
 
-def update_pedido_servico(**kwargs):
-	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+	retorno = []
+	for row in result_set:
+		linha = {}
+		linha['pedido'] = row[0]
+		linha['servico'] = row[1]
+		linha['nome'] = row[2]
+		linha['servico_props'] = row[3]
+		retorno.append(linha) 
+
+	db.session.close()
+	return retorno
+
+def atualiza(**kwargs):
+	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 	updated_values = validate_from_form(pedido_servico, **kwargs)
-	update_model(updated_values)
+	update_pedido_servico(updated_values)
 
-
-def update_model(pedido_servico):
+def update_pedido_servico(pedido_servico):
 	if not pedido_servico:
 		raise ValueError('Pedido serviço não pode ser nulo')
 	if not pedido_servico.pedido:
@@ -65,17 +62,9 @@ def update_model(pedido_servico):
 	else:
 		funcionario = pedido_servico.funcionario.codigo
 
-	try:
-		conn, cr = db.get_db_resources()
-		cr.callproc('prc_update_pedido_servico', (pedido_servico.pedido.codigo, pedido_servico.servico.codigo, funcionario,
-			pedido_servico.valor_comissao, pedido_servico.data_inicio, pedido_servico.data_fim, json_util.dict_to_str(pedido_servico.servico_props)))
-	except:
-		raise
-	else:
-		conn.commit()
-	finally:
-		cr.close()
-		conn.close()
+	db.session.update(pedido_servico)
+	db.session.commit()
+	db.session.close()
 
 
 def agendar_iniciar(**kwargs):

@@ -10,3 +10,7 @@ html,body{
 	margin: 0 auto;
 	width: 80%;
 }
+
+.hide-tag{
+	display: none;
+}

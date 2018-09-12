@@ -14,7 +14,7 @@ from app_util.flask_util import FlaskUtilJs
 
 
 # this will change
-LOCAL_PATH = '/home/vinicius/config-files/'
+LOCAL_PATH = '/home/vyosiura/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)
@@ -25,11 +25,9 @@ mysql_persistence.db.init_app(app)
 
 app.register_blueprint(pedido_endpoint.bp)
 
-
 @app.route("/")
 def template_test():
     return render_template('index.html', my_string="Wheeee!", my_list=[0, 1, 2, 3, 4, 5])
-
 
 # app.register_blueprint(loja_endpoint.loja)
 
