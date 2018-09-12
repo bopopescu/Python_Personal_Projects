@@ -70,7 +70,7 @@ def jason_to_model(dic):
 	cliente_endereco = cliente_endereco_service.cliente_endereco_handler(dic)
 
 	return Pedido(cliente_endereco=cliente_endereco, loja=loja, complemento=pedido_pai, 
-		numero=numero_pedido, valor=valor_pedido, data_entrada=data_entrada, data_inicio=data_inicio, data_fim=data_fim, ambiente=ambiente)
+		numero=numero_pedido, valor=valor_pedido, data_entrada=data_entrada, data_inicio=data_inicio, data_fim=data_fim, ambientes=ambiente)
 
 
 def query_pedido_by_id(codigo):

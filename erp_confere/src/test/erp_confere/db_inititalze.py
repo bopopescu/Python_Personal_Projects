@@ -1,8 +1,14 @@
-from run import db
-# from model.models import Loja, Funcao, Ambiente, Servico
+from run import app
+from persistence.mysql_persistence import db
+
 
 
 if __name__ == '__main__':
+
+	app.app_context().push()
+
+	# with app.app_context():
+	# 	db.init_app(app)
 
 	from model.models import *
 

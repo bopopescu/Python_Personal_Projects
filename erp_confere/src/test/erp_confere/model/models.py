@@ -89,7 +89,7 @@ class Servico(db.Model):
 	codigo = db.Column('cd_servico', db.Integer, nullable=False, autoincrement=False)
 	nome = db.Column('nm_servico', db.String(30), nullable=False)
 	nome_real = db.Column('nm_servico_real', db.String(30), nullable=False)
-	valor = db.Column('vl_servico', mysqldialect.DECIMAL(precision=10,scale=2), nullable=False, default=0)
+	valor = db.Column('vl_servico', mysqldialect.DECIMAL(precision=12,scale=6), nullable=False, default=0)
 	sequencia = db.Column('nr_sequencia', db.Integer, nullable=False)
 	tipo_valor = db.Column('tp_vl_servico', mysqldialect.ENUM('pct', 'rl'), default='pct', nullable=False)
 

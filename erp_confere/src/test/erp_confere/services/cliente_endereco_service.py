@@ -14,15 +14,15 @@ def cliente_endereco_handler(dic):
 
 		cep, cliente = resolve_cep_cliente(numero_cep, dic)
 
-		cliente_endereco = query_cliente_endereco_by_cep_cliente(cep.cep, cliente.codigo)
+		cliente_endereco = query_cliente_endereco_by_cep_cliente(cep.numero, cliente.codigo)
 
 		if cliente_endereco:
-			cliente_endereco.cep = CepModel.query_by_id(cliente_endereco.cep)
-			cliente_endereco.cliente = ClienteModel.query_by_id(cliente_endereco.cliente) 
+			cliente_endereco.cep_obj = cep_service.query_cep_by_id(cliente_endereco.cep)
+			cliente_endereco.cliente_obj = cliente_service.query_cliente_by_id(cliente_endereco.cliente) 
 
 			return cliente_endereco
 
-		cliente_endereco = ClienteEndereco(cep=cep, cliente=cliente, numero=numero_endereco, 
+		cliente_endereco = ClienteEndereco(cep_obj=cep, cliente_obj=cliente, numero=numero_endereco, 
 				complemento=complemento, referencia=referencia)
 
 		insert_cliente_endereco(cliente_endereco)
@@ -32,7 +32,7 @@ def cliente_endereco_handler(dic):
 def insert_cliente_endereco(cliente_endereco):
 	db.session.add(cliente_endereco)
 	db.session.commit()
-	db.session.close()
+
 
 def resolve_cep_cliente(numero_cep, dic):
 	cep = cep_service.cep_handler(numero_cep)

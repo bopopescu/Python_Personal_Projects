@@ -12,7 +12,7 @@ def cliente_handler(dic):
 	return cliente
 
 def verify_cliente(dic):
-	cliente = ClienteModel.query_cliente_by_name(dic['nome'].strip(), dic['sobrenome'].strip())
+	cliente = query_cliente_by_name(dic['nome'].strip(), dic['sobrenome'].strip())
 	if cliente:
 		return cliente
 	return None

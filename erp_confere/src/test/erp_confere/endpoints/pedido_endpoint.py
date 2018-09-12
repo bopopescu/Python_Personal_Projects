@@ -108,37 +108,19 @@ def cadastrar():
 	
 	if request.method == 'POST':
 		
-		# Pedido
-		pedido = {}
-		pedido['numero_pedido'] = request.form['numero-pedido']
-		pedido['valor_pedido'] = float(request.form['valor-pedido'].replace(',', '.'))
-		pedido['data_entrada'] = date_util.convert_form_date_to_date(request.form['data-entrada'])
-		pedido['loja'] = request.form['loja']
-		# Cliente
-		pedido['nome'] = request.form['nome-cliente']
-		pedido['sobrenome'] = request.form['sobrenome-cliente']
-		pedido['email'] = request.form['email']
-		pedido['tel_residencial'] = request.form['telefone-residencial']
-		pedido['tel_celular'] = request.form['telefone-celular']
-		# Endereço
-		pedido['cep'] = request.form['cep']
-		pedido['endereco'] = request.form['endereco']
-		pedido['complemento'] = request.form['complemento']
-		pedido['bairro'] = request.form['bairro']
-		pedido['numero'] = request.form['numero']
-		# Serviços
-		pedido['servicos'] = request.form.getlist('servicos')
-		pedido['ambientes'] = ambientes_to_dict(request.form)
+		pedido = build_request_form(request)
 
-		try:
-			pedido_service.create_pedido_handler(pedido)
-		except Exception as e: 
-			msg = str(e.message)
-			categoria = 'error'
-		else:
-			msg = 'Pedido cadastrado com sucesso'
-			categoria = 'success'
-		return redirect(url_for('pedido.cadastrar'))
+		pedido_service.create_pedido_handler(pedido)
+		
+		# try:
+		# 	pedido_service.create_pedido_handler(pedido)
+		# except Exception as e: 
+		# 	msg = str(e)
+		# 	categoria = 'error'
+		# else:
+		# 	msg = 'Pedido cadastrado com sucesso'
+		# 	categoria = 'success'
+		# return redirect(url_for('pedido.cadastrar'))
 	else:
 		servicos = servico_service.query_all_servicos()
 		ambientes = ambiente_service.query_all_ambientes()
@@ -150,7 +132,7 @@ def cadastrar():
 
 def ambientes_to_dict(form):
 	# Ambientes
-	ambientes = ambiente_service.get_all_ambientes()
+	ambientes = ambiente_service.query_all_ambientes()
 	ambientes_sent = []
 	for ambiente in ambientes:
 		nome_ambiente = ambiente.nome.replace(' ', '-').lower()
@@ -201,3 +183,29 @@ def parse_form(form):
 				parsed_form[key.replace('-', '_')] = form[key]
 
 	return parsed_form
+
+
+def build_request_form(request):
+	# Pedido
+	pedido = {}
+	pedido['numero_pedido'] = request.form['numero-pedido']
+	pedido['valor_pedido'] = float(request.form['valor-pedido'].replace(',', '.'))
+	pedido['data_entrada'] = date_util.convert_form_date_to_date(request.form['data-entrada'])
+	pedido['loja'] = request.form['loja']
+	# Cliente
+	pedido['nome'] = request.form['nome-cliente']
+	pedido['sobrenome'] = request.form['sobrenome-cliente']
+	pedido['email'] = request.form['email']
+	pedido['tel_residencial'] = request.form['telefone-residencial']
+	pedido['tel_celular'] = request.form['telefone-celular']
+	# Endereço
+	pedido['cep'] = request.form['cep']
+	pedido['endereco'] = request.form['endereco']
+	pedido['complemento'] = request.form['complemento']
+	pedido['bairro'] = request.form['bairro']
+	pedido['numero'] = request.form['numero']
+	# Serviços
+	pedido['servicos'] = request.form.getlist('servicos')
+	pedido['ambientes'] = ambientes_to_dict(request.form)
+
+	return pedido

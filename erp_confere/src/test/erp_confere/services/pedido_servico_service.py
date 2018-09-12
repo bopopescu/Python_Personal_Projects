@@ -16,7 +16,7 @@ def json_to_model(pedido, servico):
 
 def generate_pedido_servico(pedido, servico):
 	status = json_util.dict_to_str({'status': 'novo'})
-	return PedidoServicoModel(pedido, servico, None, 0, None, None, status)	
+	return PedidoServico(pedido_obj=pedido, servico_obj=servico, funcionario=None, valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)	
 
 def update_pedido_servico(pedido_servico):
 	conn, cr = db.get_db_resources()
