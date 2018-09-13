@@ -47,11 +47,6 @@ def query_partial_pedido_servico_by_pedido(codigo_pedido):
 	db.session.close()
 	return retorno
 
-def atualiza(**kwargs):
-	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
-	updated_values = validate_from_form(pedido_servico, **kwargs)
-	update_pedido_servico(updated_values)
-
 def update_pedido_servico(pedido_servico):
 	if not pedido_servico:
 		raise ValueError('Pedido serviço não pode ser nulo')
@@ -65,6 +60,7 @@ def update_pedido_servico(pedido_servico):
 		funcionario_obj = pedido_servico.funcionario_obj
 
 	db.session.commit()
+
 
 def agendar_iniciar(**kwargs):
 	'''
@@ -95,7 +91,6 @@ def agendar_iniciar(**kwargs):
 				else:
 					pedido_servico.servico_props['status'] = 'iniciado'
 
-				pedido_servico.servico_props['status'] = 'iniciado'
 				pedido_servico.data_inicio = datetime.date.today()
 				update_pedido_servico(pedido_servico)
 			else:
@@ -106,25 +101,40 @@ def agendar_iniciar(**kwargs):
 		raise ValueError('Pedido foi solicitado o agendamento/inicialização, porém não está aberto')
 
 
+def atualiza(**kwargs):
+	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+	validate_from_form(pedido_servico, **kwargs)
+	print(kwargs)
+	update_pedido_servico(pedido_servico)
+
+
 def concluir(**kwargs):
-	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+
+
+	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 	pedido_serivco_changeable = is_pedido_servico_status_changeable(pedido_servico)
 
 	if pedido_serivco_changeable:
-		if validate_pedido_servico(**kwargs):
-			updated_pedido_servico = validate_from_form(pedido_servico, **kwargs)
-			updated_pedido_servico.servico_props['status'] = 'concluido'
-			updated_pedido_servico.data_fim = datetime.date.today()
-			update_pedido_servico(updated_pedido_servico)
-		else:
-			raise ValueError('Não há informações para tratar')
+
+		if pedido_servico.servico_obj.nome == 'subir_paredes':
+			if not kwargs['promob_inicial']:
+				raise ValueError('Favor informar o promob inicial')
+		elif pedido_servico.servico_obj.nome == 'liberacao':
+			if kwargs['promob_final']:
+				raise ValueError('Favor informar o promob inicial')
+
+		validate_from_form(pedido_servico, **kwargs)
+		pedido_servico.servico_props['status'] = 'concluido'
+		pedido_servico.data_fim = datetime.date.today()
+		update_pedido_servico(pedido_servico)
+
 	else:
 		raise ValueError('Favor encerrar devidamente o serviço anterior')
 
 def reabrir(**kwargs):
 	nome_servico = kwargs['nome_servico']
 	current_status = kwargs['status']
-	pedido_servico = get_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 
 	if current_status == 'concluido':
 		if nome_servico == 'medicao' or nome_servico == 'atendimento':
@@ -134,29 +144,14 @@ def reabrir(**kwargs):
 		update_pedido_servico(pedido_servico)
 
 
-def validate_pedido_servico(**kwargs):
-	nome_servico = kwargs['nome_servico']
-	if nome_servico == 'medicao' or nome_servico == 'atendimento':
-		return validate_agendamento(**kwargs)
-	elif nome_servico == 'subir_paredes' or nome_servico == 'liberacao':
-		return validate_promob(**kwargs)
-	elif nome_servico == 'projeto' or nome_servico == 'manual_de_montagem':
-		return True
-	else:
-		return False
-
 
 def validate_promob(**kwargs):
 	return 'promob_inicial' in kwargs or 'promob_final' in kwargs
 
 
 def validate_agendamento(**kwargs):
-	if 'agendamento' in kwargs:
+	if len(kwargs['agendamento']) > 0:
 		return True
-	for indx in range(3):
-		nome_kwargs = 'medicao_' + str(indx)
-		if nome_kwargs in kwargs:
-			return True
 	return False
 
 def is_pedido_servico_status_changeable(pedido_servico):
@@ -167,7 +162,7 @@ def is_pedido_servico_status_changeable(pedido_servico):
 			.join(PedidoServico.servico_obj)\
 			.with_entities(PedidoServico.servico_props['status'])\
 			.filter(PedidoServico.pedido == pedido_servico.pedido, PedidoServico.servico < pedido_servico.servico)\
-			.order_by(Servico.sequencia)\
+			.order_by(Servico.sequencia.desc())\
 			.limit(1)\
 			.one()[0]
 	except NoResultFound as e:
@@ -183,7 +178,6 @@ def is_pedido_servico_status_changeable(pedido_servico):
 def validate_from_form(pedido_servico, **kwargs):
 
 	# updated_values = copy.deepcopy(pedido_servico)
-	pedido_servico
 	if 'comentario' in kwargs:
 		if kwargs['comentario']:
 			if 'comentario' in pedido_servico.servico_props:
@@ -208,7 +202,7 @@ def validate_from_form(pedido_servico, **kwargs):
 		if kwargs['promob_inicial']:
 			if 'promob_inicial' in pedido_servico.servico_props:
 				if kwargs['promob_inicial'] != pedido_servico.servico_props['promob_inicial']:
-					pedido_servico.servico_props['promob_inicial']
+					pedido_servico.servico_props['promob_inicial'] = kwargs['promob_inicial']
 			else:
 				pedido_servico.servico_props['promob_inicial'] = kwargs['promob_inicial']
 
@@ -223,22 +217,27 @@ def validate_from_form(pedido_servico, **kwargs):
 	if 'agendamento' in kwargs:
 		if kwargs['agendamento']:
 			if 'agendamento' in pedido_servico.servico_props:
-				print(pedido_servico.servico_props['agendamento'])
-				pedido_servico.servico_props['agendamento'].append(kwargs['agendamento'])
-				print(kwargs['agendamento'])
-				print(pedido_servico.servico_props['agendamento'])
+				pedido_servico.servico_props['agendamento'] = kwargs['agendamento']
 			else:
-				pedido_servico.servico_props['agendamento'] = [kwargs['agendamento']]
+				pedido_servico.servico_props['agendamento'] = kwargs['agendamento']		
 
-	for indx in range(3):
-		key_medicao = 'medicao_%s' % indx
-		if key_medicao in kwargs:
-			if kwargs[key_medicao]:
-				if 'agendamento' in pedido_servico.servico_props:
-					if kwargs[key_medicao] != pedido_servico.servico_props['agendamento'][indx]:
-						print(pedido_servico.servico_props['agendamento'])
-						pedido_servico.servico_props['agendamento'][indx] = kwargs[key_medicao]
-				else:
-					pedido_servico.servico_props['agendamento'] = [kwargs[key_medicao]]
+	if 'agendamento' in kwargs:
+		if kwargs['agendamento']:
+			if 'agendamento' in pedido_servico.servico_props:	
+				pedido_servico.servico_props['agendamento'] = kwargs['agendamento']
+			else:
+				pedido_servico.servico_props['agendamento'] = kwargs['agendamento']
+
+	# agendamentos = len(pedido_servico.servico_props['agendamento'])
+	# for indx in range(agendamentos):
+	# 	key_medicao = 'medicao_%s' % indx
+	# 	if key_medicao in kwargs:
+	# 		if kwargs[key_medicao]:
+	# 			if 'agendamento' in pedido_servico.servico_props:
+	# 				if kwargs[key_medicao] != pedido_servico.servico_props['agendamento'][indx]:
+	# 					print(pedido_servico.servico_props['agendamento'])
+	# 					pedido_servico.servico_props['agendamento'].append(kwargs[key_medicao])
+	# 			else:
+	# 				pedido_servico.servico_props['agendamento'] = [kwargs[key_medicao]]
 
 	# return updated_values

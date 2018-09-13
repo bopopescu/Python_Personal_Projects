@@ -43,11 +43,13 @@
 				
 				{% if pedido_servico.servico_obj.nome == 'subir_paredes' or pedido_servico.servico_obj.nome == 'liberacao' %}
 					{% set promob_nome = 'inicial' if  pedido_servico.servico_obj.nome == 'subir_paredes' else 'final' %}
+					{% set promob_key = 'promob'+ promob_nome %}
 					<div class="form-row">
 						<div class="form-group col-sm-6">
 							<label>Promob {{ promob_nome }}</label>
 							<input type="text" name="promob-{{promob_nome}}" 
-							class="form-control form-control-lg real-value">
+							class="form-control form-control-lg real-value"
+							value="{{ pedido_servico.servico_props['promob_inicial'] if promob_nome == 'inicial' else pedido_servico.servico_props['promob_final']}}">
 						</div>
 					</div>
 				{% endif %}
@@ -89,10 +91,10 @@
 									{% for agendamento in pedido_servico.servico_props['agendamento'] %}
 										<div class="form-group col-sm-3">
 												<label>{{ loop.index }}<sup><small>a</small></sup> Medição</label>
-												<input type="text" name="medicao-{{ loop.index - 1 }}" 
+												<input type="text" name="agendamento" 
 												class="form-control form-control-lg datetimepicker" 
 												value="{{agendamento}}"
-												{{ 'disabled' if list_size > 1 and list_size != loop.index else '' }}>
+												{{ 'readonly' if list_size > 1 and list_size != loop.index else '' }}>
 										</div>
 									{% endfor %}
 							{% endif %}
@@ -178,6 +180,9 @@
 {% block script %}
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
+			if($('.datetimepicker[readonly]')){
+				$('.datetimepicker[readonly]').removeClass('datetimepicker')
+			}
 
 			$('.real-value').numeric({decimalPlaces:2, altDecimal: '.', decimal:',', negative: false});
 
@@ -229,7 +234,7 @@
 			}
 			$('#pedido-servico').on('click', 'input[type=submit]', function(event) {
 				
-				var status = $('input[name=status]').val()
+				var status = $('input[name=status][value!=Atualizar]').val()
 				if(status == 'concluido'){
 					$(':input').each(function(index, el) {
 						$(this).removeAttr('disabled')		
@@ -241,8 +246,11 @@
 			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false, scrollInput: false})
 			var removeWhitespace = $('#comentario').val().trim()
 			$('#comentario').val(removeWhitespace)
+
 			$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05',
 				scrollInput: false});
+
+
 
 		});
 	</script>

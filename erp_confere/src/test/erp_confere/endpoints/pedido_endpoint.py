@@ -8,6 +8,7 @@ from app_util import date_util
 from services import pedido_servico_service
 from flask_paginate import Pagination, get_page_args
 from marshmallow import pprint
+import copy
 import decimal
 import jsonpickle 
 import app_util.jsonpickle_handler 
@@ -29,8 +30,9 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		servico_form = parse_form(request.form)
 
 		if request.form['acao'] == 'Atualizar':
+			print(servico_form)
 			pedido_servico_service.atualiza(**servico_form)
-
+			
 			flash('Atualizando com sucesso', 'success')
 			return redirect(url_for('pedido.pedido_servico', 
 				codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
@@ -113,14 +115,14 @@ def cadastrar():
 def ambientes_to_dict(form):
 	# Ambientes
 	ambientes = ambiente_service.query_all_ambientes()
-	ambientes_sent = []
+	ambientes_sent = {'ambientes': []}
 	for ambiente in ambientes:
 		nome_ambiente = ambiente.nome.replace(' ', '-').lower()
 		amb = {}
 		if nome_ambiente in form:
 			amb['nome'] = ambiente.nome
 			amb['quantidade'] = form['quantidade-' + nome_ambiente]
-			ambientes_sent.append(amb)
+			ambientes_sent['ambientes'].append(amb)
 
 	return ambientes_sent
 
@@ -151,18 +153,18 @@ def validate_form_agendar_iniciar(request):
 def parse_form(form):
 
 	parsed_form = {}
-
 	for key in form:
 		if form[key] == '':
 			parsed_form[key.replace('-', '_')] = None
 		else:
 			if key == 'promob-inicial' or key == 'promob-final':
-				parsed_form[key.replace('-', '_')] = decimal.Decimal(form[key].replace(',', '.'))
+				parsed_form[key.replace('-', '_')] = float(form[key].replace(',', '.'))
+			elif key == 'agendamento':
+				parsed_form[key] = copy.copy(form.getlist('agendamento'))
 			else:
 				parsed_form[key.replace('-', '_')] = form[key]
 
 	return parsed_form
-
 
 def build_request_form(request):
 	# Pedido
