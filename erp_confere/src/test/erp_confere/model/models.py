@@ -1,5 +1,6 @@
 from urllib.parse import quote_plus
 import sqlalchemy.dialects.mysql as mysqldialect
+import sqlalchemy.ext.mutable as mutable
 import datetime
 from persistence.mysql_persistence import db
 
@@ -110,7 +111,7 @@ class Pedido(db.Model):
 	data_entrada = db.Column('dt_entrada', mysqldialect.DATE, nullable=False)
 	data_inicio = db.Column('dt_inicio', mysqldialect.DATE)
 	data_fim = db.Column('dt_fim', mysqldialect.DATE)
-	ambientes = db.Column('ambientes', mysqldialect.JSON, nullable=False)
+	ambientes = db.Column('ambientes', mutable.MutableDict.as_mutable(mysqldialect.JSON), nullable=False)
 
 class PedidoServico(db.Model):
 	__tablename__ = 'pedido_servico'
@@ -128,5 +129,4 @@ class PedidoServico(db.Model):
 	valor_comissao = db.Column('vl_comissao', mysqldialect.DECIMAL(precision=10,scale=2), nullable=False, default=0)
 	data_inicio = db.Column('dt_inicio', mysqldialect.DATE)
 	data_fim = db.Column('dt_fim', mysqldialect.DATE)
-	servico_props = db.Column('servico_props', mysqldialect.JSON)
-
+	servico_props = db.Column('servico_props', mutable.MutableDict.as_mutable(mysqldialect.JSON))

@@ -34,9 +34,7 @@
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
   <script type="text/javascript">
-    console.log('{{ request.script_root }}')
     var SCRIPT_ROOT = {{ request.script_root|tojson|safe }}
-    console.log(SCRIPT_ROOT)
   </script>
 <div class="wrapper">
 
@@ -375,7 +373,7 @@
 <!-- ./wrapper -->
 
 <!-- REQUIRED JS SCRIPTS -->
-  {{ flask_util_js.js }}
+  
 	<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/jquery.numeric.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery-ui.min.js') }}"></script>
@@ -383,9 +381,11 @@
 	<!-- AdminLTE App -->
 	<script src="{{ url_for('static', filename='js/adminlte.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.datetimepicker.full.min.js') }}"></script>
+  {% block script %} {% endblock %}
+  {{ flask_util_js.js }}
 <!-- Optionally, you can add Slimscroll and FastClick plugins.
      Both of these plugins are recommended to enhance the
      user experience. -->
-     {% block script %} {% endblock %}
+     
 </body>
 </html>

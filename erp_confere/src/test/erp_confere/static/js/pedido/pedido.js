@@ -1,30 +1,30 @@
 jQuery(document).ready(function($) {
-	
+
 	$('.datepicker').datepicker({dateFormat: 'dd/mm/yy'})
-	
+	console.log('Entrou/?')
 	$('#cep').focusout(function(){
-		
 		if ($(this).val() != '' && $(this).val() == 8){
-			$.get('https://viacep.com.br/ws/' + $('#cep').val().replace('-', '') + '/json/', function(data, status, xhr) {
+			$.get('https://viacep.com.br/ws/' + $(this).val() + '/json/', function(data, status, xhr) {
 				if(status == "success"){
 					if(!data.erro){
 						$('#endereco').val(data.logradouro + ' ' + data.complemento)
 						$('#bairro').val(data.bairro)
 						$('#cidade').val(data.localidade)
 						$('#uf').val(data.uf)
-						$('#cep').addClass('is-valid')
-						$('#cep').removeClass('is-invalid')
+						/*$('#cep').addClass('is-valid')
+						$('#cep').removeClass('is-invalid')*/
 					} else {
-						$('#cep').addClass('is-invalid')
-						$('#cep').removeClass('is-valid')
+						/*$('#cep').addClass('is-invalid')
+						$('#cep').removeClass('is-valid')*/
 					}
 				}
 			});	
+		} else {
+			console.log('Errrrrou')
 		}
 	});
 
 	$('input[type="text"]').focusout(function(event) {
-		/* Act on the event */
 		$(this).val($(this).val().trim())
 	});
 

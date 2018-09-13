@@ -14,7 +14,8 @@ from app_util.flask_util import FlaskUtilJs
 
 
 # this will change
-LOCAL_PATH = '/home/vyosiura/config-files/'
+# LOCAL_PATH = '/home/vyosiura/config-files/'
+LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)

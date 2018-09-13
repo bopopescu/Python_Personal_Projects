@@ -37,8 +37,8 @@
 				<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
 
 				<input type="hidden" name="nome-servico" value="{{ pedido_servico.servico_obj.nome }}">
-				<input type="hidden" name="codigo-servico" value="{{ pedido_servico.servico.codigo }}">
-				<input type="hidden" name="codigo-pedido" value="{{ pedido_servico.pedido.codigo }}">
+				<input type="hidden" name="codigo-servico" value="{{ pedido_servico.servico }}">
+				<input type="hidden" name="codigo-pedido" value="{{ pedido_servico.pedido }}">
 				<input type="hidden" name="status" value="{{ pedido_servico.servico_props['status'] }}">
 				
 				{% if pedido_servico.servico_obj.nome == 'subir_paredes' or pedido_servico.servico_obj.nome == 'liberacao' %}

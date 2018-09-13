@@ -38,17 +38,8 @@ def pedido_servico(codigo_pedido, codigo_servico):
 			if request.form['acao'] == 'Iniciar' or request.form['acao'] == 'Agendar':
 				if validate_form_agendar_iniciar(request):
 					# update the status and others information
-					try:
-						pedido_servico_service.agendar_iniciar(**servico_form)
-					except Exception as e:
-						raise
-						msg = str(e)
-						categoria = 'error'
-					else:
-						msg = 'Serviço iniciado com sucesso' 
-						categoria = 'success'
-					finally:
-						flash(msg, categoria)
+					pedido_servico_service.agendar_iniciar(**servico_form)
+					flash('Serviço iniciado com sucesso' ,'success')
 				else:
 					flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
 			elif request.form['acao'] == 'Concluir':
@@ -143,7 +134,6 @@ def validate_form_agendar_iniciar(request):
 	if request.form['funcionario'] == '':
 		return False
 
-	# It has to have at least an appointment to change the 'status' 
 	if request.form['nome-servico'] == 'medicao' or request.form['nome-servico'] == 'atendimento':
 		if 'agendamento' in request.form:
 			if request.form['agendamento'] == '':
