@@ -120,12 +120,14 @@ def concluir(**kwargs):
 			if not kwargs['promob_inicial']:
 				raise ValueError('Favor informar o promob inicial')
 		elif pedido_servico.servico_obj.nome == 'liberacao':
-			if kwargs['promob_final']:
-				raise ValueError('Favor informar o promob inicial')
+			if not kwargs['promob_final']:
+				raise ValueError('Favor informar o promob final')
 
 		validate_from_form(pedido_servico, **kwargs)
 		pedido_servico.servico_props['status'] = 'concluido'
 		pedido_servico.data_fim = datetime.date.today()
+		if is_pedido_finalizado(pedido_servico):
+			pedido_servico.pedido_obj.data_fim = datetime.date.today()
 		update_pedido_servico(pedido_servico)
 
 	else:
@@ -174,6 +176,23 @@ def is_pedido_servico_status_changeable(pedido_servico):
 		return True
 	return False
 
+
+def is_pedido_finalizado(pedido_servico):
+	'''
+		If there aren't any pedido_servico left to execute, then the pedido is finished
+	'''
+	try:
+		db.session.query(PedidoServico, Servico)\
+			.join(PedidoServico.servico_obj)\
+			.with_entities(PedidoServico.servico_props['status'])\
+			.filter(PedidoServico.pedido == pedido_servico.pedido, PedidoServico.servico > pedido_servico.servico)\
+			.order_by(Servico.sequencia.desc())\
+			.limit(1)\
+			.one()[0]
+	except NoResultFound as e:
+		return True
+	else:
+		return False
 
 def validate_from_form(pedido_servico, **kwargs):
 

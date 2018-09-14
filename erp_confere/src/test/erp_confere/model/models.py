@@ -1,14 +1,45 @@
 from urllib.parse import quote_plus
+from flask_security import UserMixin, RoleMixin
 import sqlalchemy.dialects.mysql as mysqldialect
 import sqlalchemy.ext.mutable as mutable
 import datetime
 from persistence.mysql_persistence import db
 
-class Funcao(db.Model):
-	__tablename__ = 'funcao'
+class Role(db.Model, RoleMixin):
+    __tablename__ = 'funcao'
+    __table_args__ = (db.PrimaryKeyConstraint('cd_funcao', name='pk_funcao'), db.UniqueConstraint('nm_funcao', name='uq_nm_funcao'))
 
-	codigo = db.Column('cd_funcao', db.Integer, primary_key=True, nullable=False)
-	nome = db.Column('nm_funcao', db.String(45), nullable=False)
+    id = db.Column('cd_funcao', db.Integer, nullable=False)
+    name = db.Column('nm_funcao', db.String(80), nullable=False)
+    description = db.Column('ds_funcao', db.String(255))
+
+class User(db.Model, UserMixin):
+    __tablename__ = 'usuario'
+    __table_args__ = (db.PrimaryKeyConstraint('cd_usuario', name='pk_funcao'), db.UniqueConstraint('ds_email', name='uq_ds_email'))
+
+
+    id = db.Column('cd_usuario', db.Integer, nullable=False)
+    email = db.Column('ds_email', db.String(255), nullable=False)
+    username = db.Column('nm_usuario', db.String(255))
+    password = db.Column('ds_senha', db.String(255), nullable=False)
+    last_login_at = db.Column('ds_ultimo_login', mysqldialect.DATETIME)
+    current_login_at = db.Column('ds_recente_login', mysqldialect.DATETIME)
+    last_login_ip = db.Column('ds_ultimo_ip_login', db.String(100))
+    current_login_ip = db.Column('ds_recente_ip_login', db.String(100))
+    login_count = db.Column('nr_qtde_login', db.Integer)
+    active = db.Column('ativo', mysqldialect.TINYINT(1))
+    confirmed_at = db.Column('dt_hr_email_confirmado', mysqldialect.DATETIME)
+    roles = db.relationship('Role', secondary='funcao_usuario',
+                         backref=db.backref('users', lazy='dynamic'))
+
+class RolesUsers(db.Model):
+    __tablename__ = 'funcao_usuario'
+    __table_args__ = (db.PrimaryKeyConstraint('cd_funcao_usuario', name='pk_funcao_usuario'),)
+    
+    id = db.Column('cd_funcao_usuario', db.Integer)
+    user_id = db.Column('cd_usuario', db.Integer, db.ForeignKey('usuario.cd_usuario', name='fk_funcao_usuario_has_usuario'), nullable=False)
+    role_id = db.Column('cd_funcao', db.Integer, db.ForeignKey('funcao.cd_funcao', name='fk_funcao_usuario_has_funcao'), nullable=False)
+
 
 class Funcionario(db.Model):
 	__tablename__ = 'funcionario'
@@ -22,19 +53,6 @@ class Funcionario(db.Model):
 	telefone_residencial = db.Column('nr_telefone_res', mysqldialect.BIGINT)
 	telefone_celular = db.Column('nr_telefone_cel', mysqldialect.BIGINT)
 	cargo = db.Column('ds_cargo', mysqldialect.ENUM('socio', 'finalizador', 'projetista', 'medidor', 'secretaria'), nullable=False)
-
-class Usuario(db.Model):
-	__tablename__ = 'usuario'
-	__table_args__ = (db.PrimaryKeyConstraint('cd_usuario', name='PK_USUARIO'),)
-
-	codigo = db.Column('cd_usuario', db.Integer, db.ForeignKey('funcionario.cd_funcionario', name='fk_usuario_has_funcionario'),nullable=False)
-	username = db.Column('ds_username', db.String(45), nullable=False)
-	password = db.Column('ds_password', db.String(45), nullable=False)
-	data_criacao = db.Column('dt_criacao', mysqldialect.DATETIME, nullable=False, default=datetime.datetime.utcnow())
-	data_alteracao = db.Column('dt_alteracao', mysqldialect.DATETIME, nullable=False, default=datetime.datetime.utcnow())
-	funcao = db.Column('cd_funcao', db.Integer, db.ForeignKey('funcao.cd_funcao', name='fk_funcionario_has_funcao'), nullable=False)
-	funcao_obj = db.relationship('Funcao')
-	funcionario_obj = db.relationship('Funcionario')
 
 class Loja(db.Model):
 	__tablename__ = 'loja'

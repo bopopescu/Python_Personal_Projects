@@ -1,9 +1,11 @@
 from flask import Flask, render_template
 from urllib.parse import quote_plus
 from flask_sqlalchemy import SQLAlchemy
+from flask_security import Security, login_required, SQLAlchemySessionUserDatastore
 from endpoints import pedido_endpoint
 import persistence.mysql_persistence as mysql_persistence
 from app_util.flask_util import FlaskUtilJs
+from model.models import User, Role
 # import endpoints.pedido_endpoint as pedido_endpoint
 # import endpoints.loja_endpoint as loja_endpoint
 # from app_util.flask_util import FlaskUtilJs
@@ -14,19 +16,25 @@ from app_util.flask_util import FlaskUtilJs
 
 
 # this will change
-LOCAL_PATH = '/home/vyosiura/config-files/'
-# LOCAL_PATH = '/home/vinicius/config-files/'
+# LOCAL_PATH = '/home/vyosiura/config-files/'
+LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)
 app.config.from_pyfile(app.instance_path + 'flask.cfg')
 app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'] % (
     app.config['SQL_USER'], app.config['SQL_PASSWORD'])
+
 mysql_persistence.db.init_app(app)
 
+user_datastore = SQLAlchemySessionUserDatastore(mysql_persistence.db.session, User, Role)
+
+security = Security(app, user_datastore)
 app.register_blueprint(pedido_endpoint.bp)
 
+
 @app.route("/")
+@login_required
 def template_test():
     return render_template('index.html', my_string="Wheeee!", my_list=[0, 1, 2, 3, 4, 5])
 

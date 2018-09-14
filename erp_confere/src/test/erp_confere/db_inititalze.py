@@ -1,4 +1,4 @@
-from run import app
+from run import app, user_datastore
 from persistence.mysql_persistence import db
 
 
@@ -20,12 +20,12 @@ if __name__ == '__main__':
 				Loja(nome='Favorita - Suzano', valor_comissao=1.25)
 			]
 
-	funcoes = [
-				Funcao(nome='Administrador'),
-				Funcao(nome='Projetista'),
-				Funcao(nome='Finalizador'),
-				Funcao(nome='Medidor')
-			]
+	# funcoes = [
+	# 			Funcao(nome='Administrador'),
+	# 			Funcao(nome='Projetista'),
+	# 			Funcao(nome='Finalizador'),
+	# 			Funcao(nome='Medidor')
+	# 		]
 
 	ambientes = [
 				Ambiente(nome='Quarto'),
@@ -49,9 +49,9 @@ if __name__ == '__main__':
 				Servico(codigo=6, nome='manual_de_montagem', nome_real='Manual de Montagem', valor='0.0025', 
 					sequencia=6, tipo_valor='pct')
 			]
-
+	user_datastore.create_user(email='matt@nobien.net', password='password')
 	db.session.add_all(lojas)
-	db.session.add_all(funcoes)
+	# db.session.add_all(funcoes)
 	db.session.add_all(ambientes)
 	db.session.add_all(servicos)
 	db.session.commit()
