@@ -8,6 +8,7 @@ from app_util import date_util
 from services import pedido_servico_service
 from flask_paginate import Pagination, get_page_args
 from marshmallow import pprint
+from flask_security import roles_accepted, login_required
 import copy
 import decimal
 import jsonpickle 
@@ -19,12 +20,14 @@ import json
 bp = Blueprint('pedido', __name__, url_prefix='/pedido')
 
 @bp.route('/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('admin')
 def pedido_servico(codigo_pedido, codigo_servico):
 
 	if request.method == 'GET':
 		pedido_servico = pedido_servico_service.query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
 		funcionarios = funcionario_service.query_funcionarios()
-		return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
+		return render_template('admin/pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
 	elif request.method == 'POST':
 		
 		servico_form = parse_form(request.form)
@@ -62,12 +65,8 @@ def pedido_servico(codigo_pedido, codigo_servico):
 					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 
 
-
-@bp.route('/')
-def pedido():
-	return render_template('pedido.html')
-
 @bp.route('/pedidos', methods=['GET', 'POST'])
+@login_required
 def pedidos():
 	search = False
 
@@ -84,9 +83,10 @@ def pedidos():
 	pagination = Pagination(page=page, total=len(pedidos), per_page=per_page, search=search, record_name='pedidos',
 		css_framework='bootstrap4') 
 
-	return render_template('pedido/pedidos.html', pedidos=pedidos, pagination=pagination)
+	return render_template('admin/pedido/pedidos.html', pedidos=pedidos, pagination=pagination)
 
 @bp.route('/<int:codigo_pedido>/pedido_servico')
+@login_required
 def pedido_servicos(codigo_pedido):
 	
 	pedido_servicos = pedido_servico_service.query_partial_pedido_servico_by_pedido(codigo_pedido)
@@ -94,6 +94,7 @@ def pedido_servicos(codigo_pedido):
 	return jsonify(pedido_servicos)
 
 @bp.route('/cadastrar', methods=["GET", "POST"])
+@login_required
 def cadastrar():
 	
 	if request.method == 'POST':
@@ -108,9 +109,15 @@ def cadastrar():
 		ambientes = ambiente_service.query_all_ambientes()
 		lojas = loja_service.query_all_lojas()
 
-		return render_template('pedido/cadastrar.html', servicos=servicos, ambientes=ambientes, lojas=lojas)
+		return render_template('admin/pedido/cadastrar.html', servicos=servicos, ambientes=ambientes, lojas=lojas)
 
 
+@bp.route('/medicao', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('medidor')
+def medicao():
+	pedido_servicos = pedido_servico_service.query_pedido_servico_medicao()
+	return render_template('medidor/index.html', pedido_servicos=pedido_servicos)
 
 def ambientes_to_dict(form):
 	# Ambientes

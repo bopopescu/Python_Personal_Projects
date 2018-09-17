@@ -1,7 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from urllib.parse import quote_plus
 from flask_sqlalchemy import SQLAlchemy
-from flask_security import Security, login_required, SQLAlchemySessionUserDatastore
+from flask_security import Security, login_required, SQLAlchemySessionUserDatastore, current_user, roles_accepted
 from endpoints import pedido_endpoint
 import persistence.mysql_persistence as mysql_persistence
 from app_util.flask_util import FlaskUtilJs
@@ -36,7 +36,14 @@ app.register_blueprint(pedido_endpoint.bp)
 @app.route("/")
 @login_required
 def template_test():
-    return render_template('index.html', my_string="Wheeee!", my_list=[0, 1, 2, 3, 4, 5])
+	for role in current_user.roles:
+		print(role.name)
+	if current_user.roles[0].name == 'admin':
+		return render_template('admin/index.html', my_string="Wheeee!", my_list=[0, 1, 2, 3, 4, 5])
+	elif current_user.roles[0].name == 'medidor': # See only 
+		return redirect(url_for('pedido.medicao'))
+	elif current_user.roles[0].name == 'projetista': # See only the pedido_servico which are 'Liberacao', 'Subir Paredes' e 'Projetos'
+		pass 
 
 # app.register_blueprint(loja_endpoint.loja)
 

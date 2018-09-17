@@ -6,6 +6,8 @@
 <h1>Confere - Index</h1>
 {% endblock %}
 
+{% include 'sidebar_content.html' %}
+
 {% block section %}
 <a href="{{ url_for('security.logout') }}">LOGOUT</a> 
 <h1>Hello, World!</h1>

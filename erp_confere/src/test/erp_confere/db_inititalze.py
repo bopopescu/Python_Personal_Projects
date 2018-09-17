@@ -49,10 +49,25 @@ if __name__ == '__main__':
 				Servico(codigo=6, nome='manual_de_montagem', nome_real='Manual de Montagem', valor='0.0025', 
 					sequencia=6, tipo_valor='pct')
 			]
-	user_datastore.create_user(email='matt@nobien.net', password='password')
+	funcoes = [
+		Role(name='admin', description='Administrador do sistema'),
+		Role(name='medidor', description='Realiza a medição'),
+		Role(name='projetista', description='Realiza os projetos')
+	]
 	db.session.add_all(lojas)
 	# db.session.add_all(funcoes)
 	db.session.add_all(ambientes)
 	db.session.add_all(servicos)
+
+	# [user_datastore.create_role(name=funcao.name, description=funcao.description) for funcao in funcoes]
+	
+	marco = user_datastore.create_user(username='marco.han', email='marcohanpsn@gmail.com', password='password')
+	vinicius = user_datastore.create_user(username='vinicius.yosiura', email='vinicius.yosiura@live.com', password='password')
+	matt = user_datastore.create_user(username='matt', email='matt@nobien.net', password='password')
+
+	user_datastore.add_role_to_user(vinicius, funcoes[0])
+	user_datastore.add_role_to_user(marco, funcoes[1])
+	user_datastore.add_role_to_user(matt, funcoes[2])
+
 	db.session.commit()
 	db.session.close()

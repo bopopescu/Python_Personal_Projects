@@ -151,6 +151,11 @@ def validate_promob(**kwargs):
 	return 'promob_inicial' in kwargs or 'promob_final' in kwargs
 
 
+def query_pedido_servico_medicao():
+	return db.session.query(PedidoServico).filter(PedidoServico.servico == 1, 
+		((PedidoServico.servico_props['status'] == 'iniciado') | (PedidoServico.servico_props['status'] == 'agendado'))).all()
+
+
 def validate_agendamento(**kwargs):
 	if len(kwargs['agendamento']) > 0:
 		return True

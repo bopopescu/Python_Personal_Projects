@@ -34,7 +34,8 @@ class User(db.Model, UserMixin):
 
 class RolesUsers(db.Model):
     __tablename__ = 'funcao_usuario'
-    __table_args__ = (db.PrimaryKeyConstraint('cd_funcao_usuario', name='pk_funcao_usuario'),)
+    __table_args__ = (db.PrimaryKeyConstraint('cd_funcao_usuario', name='pk_funcao_usuario'), 
+    	db.UniqueConstraint('cd_usuario', 'cd_funcao', name="uq_cd_usuario_cd_funcao"))
     
     id = db.Column('cd_funcao_usuario', db.Integer)
     user_id = db.Column('cd_usuario', db.Integer, db.ForeignKey('usuario.cd_usuario', name='fk_funcao_usuario_has_usuario'), nullable=False)
