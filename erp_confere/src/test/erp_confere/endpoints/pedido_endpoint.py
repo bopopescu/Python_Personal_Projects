@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, request, jsonify,redirect, flash
+from flask import Blueprint, render_template, url_for, request, jsonify,redirect, flash, abort
 from services import servico_service
 from services import ambiente_service
 from services import loja_service
@@ -8,7 +8,8 @@ from app_util import date_util
 from services import pedido_servico_service
 from flask_paginate import Pagination, get_page_args
 from marshmallow import pprint
-from flask_security import roles_accepted, login_required
+from flask_security import roles_accepted, login_required, current_user
+from endpoints.exception_handler import http_error
 import copy
 import decimal
 import jsonpickle 
@@ -21,49 +22,56 @@ bp = Blueprint('pedido', __name__, url_prefix='/pedido')
 
 @bp.route('/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET', 'POST'])
 @login_required
-@roles_accepted('admin')
+@roles_accepted('admin', 'medidor', 'projetista')
 def pedido_servico(codigo_pedido, codigo_servico):
 
-	if request.method == 'GET':
-		pedido_servico = pedido_servico_service.query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
-		funcionarios = funcionario_service.query_funcionarios()
-		return render_template('admin/pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
-	elif request.method == 'POST':
-		
-		servico_form = parse_form(request.form)
+	is_medidor_and_medicao = current_user.roles[0].name == 'medidor' and codigo_servico == 1
+	is_projetista = current_user.roles[0].name == 'projetista' and condigo_servico in [2, 3, 4] 
+	is_admin = current_user.roles[0].name == 'admin'
 
-		if request.form['acao'] == 'Atualizar':
-			print(servico_form)
-			pedido_servico_service.atualiza(**servico_form)
+	if is_medidor_and_medicao or is_projetista or is_admin:
+		if request.method == 'GET':
+			pedido_servico = pedido_servico_service.query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
+			funcionarios = funcionario_service.query_funcionarios()
+			return render_template('admin/pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
+		elif request.method == 'POST':
 			
-			flash('Atualizando com sucesso', 'success')
-			return redirect(url_for('pedido.pedido_servico', 
-				codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
-		else:
-			if request.form['acao'] == 'Iniciar' or request.form['acao'] == 'Agendar':
-				if validate_form_agendar_iniciar(request):
-					# update the status and others information
-					pedido_servico_service.agendar_iniciar(**servico_form)
-					flash('Serviço iniciado com sucesso' ,'success')
-				else:
-					flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
-			elif request.form['acao'] == 'Concluir':
-				try:
-					pedido_servico_service.concluir(**servico_form)
-				except ValueError as err:
-					flash(str(err), 'error')
-				else:
-					flash('Serviço concluido!')
-			elif request.form['acao'] == 'Reabrir':
+			servico_form = parse_form(request.form)
+
+			if request.form['acao'] == 'Atualizar':
 				print(servico_form)
-				pedido_servico_service.reabrir(**servico_form)
-				flash('Serviço reaberto', 'success')
-			else:
-				flash('Favor informar o valor do promob para realizar a conclusão do serviço')
-			
-			return redirect(url_for('pedido.pedido_servico', 
+				pedido_servico_service.atualiza(**servico_form)
+				
+				flash('Atualizando com sucesso', 'success')
+				return redirect(url_for('pedido.pedido_servico', 
 					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
-
+			else:
+				if request.form['acao'] == 'Iniciar' or request.form['acao'] == 'Agendar':
+					if validate_form_agendar_iniciar(request):
+						# update the status and others information
+						pedido_servico_service.agendar_iniciar(**servico_form)
+						flash('Serviço iniciado com sucesso' ,'success')
+					else:
+						flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
+				elif request.form['acao'] == 'Concluir':
+					try:
+						pedido_servico_service.concluir(**servico_form)
+					except ValueError as err:
+						flash(str(err), 'error')
+					else:
+						flash('Serviço concluido!')
+				elif request.form['acao'] == 'Reabrir':
+					print(servico_form)
+					pedido_servico_service.reabrir(**servico_form)
+					flash('Serviço reaberto', 'success')
+				else:
+					flash('Favor informar o valor do promob para realizar a conclusão do serviço')
+				
+				return redirect(url_for('pedido.pedido_servico', 
+						codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
+	else:
+		abort(403, 'Sem acesso')
+		
 
 @bp.route('/pedidos', methods=['GET', 'POST'])
 @login_required

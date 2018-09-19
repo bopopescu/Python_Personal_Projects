@@ -33,6 +33,7 @@ security = Security(app, user_datastore)
 app.register_blueprint(pedido_endpoint.bp)
 
 
+
 @app.route("/")
 @login_required
 def template_test():
@@ -44,6 +45,10 @@ def template_test():
 		return redirect(url_for('pedido.medicao'))
 	elif current_user.roles[0].name == 'projetista': # See only the pedido_servico which are 'Liberacao', 'Subir Paredes' e 'Projetos'
 		pass 
+
+@app.errorhandler(403)
+def forbidden(e):
+	return render_template('403.html'), 403
 
 # app.register_blueprint(loja_endpoint.loja)
 

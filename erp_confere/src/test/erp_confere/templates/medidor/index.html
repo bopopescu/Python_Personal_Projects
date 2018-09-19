@@ -19,7 +19,12 @@
 						<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
 						<td>{{ pedido_servico.pedido_obj.numero }}</td>
 						<td>{{ pedido_servico.data_inicio }}</td>
-						<td>{{ pedido_servico.servico_props['agendamento'][-1]|string|('%d-%m-%Y') }}</td>
+						<td>{{ pedido_servico.servico_props['agendamento'][-1] }}</td>
+						<td><a class="btn btn-primary"
+							href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">
+								Atualizar
+							</a>
+						</td>
 					</tr>
 				{% endfor %}
 			</tbody>
