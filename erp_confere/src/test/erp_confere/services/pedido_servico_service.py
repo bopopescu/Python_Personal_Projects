@@ -47,6 +47,11 @@ def query_partial_pedido_servico_by_pedido(codigo_pedido):
 	db.session.close()
 	return retorno
 
+
+def query_pedido_servico_concluido():
+	return db.session.query(PedidoServico).filter(PedidoServico.servico_props['status'] == 'concluido').all()
+
+
 def update_pedido_servico(pedido_servico):
 	if not pedido_servico:
 		raise ValueError('Pedido serviço não pode ser nulo')
@@ -104,18 +109,14 @@ def agendar_iniciar(**kwargs):
 def atualiza(**kwargs):
 	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 	validate_from_form(pedido_servico, **kwargs)
-	print(kwargs)
 	update_pedido_servico(pedido_servico)
 
 
 def concluir(**kwargs):
-
-
 	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 	pedido_serivco_changeable = is_pedido_servico_status_changeable(pedido_servico)
 
 	if pedido_serivco_changeable:
-
 		if pedido_servico.servico_obj.nome == 'subir_paredes':
 			if not kwargs['promob_inicial']:
 				raise ValueError('Favor informar o promob inicial')
@@ -126,12 +127,31 @@ def concluir(**kwargs):
 		validate_from_form(pedido_servico, **kwargs)
 		pedido_servico.servico_props['status'] = 'concluido'
 		pedido_servico.data_fim = datetime.date.today()
+
+		if pedido_servico.servico_obj.tipo_valor == 'rl':
+			pedido_servico.valor_comissao = pedido_servico.servico_obj.valor
+		elif pedido_servico.servico_obj.tipo_valor == 'pct':
+			pedido_servico.valor_comissao = pedido_servico.servico_obj.valor * pedido_servico.pedido_obj.valor
+
 		if is_pedido_finalizado(pedido_servico):
 			pedido_servico.pedido_obj.data_fim = datetime.date.today()
 		update_pedido_servico(pedido_servico)
-
 	else:
 		raise ValueError('Favor encerrar devidamente o serviço anterior')
+
+
+def aprovar(**kwargs):
+	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+
+	if pedido_servico:
+		if pedido_servico.servico_props['status'] == 'concluido':
+			pedido_servico.servico_props['status'] = 'liberado'
+			update_pedido_servico(pedido_servico)
+		else:
+			raise ValueError('Servico não está marcado como concluído')
+	else:
+		raise NoResultFound('Não foi possível encontrar o pedido solicitado')
+
 
 def reabrir(**kwargs):
 	nome_servico = kwargs['nome_servico']
@@ -146,20 +166,26 @@ def reabrir(**kwargs):
 		update_pedido_servico(pedido_servico)
 
 
-
 def validate_promob(**kwargs):
 	return 'promob_inicial' in kwargs or 'promob_final' in kwargs
 
 
+def query_pedido_servico_projetista():
+	return db.session.query(PedidoServico)\
+		.filter(PedidoServico.servico.in_([2, 3, 5, 6]), PedidoServico.servico_props['status'] == 'novo')\
+		.all()
+
+
 def query_pedido_servico_medicao():
 	return db.session.query(PedidoServico).filter(PedidoServico.servico == 1, 
-		((PedidoServico.servico_props['status'] == 'iniciado') | (PedidoServico.servico_props['status'] == 'agendado'))).all()
+		((PedidoServico.servico_props['status'] == 'agendado'))).all()
 
 
 def validate_agendamento(**kwargs):
 	if len(kwargs['agendamento']) > 0:
 		return True
 	return False
+
 
 def is_pedido_servico_status_changeable(pedido_servico):
 	previous_state = None
@@ -198,6 +224,7 @@ def is_pedido_finalizado(pedido_servico):
 		return True
 	else:
 		return False
+
 
 def validate_from_form(pedido_servico, **kwargs):
 

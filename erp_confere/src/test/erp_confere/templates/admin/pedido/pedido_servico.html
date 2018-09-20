@@ -1,7 +1,6 @@
 {% extends 'template.html' %}
 
-{% block title %} Serviços do pedido: {{pedido_servico.pedido_obj.numero}}</h2> {% endblock %}
-
+{% block title %} Pedido: {{pedido_servico.pedido_obj.numero}}</h2> {% endblock %}
 
 {% block section %}
 	{% with messages = get_flashed_messages(with_categories=true) %}
@@ -32,7 +31,6 @@
 		<h2 class="form-centralization">Servico: {{ pedido_servico.servico_obj.nome_real }}</h2>
 		<form id="pedido-servico" method="post" class="form-centralization">
 
-			<h3>Número do pedido: {{ pedido_servico.pedido_obj.numero }}</h3>
 			<fieldset>
 				<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
 
@@ -153,7 +151,7 @@
 							class="form-control form-control-lg btn btn-success">
 						{% endif %}
 					</div>
-					{% if pedido_servico.servico_props['status'] != 'concluido' %}
+					{% if pedido_servico.servico_props['status'] != 'liberado' %}
 						<div class="form-group">
 							<input type="submit" name="acao" value="Atualizar" class="btn btn-primary btn-margin">
 						</div>
@@ -214,7 +212,8 @@
 					$('.add-medicao').after(divRow)		
 				} 
 
-				$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05'});
+				$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05',
+					scrollInput: false, disabledWeekDays: [0], minDate: 0});
 
 			});
 
@@ -224,7 +223,7 @@
 				$('.novo-agendamento').remove()
 
 			});
-			if($('input[name=status]').val() == 'concluido'){
+			if($('input[name=status]').val() == 'concluido' || $('input[name=status]').val() == 'liberado'){
 				$(':input').each(function(index,el) {
 					if(el.type != 'submit'){
 						$(this).attr('disabled', 'true');
@@ -248,9 +247,7 @@
 			$('#comentario').val(removeWhitespace)
 
 			$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05',
-				scrollInput: false});
-
-
+				scrollInput: false, disabledWeekDays: [0], minDate: 0});
 
 		});
 	</script>

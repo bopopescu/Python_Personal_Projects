@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
+
 from run import app, user_datastore
 from persistence.mysql_persistence import db
-
 
 
 if __name__ == '__main__':
@@ -52,7 +53,8 @@ if __name__ == '__main__':
 	funcoes = [
 		Role(name='admin', description='Administrador do sistema'),
 		Role(name='medidor', description='Realiza a medição'),
-		Role(name='projetista', description='Realiza os projetos')
+		Role(name='projetista', description='Realiza os projetos'),
+		Role(name='controladora', description='Controla os pedidos servicos')
 	]
 	db.session.add_all(lojas)
 	# db.session.add_all(funcoes)
@@ -64,10 +66,12 @@ if __name__ == '__main__':
 	marco = user_datastore.create_user(username='marco.han', email='marcohanpsn@gmail.com', password='password')
 	vinicius = user_datastore.create_user(username='vinicius.yosiura', email='vinicius.yosiura@live.com', password='password')
 	matt = user_datastore.create_user(username='matt', email='matt@nobien.net', password='password')
+	paula = user_datastore.create_user(username='paula.tejando', email='paula.tejando@gmail.com', password='password')
 
 	user_datastore.add_role_to_user(vinicius, funcoes[0])
 	user_datastore.add_role_to_user(marco, funcoes[1])
 	user_datastore.add_role_to_user(matt, funcoes[2])
+	user_datastore.add_role_to_user(paula, funcoes[3])
 
 	db.session.commit()
 	db.session.close()

@@ -16,8 +16,8 @@ from model.models import User, Role
 
 
 # this will change
-# LOCAL_PATH = '/home/vyosiura/config-files/'
-LOCAL_PATH = '/home/vinicius/config-files/'
+LOCAL_PATH = '/home/vyosiura/config-files/'
+# LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)
@@ -33,7 +33,6 @@ security = Security(app, user_datastore)
 app.register_blueprint(pedido_endpoint.bp)
 
 
-
 @app.route("/")
 @login_required
 def template_test():
@@ -44,7 +43,9 @@ def template_test():
 	elif current_user.roles[0].name == 'medidor': # See only 
 		return redirect(url_for('pedido.medicao'))
 	elif current_user.roles[0].name == 'projetista': # See only the pedido_servico which are 'Liberacao', 'Subir Paredes' e 'Projetos'
-		pass 
+		return redirect(url_for('pedido.projetista'))
+	elif current_user.roles[0].name == 'controladora':
+		return redirect(url_for('pedido.pedidos'))
 
 @app.errorhandler(403)
 def forbidden(e):

@@ -22,14 +22,15 @@ bp = Blueprint('pedido', __name__, url_prefix='/pedido')
 
 @bp.route('/<int:codigo_pedido>/servico/<int:codigo_servico>', methods=['GET', 'POST'])
 @login_required
-@roles_accepted('admin', 'medidor', 'projetista')
+@roles_accepted('admin', 'medidor', 'projetista', 'controladora')
 def pedido_servico(codigo_pedido, codigo_servico):
 
 	is_medidor_and_medicao = current_user.roles[0].name == 'medidor' and codigo_servico == 1
-	is_projetista = current_user.roles[0].name == 'projetista' and condigo_servico in [2, 3, 4] 
+	is_projetista = current_user.roles[0].name == 'projetista' and codigo_servico in [2, 3, 5, 6] 
 	is_admin = current_user.roles[0].name == 'admin'
+	is_controladora = current_user.roles[0].name == 'controladora'
 
-	if is_medidor_and_medicao or is_projetista or is_admin:
+	if is_medidor_and_medicao or is_projetista or is_admin or is_controladora:
 		if request.method == 'GET':
 			pedido_servico = pedido_servico_service.query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
 			funcionarios = funcionario_service.query_funcionarios()
@@ -66,7 +67,7 @@ def pedido_servico(codigo_pedido, codigo_servico):
 					flash('Serviço reaberto', 'success')
 				else:
 					flash('Favor informar o valor do promob para realizar a conclusão do serviço')
-				
+
 				return redirect(url_for('pedido.pedido_servico', 
 						codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 	else:
@@ -75,34 +76,34 @@ def pedido_servico(codigo_pedido, codigo_servico):
 
 @bp.route('/pedidos', methods=['GET', 'POST'])
 @login_required
+@roles_accepted('admin', 'controladora')
 def pedidos():
 	search = False
-
 	page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='page_parameter')
-
-	# print('Page: {} | Per page: {} | Offset: {}'.format(page, per_page, offset))
-
 	q = request.args.get('q')
 	if q:
 		search = True
 	
 	pedidos = pedido_service.query_pedidos()
-
 	pagination = Pagination(page=page, total=len(pedidos), per_page=per_page, search=search, record_name='pedidos',
 		css_framework='bootstrap4') 
 
 	return render_template('admin/pedido/pedidos.html', pedidos=pedidos, pagination=pagination)
 
+
 @bp.route('/<int:codigo_pedido>/pedido_servico')
 @login_required
+@roles_accepted('admin', 'controladora')
 def pedido_servicos(codigo_pedido):
 	
 	pedido_servicos = pedido_servico_service.query_partial_pedido_servico_by_pedido(codigo_pedido)
 	print(pedido_servicos)
 	return jsonify(pedido_servicos)
 
+
 @bp.route('/cadastrar', methods=["GET", "POST"])
 @login_required
+@roles_accepted('admin', 'controladora')
 def cadastrar():
 	
 	if request.method == 'POST':
@@ -122,10 +123,11 @@ def cadastrar():
 
 @bp.route('/medicao', methods=['GET', 'POST'])
 @login_required
-@roles_accepted('medidor')
+@roles_accepted('medidor', 'admin')
 def medicao():
 	pedido_servicos = pedido_servico_service.query_pedido_servico_medicao()
 	return render_template('medidor/index.html', pedido_servicos=pedido_servicos)
+
 
 def ambientes_to_dict(form):
 	# Ambientes
@@ -140,6 +142,29 @@ def ambientes_to_dict(form):
 			ambientes_sent['ambientes'].append(amb)
 
 	return ambientes_sent
+
+
+@bp.route('/projetista', methods=['GET'])
+@login_required
+@roles_accepted('projetista')
+def projetista():
+	pedido_servicos = pedido_servico_service.query_pedido_servico_projetista()
+	return render_template('projetista/index.html', pedido_servicos=pedido_servicos)
+
+@bp.route('/aprovar', methods=['GET'])
+@login_required
+@roles_accepted('admin')
+def aprovar():
+	pedido_servicos = pedido_servico_service.query_pedido_servico_concluido()
+	return render_template('admin/pedido/aprovar.html', pedido_servicos=pedido_servicos)
+
+@bp.route('/liberado/<int:codigo_pedido>/<int:codigo_servico>', methods=['GET'])
+@login_required
+@roles_accepted('admin')
+def liberado(codigo_pedido, codigo_servico):
+
+	pedido_servico = pedido_servico_service.aprovar(codigo_pedido=codigo_pedido, codigo_servico=codigo_servico)
+	return redirect(url_for('pedido.aprovar'))
 
 
 def validate_form_agendar_iniciar(request):
