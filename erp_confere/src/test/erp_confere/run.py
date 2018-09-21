@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for
 from urllib.parse import quote_plus
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, login_required, SQLAlchemySessionUserDatastore, current_user, roles_accepted
-from endpoints import pedido_endpoint
+from endpoints import pedido_endpoint, admin_endpoint
 import persistence.mysql_persistence as mysql_persistence
 from app_util.flask_util import FlaskUtilJs
 from model.models import User, Role
@@ -31,6 +31,7 @@ user_datastore = SQLAlchemySessionUserDatastore(mysql_persistence.db.session, Us
 
 security = Security(app, user_datastore)
 app.register_blueprint(pedido_endpoint.bp)
+app.register_blueprint(admin_endpoint.bp)
 
 
 @app.route("/")

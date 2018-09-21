@@ -1,26 +1,32 @@
 jQuery(document).ready(function($) {
 
-	$('.datepicker').datepicker({dateFormat: 'dd/mm/yy'})
-	console.log('Entrou/?')
+	$('.datepicker').datepicker({dateFormat: 'dd/mm/yy', minDate: 0})
+
 	$('#cep').focusout(function(){
-		if ($(this).val() != '' && $(this).val() == 8){
-			$.get('https://viacep.com.br/ws/' + $(this).val() + '/json/', function(data, status, xhr) {
+		
+		cep = $('#cep').val().replace('-', '');
+		
+		if (cep != '' && cep.length == 8){
+			$.get('https://viacep.com.br/ws/' + cep + '/json/', function(data, status, xhr) {
 				if(status == "success"){
 					if(!data.erro){
 						$('#endereco').val(data.logradouro + ' ' + data.complemento)
 						$('#bairro').val(data.bairro)
 						$('#cidade').val(data.localidade)
 						$('#uf').val(data.uf)
-						/*$('#cep').addClass('is-valid')
-						$('#cep').removeClass('is-invalid')*/
+
+						if ($('#cep').hasClass('is-invalid')){
+							$('#cep').removeClass('is-invalid')
+						}
 					} else {
-						/*$('#cep').addClass('is-invalid')
-						$('#cep').removeClass('is-valid')*/
+						$('#cep').addClass('is-invalid');	
 					}
+				} else {
+					$('#cep').addClass('is-invalid');
 				}
 			});	
 		} else {
-			console.log('Errrrrou')
+			$('#cep').addClass('is-invalid');
 		}
 	});
 
@@ -122,4 +128,9 @@ jQuery(document).ready(function($) {
 	$('.numeric').numeric({negative: false});
 	$('.real-value').numeric({decimalPlaces:2, altDecimal: '.', decimal:',', negative: false});
 
+	if($('div[role="alert"]').length){
+		setTimeout(function(){
+			$('div[role="alert"]').fadeOut()
+		}, 5000);
+	}
 });

@@ -17,7 +17,6 @@ class User(db.Model, UserMixin):
     __tablename__ = 'usuario'
     __table_args__ = (db.PrimaryKeyConstraint('cd_usuario', name='pk_funcao'), db.UniqueConstraint('ds_email', name='uq_ds_email'))
 
-
     id = db.Column('cd_usuario', db.Integer, nullable=False)
     email = db.Column('ds_email', db.String(255), nullable=False)
     username = db.Column('nm_usuario', db.String(255))
@@ -31,6 +30,8 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column('dt_hr_email_confirmado', mysqldialect.DATETIME)
     roles = db.relationship('Role', secondary='funcao_usuario',
                          backref=db.backref('users', lazy='dynamic'))
+    funcionario = db.relationship('Funcionario')
+
 
 class RolesUsers(db.Model):
     __tablename__ = 'funcao_usuario'
@@ -46,7 +47,7 @@ class Funcionario(db.Model):
 	__tablename__ = 'funcionario'
 	__table_args__ = ((db.PrimaryKeyConstraint('cd_funcionario', name='pk_funcionario'),))
 
-	codigo = db.Column('cd_funcionario', db.Integer, nullable=False)
+	codigo = db.Column('cd_funcionario', db.Integer, db.ForeignKey('usuario.cd_usuario', name='fk_funcionario_has_usuario'), nullable=False)
 	nome = db.Column('nm_funcionario', db.String(45), nullable=False)
 	sobrenome = db.Column('sobre_nm_funcionario', db.String(45), nullable=False)
 	data_admissao = db.Column('dt_admissao', mysqldialect.DATE, nullable=False)
@@ -55,12 +56,14 @@ class Funcionario(db.Model):
 	telefone_celular = db.Column('nr_telefone_cel', mysqldialect.BIGINT)
 	cargo = db.Column('ds_cargo', mysqldialect.ENUM('socio', 'finalizador', 'projetista', 'medidor', 'secretaria'), nullable=False)
 
+
 class Loja(db.Model):
 	__tablename__ = 'loja'
 
 	codigo = db.Column('cd_loja', db.Integer, primary_key=True, nullable=False)
 	nome = db.Column('nm_loja', db.String(45), nullable=False)
 	valor_comissao = db.Column('valor_comissao', mysqldialect.DECIMAL(precision=10, scale=2), nullable=False, default=0)
+
 
 class Cep(db.Model):
 	__tablename__ = 'cep'
@@ -71,6 +74,7 @@ class Cep(db.Model):
 	bairro = db.Column('bairro', db.String(45), nullable=False)
 	cidade = db.Column('cidade', db.String(45), nullable=False)
 	uf = db.Column('uf', db.String(2), nullable=False)
+
 
 class ClienteEndereco(db.Model):
 	__tablename__ = 'cliente_endereco'
@@ -85,6 +89,7 @@ class ClienteEndereco(db.Model):
 	complemento = db.Column('ds_complemento', db.String(120))
 	referencia = db.Column('ds_referencia', db.String(255))
 
+
 class Cliente(db.Model):
 	__tablename__ = 'cliente'
 
@@ -95,12 +100,14 @@ class Cliente(db.Model):
 	telefone_residencial = db.Column('nr_telefone_res', mysqldialect.BIGINT)
 	telefone_celular = db.Column('nr_telefone_cel', mysqldialect.BIGINT, nullable=False)
 
+
 class Ambiente(db.Model):
 	__tablename__ = 'ambiente'
 	__table_args__ = (db.UniqueConstraint('nm_ambiente', name='UQ_NM_AMBIENTE'), )
 
 	codigo = db.Column('cd_ambiente', db.Integer, primary_key=True, nullable=False)
 	nome = db.Column('nm_ambiente', db.String(30), nullable=False)
+
 
 class Servico(db.Model):
 	__tablename__ = 'servico'
@@ -112,6 +119,7 @@ class Servico(db.Model):
 	valor = db.Column('vl_servico', mysqldialect.DECIMAL(precision=12,scale=6), nullable=False, default=0)
 	sequencia = db.Column('nr_sequencia', db.Integer, nullable=False)
 	tipo_valor = db.Column('tp_vl_servico', mysqldialect.ENUM('pct', 'rl'), default='pct', nullable=False)
+
 
 class Pedido(db.Model):
 	__tablename__ = 'pedido'
@@ -131,6 +139,7 @@ class Pedido(db.Model):
 	data_inicio = db.Column('dt_inicio', mysqldialect.DATE)
 	data_fim = db.Column('dt_fim', mysqldialect.DATE)
 	ambientes = db.Column('ambientes', mutable.MutableDict.as_mutable(mysqldialect.JSON), nullable=False)
+
 
 class PedidoServico(db.Model):
 	__tablename__ = 'pedido_servico'

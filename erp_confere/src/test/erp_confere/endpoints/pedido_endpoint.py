@@ -112,6 +112,7 @@ def cadastrar():
 
 		msg = 'Pedido cadastrado com sucesso'
 		categoria = 'success'
+		flash(msg, categoria)
 		return redirect(url_for('pedido.cadastrar'))
 	else:
 		servicos = servico_service.query_all_servicos()

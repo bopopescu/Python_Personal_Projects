@@ -1,10 +1,11 @@
 
 {% extends 'template.html' %}
-{% from "security/_macros.html" import render_field_with_errors, render_field %}
 
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+{% block title %} Login {% endblock %}
 {% block section %}
 	{% include "security/_messages.html" %}
-		<h1>{{ _('Login') }}</h1>
+		{# <h1>{{ _('Login') }}</h1> #}
 		<form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
 		  {{ login_user_form.hidden_tag() }}
 		  <div class="form-row">
@@ -14,10 +15,11 @@
 		  </div>
 		  <div class="form-row">
 		  	<div class="form-group col-sm-6">
-		  		{{ render_field_with_errors(login_user_form.password, class_='form-control') }}		
+		  		{{ render_field_with_errors(login_user_form.password, class_='form-control', placeholder='Senha') }}		
 		  	</div>
 		  </div>
 		  <div class="form-row">
+		  	<div>
 		  	<div class="form-check form-check-inline">
 		  		{{ render_field_with_errors(login_user_form.remember, class_='form-check-input') }}		
 		  	</div>
@@ -25,5 +27,19 @@
 		  {{ render_field(login_user_form.next) }}
 		  {{ render_field(login_user_form.submit, class_='btn btn-primary') }}
 		</form>
-	{% include "security/_menu.html" %}
+{% endblock %}
+{% block script %}
+	<script type="text/javascript">
+		jQuery(document).ready(function($){
+			$('label[for=email]').text('Usuario')
+			$('label[for=password]').text('Senha')
+			$('label[for=remember]').text('Salvar')
+
+			if ($('ul[class="flashes"]')){
+				$('ul[class="flashes"]').children().addClass('list-group-item list-group-item-warning')
+				$('ul[class="flashes"]').addClass('list-group col-sm-5')
+			}
+			
+		})
+	</script>
 {% endblock %}

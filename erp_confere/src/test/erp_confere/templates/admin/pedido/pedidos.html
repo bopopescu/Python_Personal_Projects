@@ -25,7 +25,7 @@
 					<td class="loja-nome">{{ pedido.loja_obj.nome }}</td>
 					<td class="pedido-numero">{{ pedido.numero }}</td>
 					<td class="cliente-nome">{{ pedido.cliente_endereco_obj.cliente_obj.nome + ' ' +  pedido.cliente_endereco_obj.cliente_obj.sobrenome}}</td>
-					<td class="pedido-valor">{{ 'R$ ' + pedido.valor_pedido|string|replace('.', ',') }}</td>
+					<td class="pedido-valor">{{ 'R$ ' + pedido.valor|string|replace('.', ',') }}</td>
 					<td class="pedido-data">{{ pedido.data_entrada.strftime('%d/%m/%Y') }}</td>
 				</tr>
 			{% endfor %}
@@ -109,34 +109,6 @@
 				}
 			}
 		});
-
-		// $('#pedidos tbody').on('click', '.btn-pedido-servico', function(event) {
-			// event.preventDefault();
-			/* Act on the event */
-			// console.log($(this).parent().siblings());
-
-			// var pedido_servico = {
-			// 	pedido: null,
-			// 	servico: null
-			// };
-
-			// $(this).parent().siblings().each(function(idx, el) {
-			// 	console.log(el)
-			// 	var element = $(this)
-
-			// 	if (element.hasClass('codigo-pedido')){
-			// 		pedido_servico.pedido = element.text();
-			// 	} else if(element.hasClass('codigo-servico')){
-			// 		pedido_servico.servico = element.text();
-			// 	}
-			// });
-			// console.log(pedido_servico.pedido);
-			// console.log(pedido_servico.servico);
-			// var urls = flask_util.url_for('pedido.pedido_servico', {codigo_pedido: pedido_servico.pedido, codigo_servico: pedido_servico.servico});
-			// alert(urls)
-			// window.location = urls;
-			
-		// });
 
 	});
 </script>

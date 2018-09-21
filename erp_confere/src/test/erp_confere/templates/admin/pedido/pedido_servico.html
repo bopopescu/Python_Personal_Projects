@@ -65,20 +65,22 @@
 					</div>
 
 				</div>
-				<div class="form-row">
-					<div class="form-group col-sm-6">
-						<label>Funcionario</label>
-						<select class="form-control form-control-lg" form="pedido-servico" name="funcionario">
-							{% for funcionario in funcionarios %}
-								<option value="{{funcionario.codigo}}" {{ 'selected' if pedido_servico.funcionario is not none and pedido_servico.funcionario.codigo == funcionario.codigo else '' }}}>
-									{{funcionario.nome + ' ' + funcionario.sobrenome}}
+				{% if current_user.has_role('admin') %}
+					<div class="form-row">
+						<div class="form-group col-sm-6">
+							<label>Funcionario</label>
+							<select class="form-control form-control-lg" form="pedido-servico" name="funcionario">
+								{% for funcionario in funcionarios %}
+									<option value="{{funcionario.codigo}}" {{ 'selected' if pedido_servico.funcionario is not none and pedido_servico.funcionario.codigo == funcionario.codigo else '' }}}>
+										{{funcionario.nome + ' ' + funcionario.sobrenome}}
+									</option>
+								{% endfor %}
+								<option value="" {{'selected' if pedido_servico.funcionario is none else ''}}>
 								</option>
-							{% endfor %}
-							<option value="" {{'selected' if pedido_servico.funcionario is none else ''}}>
-							</option>
-						</select>
+							</select>
+						</div>
 					</div>
-				</div>
+				{% endif %}
 				{% set agendado_ou_novo = (pedido_servico.servico_props['status'] != 'novo' or pedido_servico.servico_props['status'] != 'agendado')%}
 				{% set medicao_ou_atendimento = (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento')%}
 				{% if agendado_ou_novo and medicao_ou_atendimento%}
