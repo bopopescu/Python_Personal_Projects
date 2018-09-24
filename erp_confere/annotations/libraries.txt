@@ -45,3 +45,7 @@ pip install mysqlclient								# Fastest implementation of a mysql api, needs to
 
 pip install requests								# Library to make http requests
 													# http://docs.python-requests.org/en/latest/user/quickstart/#json-response-content
+
+pip install unidecode
+
+pip install flask-security

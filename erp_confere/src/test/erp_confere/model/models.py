@@ -15,7 +15,8 @@ class Role(db.Model, RoleMixin):
 
 class User(db.Model, UserMixin):
     __tablename__ = 'usuario'
-    __table_args__ = (db.PrimaryKeyConstraint('cd_usuario', name='pk_funcao'), db.UniqueConstraint('ds_email', name='uq_ds_email'))
+    __table_args__ = (db.PrimaryKeyConstraint('cd_usuario', name='pk_funcao'), 
+    	db.UniqueConstraint('nm_usuario', 'ds_email', name='uq_ds_email_nm_usuario'), db.UniqueConstraint('nm_usuario', name='uq_nm_usuario'))
 
     id = db.Column('cd_usuario', db.Integer, nullable=False)
     email = db.Column('ds_email', db.String(255), nullable=False)

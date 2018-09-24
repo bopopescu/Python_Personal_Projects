@@ -1,8 +1,21 @@
 {% extends 'template.html' %}
 
+{% block title %} Novo funcionário {% endblock %}
 {% from 'security/_macros.html' import render_field %}
 {% block section %}
-	<form>
+	{% if form.errors.items() %}
+		{% for field in form.errors.keys() %}
+			{% for message in form.errors[field] %}
+				<div class="alert alert-danger alert-dismissible fade show">
+					{{ field + ': ' + message }}
+				</div>
+			{% endfor %}
+		{% endfor %}
+	{% endif %}
+	<form id="cadastrar-funcionario" action="" method="post">
+		
+		{{ form.crsf_token }}
+		{{ form.hidden_tag() }}
 		<div class="form-row">
 			<div class="form-group col-sm-3">
 				<label class="form-control-label">{{ form.nome.label }}</label>
@@ -33,5 +46,34 @@
 				{{ render_field(form.funcao, class_="form-control") }}
 			</div>
 		</div>
+		<div class="form-row">
+			<div class="form-group col-sm-3">
+				<label class="form-control-label">{{ form.numero_residencial.label }}</label>
+				{{ render_field(form.numero_residencial, class_="form-control numeric") }}
+			</div>
+			<div class="form-group col-sm-3">
+				<label class="form-control-label">{{ form.numero_celular.label }}</label>
+				{{ render_field(form.numero_celular, class_="form-control numeric") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-sm-3">
+				<label class="form-control-label">{{ form.cargo.label }}</label>
+				{{ render_field(form.cargo, class_="form-control", data_parsley_minlength=5) }}
+			</div>
+		</div>
+		{{ render_field(form.submit) }}
 	</form>
+{% endblock %}
+{% block script %}
+	<script src="{{ url_for('static', filename='js/parsley.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/parsley-pt-br.js') }}"></script>
+	<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			var validation = $('#cadastrar-funcionario').parsley()
+			$('.numeric').numeric({negative: false});
+			console.log(validation)
+		});
+	</script>
+
 {% endblock %}
