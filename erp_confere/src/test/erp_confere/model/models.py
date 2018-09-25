@@ -29,9 +29,9 @@ class User(db.Model, UserMixin):
     login_count = db.Column('nr_qtde_login', db.Integer)
     active = db.Column('ativo', mysqldialect.TINYINT(1))
     confirmed_at = db.Column('dt_hr_email_confirmado', mysqldialect.DATETIME)
-    roles = db.relationship('Role', secondary='funcao_usuario',
-                         backref=db.backref('users', lazy='dynamic'))
-    funcionario = db.relationship('Funcionario')
+    roles = db.relationship('Role', secondary='funcao_usuario', 
+                         backref=db.backref('users'))
+    funcionario = db.relationship('Funcionario', back_populates='usuario', uselist=False)
 
 
 class RolesUsers(db.Model):
@@ -55,7 +55,9 @@ class Funcionario(db.Model):
 	data_demissao = db.Column('dt_demissao', mysqldialect.DATE)
 	telefone_residencial = db.Column('nr_telefone_res', mysqldialect.BIGINT)
 	telefone_celular = db.Column('nr_telefone_cel', mysqldialect.BIGINT)
-	cargo = db.Column('ds_cargo', mysqldialect.ENUM('socio', 'finalizador', 'projetista', 'medidor', 'secretaria'), nullable=False)
+	cargo = db.Column('ds_cargo', mysqldialect.ENUM('socio', 'finalizador', 'projetista', 'medidor', 'secretaria'), 
+		nullable=False)
+	usuario = db.relationship('User', back_populates='funcionario')
 
 
 class Loja(db.Model):

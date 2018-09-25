@@ -12,6 +12,31 @@
 			{% endfor %}
 		{% endfor %}
 	{% endif %}
+	{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+			{% for category, message in messages %}
+				{% if category == 'error' %}
+					<div class="d-inline-flex p-10">
+						<div class="alert alert-danger alert-dismissible fade show" role="alert">
+							{{ message }}
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+					</div>
+				{% elif category == 'success' %}
+					<div class="d-inline-flex p-10">
+						<div class="alert alert-success alert-dismissible fade show" role="alert">
+							{{ message }}
+							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+					</div>
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
 	<form id="cadastrar-funcionario" action="" method="post">
 		
 		{{ form.crsf_token }}
@@ -25,16 +50,6 @@
 				<label class="form-control-label">{{ form.sobrenome.label }}</label>
 				{{ render_field(form.sobrenome, class_='form-control') }}
 			</div>	
-		</div>
-		<div class="form-row">
-			<div class="form-group col-sm-3">
-				<label class="form-control-label">{{ form.senha.label }}</label>
-				{{ render_field(form.senha, class_="form-control") }}
-			</div>
-			<div class="form-group col-sm-3">
-				<label class="form-control-label">{{ form.confirmar_senha.label }}</label>
-				{{ render_field(form.confirmar_senha, class_="form-control") }}
-			</div>
 		</div>
 		<div class="form-row">
 			<div class="form-group col-sm-3">
@@ -60,6 +75,10 @@
 			<div class="form-group col-sm-3">
 				<label class="form-control-label">{{ form.cargo.label }}</label>
 				{{ render_field(form.cargo, class_="form-control", data_parsley_minlength=5) }}
+			</div>
+			<div class="form-check form-check-inline">
+				<label class="form-check-label form-control-lg">{{ form.ativo.label }}</label>
+				{{ render_field(form.ativo, class_="form-check-input") }}
 			</div>
 		</div>
 		{{ render_field(form.submit) }}

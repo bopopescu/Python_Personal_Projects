@@ -23,8 +23,20 @@
                 <li><a href="{{ url_for('pedido.pedidos') }}">Em andamento</a></li>
               </ul>
             </li>
-          </ul>
+            <li class="treeview">
+              <a href="#"><i class="fa fa-link"></i> <span>Administrador</span>
+                <span class="pull-right-container">
+                    <i class="fa fa-angle-left pull-right"></i>
+                  </span>
+              </a>
+              <ul class="treeview-menu">
+                <li><a href="{{ url_for('admin.registrar_usuario') }}">Novo funcionário</a></li>
+                <li><a href="{{ url_for('admin.usuarios') }}">Funcionários</a></li>
+              </ul>
+            </li>
           {% endif %}
+        </ul>
+          
       </section>
     </aside>
   {% endblock %}

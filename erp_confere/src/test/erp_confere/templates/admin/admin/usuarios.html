@@ -1,0 +1,27 @@
+{% extends 'template.html' %}
+
+{% block section %}
+	<table>
+		<thead>
+			<tr>
+				<th>Nome</th>
+				<th>Usuario</th>
+				<th>Funcao</th>
+				<th>Cargo</th>
+				<th>Ativo</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for usuario in usuarios %}
+				<tr>
+					<td>{{ usuario.funcionario.nome + ' ' + usuario.funcionario.sobrenome }}</td>
+					<td>{{ usuario.username }}</td>
+					<td>{{ usuario.roles[0].name }}</td>
+					<td>{{ usuario.funcionario.cargo }}</td>
+					<td>{{ 'Sim' if usuario.active else 'Não' }}</td>
+					<td><a href="{{ url_for('admin.registrar_usuario') }}"></a></td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}

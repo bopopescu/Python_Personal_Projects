@@ -6,6 +6,7 @@ from endpoints import pedido_endpoint, admin_endpoint
 import persistence.mysql_persistence as mysql_persistence
 from app_util.flask_util import FlaskUtilJs
 from model.models import User, Role
+from endpoints.forms import trocar_senha_form
 # import endpoints.pedido_endpoint as pedido_endpoint
 # import endpoints.loja_endpoint as loja_endpoint
 # from app_util.flask_util import FlaskUtilJs
@@ -29,10 +30,10 @@ mysql_persistence.db.init_app(app)
 
 user_datastore = SQLAlchemySessionUserDatastore(mysql_persistence.db.session, User, Role)
 
-security = Security(app, user_datastore)
-app.register_blueprint(pedido_endpoint.bp)
+security = Security(app, user_datastore, 
+	change_password_form=trocar_senha_form.CustomizedChangePasswordForm)
 app.register_blueprint(admin_endpoint.bp)
-
+app.register_blueprint(pedido_endpoint.bp)
 
 @app.route("/")
 @login_required
