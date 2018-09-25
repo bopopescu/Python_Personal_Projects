@@ -13,7 +13,6 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @login_required
 @roles_accepted('admin')
 def registrar_usuario(**kwargs):
-
 	if 'user_id' in kwargs:
 		user = admin_service.query_usuario_by_id(kwargs['user_id'])
 		form = UsuarioRegistration(nome=user.funcionario.nome, sobrenome=user.funcionario.sobrenome, 
@@ -37,13 +36,14 @@ def registrar_usuario(**kwargs):
 
 
 @bp.route('/usuarios', methods=['GET', 'POST'])
+@login_required
+@roles_accepted('admin')
 def usuarios():
 	usuarios = admin_service.query_usuarios()
 	return render_template('admin/admin/usuarios.html', usuarios=usuarios)
 
 
 def handle_form_user_registration(form):
-	
 	funcionario = Funcionario(nome=form.data['nome'], sobrenome=form.data['sobrenome'], 
 		telefone_residencial=form.data['numero_residencial'], telefone_celular=form.data['numero_celular'], 
 		cargo=form.data['cargo'], data_admissao=date.today())

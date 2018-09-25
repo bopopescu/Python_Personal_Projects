@@ -88,8 +88,12 @@
                   <a href="{{ url_for('pedido.medicao') }}"><i class="fa fa-link"></i> <span>Medições</span></a>
                 </li>
               {% endif %}
-              {% if current_user.has_role('projetista') %}
-                <li><a href="{{ url_for('pedido.projetista') }}"><i class="fa fa-link"></i><span>Serviçoss</span></a></li>
+              {% if current_user.has_role('projetista') or current_user.has_role('admin') %}
+                <li>
+                  <a href="{{ url_for('pedido.projetista') }}">
+                    <i class="fa fa-link"></i><span>Serviços</span>
+                  </a>
+                </li>
               {% endif %}
               {% if current_user.roles[0].name == 'admin' %}
                 <li class="treeview">
@@ -115,8 +119,21 @@
                     <li><a href="{{ url_for('admin.usuarios') }}">Funcionários</a></li>
                   </ul>
                 </li>
-              </ul>
               {% endif %}
+              {% if current_user.roles[0].name == 'admin' or current_user.roles[0].name == 'controladora' %}
+                <li class="treeview">
+                  <a href="#"><i class="fa fa-link"></i> <span>Loja</span>
+                    <span class="pull-right-container">
+                        <i class="fa fa-angle-left pull-right"></i>
+                      </span>
+                  </a>
+                  <ul class="treeview-menu">
+                    <li><a href="{{ url_for('loja.cadastrar') }}">Nova loja</a></li>
+                    <li><a href="{{ url_for('loja.lojas') }}">Lojas</a></li>
+                  </ul>
+                </li>
+              {% endif %}
+            </ul>
           </section>
         </aside>
       {% endif %}

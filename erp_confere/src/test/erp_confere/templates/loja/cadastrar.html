@@ -1,0 +1,37 @@
+{% extends 'template.html' %}
+
+
+{% block title %} Lojas {% endblock %}
+
+{% block header %} <h3>Cadastrar novas lojas</h3> {% endblock %}
+
+{% block section %} 
+	{% from 'security/_macros.html' import render_field %}
+	{% include "layout/messages.html" %}
+	<form id="cadastrar-loja" method="post">
+		{{ form.crsf_token }}
+		{{ form.hidden_tag() }}
+		<div class="form-row">
+			<div class="form-group">
+				<label class="form-control-label">{{ form.nome.label }}</label>
+				{{ render_field(form.nome, class_="form-control") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group">
+				<label class="form-control-label">{{ form.comissao_paga.label }}</label>
+				{{ render_field(form.comissao_paga, class_="form-control real-value") }}
+			</div>
+		</div>
+		{{ render_field(form.enviar, class_="btn btn-success") }}
+	</form>
+{% endblock %}
+{% block script %}
+	<script type="text/javascript">
+		jQuery(document).ready(function($){
+
+			$('.real-value').numeric({decimalPlaces:2, altDecimal: '.', decimal:',', negative: false});
+
+		})
+	</script>
+{% endblock %}

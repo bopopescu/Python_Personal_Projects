@@ -1,0 +1,23 @@
+{% extends 'template.html' %}
+
+{% block title %} Lojas {% endblock %}
+
+{% block section %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Loja</th>
+				<th>Comissão</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for loja in lojas %}
+				<tr scope="row">
+					<td>{{ loja.nome }}</td>
+					<td>{{ loja.valor_comissao }}</td>
+				</tr>			
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
+

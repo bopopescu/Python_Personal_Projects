@@ -2,14 +2,12 @@
 
 from run import app, user_datastore
 from persistence.mysql_persistence import db
+from datetime import date
 
 
 if __name__ == '__main__':
 
 	app.app_context().push()
-
-	# with app.app_context():
-	# 	db.init_app(app)
 
 	from model.models import *
 
@@ -20,13 +18,6 @@ if __name__ == '__main__':
 				Loja(nome='Todeschinni - Guarulhos', valor_comissao=1),
 				Loja(nome='Favorita - Suzano', valor_comissao=1.25)
 			]
-
-	# funcoes = [
-	# 			Funcao(nome='Administrador'),
-	# 			Funcao(nome='Projetista'),
-	# 			Funcao(nome='Finalizador'),
-	# 			Funcao(nome='Medidor')
-	# 		]
 
 	ambientes = [
 				Ambiente(nome='Quarto'),
@@ -56,22 +47,19 @@ if __name__ == '__main__':
 		Role(name='projetista', description='Realiza os projetos'),
 		Role(name='controladora', description='Controla os pedidos servicos')
 	]
+
+	new_user = User(email='vinicius.yosiura@gmail.com', username='vinicius.yosiura', roles=[funcoes[0]],
+		password='password')
+	new_funcionario = Funcionario(nome='Vinicius', sobrenome='Akiyama Hashizumi Yosiura', 
+		telefone_celular='11979863277',	cargo='socio', usuario=new_user, data_admissao=date.today())
 	db.session.add_all(lojas)
-	# db.session.add_all(funcoes)
 	db.session.add_all(ambientes)
 	db.session.add_all(servicos)
+	db.session.add_all(funcoes)
+	db.session.add(new_user)
+	db.session.add(new_funcionario)
 
-	# [user_datastore.create_role(name=funcao.name, description=funcao.description) for funcao in funcoes]
-	
-	marco = user_datastore.create_user(username='marco.han', email='marcohanpsn@gmail.com', password='password')
-	vinicius = user_datastore.create_user(username='vinicius.yosiura', email='vinicius.yosiura@live.com', password='password')
-	matt = user_datastore.create_user(username='matt', email='matt@nobien.net', password='password')
-	paula = user_datastore.create_user(username='paula.tejando', email='paula.tejando@gmail.com', password='password')
-
-	user_datastore.add_role_to_user(vinicius, funcoes[0])
-	user_datastore.add_role_to_user(marco, funcoes[1])
-	user_datastore.add_role_to_user(matt, funcoes[2])
-	user_datastore.add_role_to_user(paula, funcoes[3])
 
 	db.session.commit()
+
 	db.session.close()

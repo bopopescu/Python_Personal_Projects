@@ -1,7 +1,8 @@
 {% extends 'template.html' %}
 
 {% block section %}
-	<table>
+	{% include "layout/messages.html" %}
+	<table class="table table-striped">
 		<thead>
 			<tr>
 				<th>Nome</th>
@@ -13,13 +14,18 @@
 		</thead>
 		<tbody>
 			{% for usuario in usuarios %}
-				<tr>
+				<tr scope="row">
 					<td>{{ usuario.funcionario.nome + ' ' + usuario.funcionario.sobrenome }}</td>
 					<td>{{ usuario.username }}</td>
 					<td>{{ usuario.roles[0].name }}</td>
 					<td>{{ usuario.funcionario.cargo }}</td>
 					<td>{{ 'Sim' if usuario.active else 'Não' }}</td>
-					<td><a href="{{ url_for('admin.registrar_usuario') }}"></a></td>
+					<td>
+						<a 	class="btn btn-primary"
+							href="{{ url_for('admin.registrar_usuario', user_id=usuario.id) }}">
+							Atualizar
+						</a>
+					</td>
 				</tr>
 			{% endfor %}
 		</tbody>

@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for
 from urllib.parse import quote_plus
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, login_required, SQLAlchemySessionUserDatastore, current_user, roles_accepted
-from endpoints import pedido_endpoint, admin_endpoint
+from endpoints import pedido_endpoint, admin_endpoint, loja_endpoint
 import persistence.mysql_persistence as mysql_persistence
 from app_util.flask_util import FlaskUtilJs
 from model.models import User, Role
@@ -17,8 +17,8 @@ from endpoints.forms import trocar_senha_form
 
 
 # this will change
-# LOCAL_PATH = '/home/vyosiura/config-files/'
-LOCAL_PATH = '/home/vinicius/config-files/'
+LOCAL_PATH = '/home/vyosiura/config-files/'
+# LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)
@@ -34,12 +34,11 @@ security = Security(app, user_datastore,
 	change_password_form=trocar_senha_form.CustomizedChangePasswordForm)
 app.register_blueprint(admin_endpoint.bp)
 app.register_blueprint(pedido_endpoint.bp)
+app.register_blueprint(loja_endpoint.bp)
 
 @app.route("/")
 @login_required
 def template_test():
-	for role in current_user.roles:
-		print(role.name)
 	if current_user.roles[0].name == 'admin':
 		return render_template('admin/index.html', my_string="Wheeee!", my_list=[0, 1, 2, 3, 4, 5])
 	elif current_user.roles[0].name == 'medidor': # See only 

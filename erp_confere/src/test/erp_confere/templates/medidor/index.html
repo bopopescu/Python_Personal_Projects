@@ -2,31 +2,32 @@
 
 {% block title %} Medições pendente {% endblock%}
 {% block section %}
-		<table table table-hover>
-			<thead>
+	{% include "layout/messages.html" %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">Loja</th>
+				<th scope="col">Numero</th>
+				<th scope="col">Data inicio</th>
+				<th scope="col">Data agendada</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pedido_servico in pedido_servicos %}
 				<tr>
-					<th scope="col">#</th>
-					<th scope="col">Loja</th>
-					<th scope="col">Numero</th>
-					<th scope="col">Data inicio</th>
-					<th scope="col">Data agendada</th>
+					<th scope="row"></th>
+					<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
+					<td>{{ pedido_servico.pedido_obj.numero }}</td>
+					<td>{{ pedido_servico.data_inicio.strftime('%d/%m/%Y') }}</td>
+					<td>{{ pedido_servico.servico_props['agendamento'][-1] }}</td>
+					<td><a class="btn btn-primary"
+						href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">
+							Atualizar
+						</a>
+					</td>
 				</tr>
-			</thead>
-			<tbody>
-				{% for pedido_servico in pedido_servicos %}
-					<tr>
-						<th scope="row"></th>
-						<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
-						<td>{{ pedido_servico.pedido_obj.numero }}</td>
-						<td>{{ pedido_servico.data_inicio }}</td>
-						<td>{{ pedido_servico.servico_props['agendamento'][-1] }}</td>
-						<td><a class="btn btn-primary"
-							href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">
-								Atualizar
-							</a>
-						</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+			{% endfor %}
+		</tbody>
+	</table>
 {% endblock %}

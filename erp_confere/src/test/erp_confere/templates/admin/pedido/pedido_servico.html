@@ -3,178 +3,141 @@
 {% block title %} Pedido: {{pedido_servico.pedido_obj.numero}}</h2> {% endblock %}
 
 {% block section %}
-	{% with messages = get_flashed_messages(with_categories=true) %}
-		{% if messages %}
-			{% for category, message in messages %}
-				{% if category == 'error' %}
-					<div class="d-inline-flex p-10">
-						<div class="alert alert-danger alert-dismissible fade show" role="alert">
-							{{ message }}
-							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-					</div>
-				{% elif category == 'success' %}
-					<div class="d-inline-flex p-10">
-						<div class="alert alert-success alert-dismissible fade show" role="alert">
-							{{ message }}
-							<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button>
-						</div>
-					</div>
-				{% endif %}
-			{% endfor %}
-		{% endif %}
-	{% endwith %}
-		<h2 class="form-centralization">Servico: {{ pedido_servico.servico_obj.nome_real }}</h2>
-		<form id="pedido-servico" method="post" class="form-centralization">
+	{% include "layout/messages.html" %}
+	<h2 class="form-centralization">Servico: {{ pedido_servico.servico_obj.nome_real }}</h2>
+	<form id="pedido-servico" method="post" class="form-centralization">
 
-			<fieldset>
-				<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
+		<fieldset>
+			<legend>Status: {{ pedido_servico.servico_props['status'] }}</legend>
 
-				<input type="hidden" name="nome-servico" value="{{ pedido_servico.servico_obj.nome }}">
-				<input type="hidden" name="codigo-servico" value="{{ pedido_servico.servico }}">
-				<input type="hidden" name="codigo-pedido" value="{{ pedido_servico.pedido }}">
-				<input type="hidden" name="status" value="{{ pedido_servico.servico_props['status'] }}">
-				
-				{% if pedido_servico.servico_obj.nome == 'subir_paredes' or pedido_servico.servico_obj.nome == 'liberacao' %}
-					{% set promob_nome = 'inicial' if  pedido_servico.servico_obj.nome == 'subir_paredes' else 'final' %}
-					{% set promob_key = 'promob'+ promob_nome %}
-					<div class="form-row">
-						<div class="form-group col-sm-6">
-							<label>Promob {{ promob_nome }}</label>
-							<input type="text" name="promob-{{promob_nome}}" 
-							class="form-control form-control-lg real-value"
-							value="{{ pedido_servico.servico_props['promob_inicial'] if promob_nome == 'inicial' else pedido_servico.servico_props['promob_final']}}">
-						</div>
-					</div>
-				{% endif %}
-
+			<input type="hidden" name="nome-servico" value="{{ pedido_servico.servico_obj.nome }}">
+			<input type="hidden" name="codigo-servico" value="{{ pedido_servico.servico }}">
+			<input type="hidden" name="codigo-pedido" value="{{ pedido_servico.pedido }}">
+			<input type="hidden" name="status" value="{{ pedido_servico.servico_props['status'] }}">
+			
+			{% if pedido_servico.servico_obj.nome == 'subir_paredes' or pedido_servico.servico_obj.nome == 'liberacao' %}
+				{% set promob_nome = 'inicial' if  pedido_servico.servico_obj.nome == 'subir_paredes' else 'final' %}
+				{% set promob_key = 'promob'+ promob_nome %}
 				<div class="form-row">
-					<div class="form-group col-sm-3">
-						<label>Data Inicio</label>
-						<input class="form-control form-control-lg datepicker" type="text" name="data-inicio" disabled
-						value="{{pedido_servico.data_inicio.strftime('%d/%m/%Y') if pedido_servico.data_inicio is not none}}">
+					<div class="form-group col-sm-6">
+						<label>Promob {{ promob_nome }}</label>
+						<input type="text" name="promob-{{promob_nome}}" 
+						class="form-control form-control-lg real-value"
+						value="{{ pedido_servico.servico_props['promob_inicial'] if promob_nome == 'inicial' else pedido_servico.servico_props['promob_final']}}">
 					</div>
-					<div class="form-group col-sm-3">
-						<label>Data Final</label>
-						<input class="form-control datepicker form-control-lg" type="text" name="data-final" 
-						value="{{pedido_servico.data_fim.strftime('%d/%m/%Y') if pedido_servico.data_fim is not none}}" disabled>
-					</div>
-
 				</div>
-				{% if current_user.has_role('admin') %}
-					<div class="form-row">
-						<div class="form-group col-sm-6">
-							<label>Funcionario</label>
-							<select class="form-control form-control-lg" form="pedido-servico" name="funcionario">
-								{% for funcionario in funcionarios %}
-									<option value="{{funcionario.codigo}}" {{ 'selected' if pedido_servico.funcionario is not none and pedido_servico.funcionario.codigo == funcionario.codigo else '' }}}>
-										{{funcionario.nome + ' ' + funcionario.sobrenome}}
-									</option>
-								{% endfor %}
-								<option value="" {{'selected' if pedido_servico.funcionario is none else ''}}>
+			{% endif %}
+
+			<div class="form-row">
+				<div class="form-group col-sm-3">
+					<label>Data Inicio</label>
+					<input class="form-control form-control-lg datepicker" type="text" name="data-inicio" disabled
+					value="{{pedido_servico.data_inicio.strftime('%d/%m/%Y') if pedido_servico.data_inicio is not none}}">
+				</div>
+				<div class="form-group col-sm-3">
+					<label>Data Final</label>
+					<input class="form-control datepicker form-control-lg" type="text" name="data-final" 
+					value="{{pedido_servico.data_fim.strftime('%d/%m/%Y') if pedido_servico.data_fim is not none}}" disabled>
+				</div>
+
+			</div>
+			{% if current_user.has_role('admin') %}
+				<div class="form-row">
+					<div class="form-group col-sm-6">
+						<label>Funcionario</label>
+						<select class="form-control form-control-lg" form="pedido-servico" name="funcionario">
+							{% for funcionario in funcionarios %}
+								<option value="{{funcionario.codigo}}" {{ 'selected' if pedido_servico.funcionario is not none and pedido_servico.funcionario.codigo == funcionario.codigo else '' }}}>
+									{{funcionario.nome + ' ' + funcionario.sobrenome}}
 								</option>
-							</select>
-						</div>
+							{% endfor %}
+							<option value="" {{'selected' if pedido_servico.funcionario is none else ''}}>
+							</option>
+						</select>
 					</div>
-				{% endif %}
-				{% set agendado_ou_novo = (pedido_servico.servico_props['status'] != 'novo' or pedido_servico.servico_props['status'] != 'agendado')%}
-				{% set medicao_ou_atendimento = (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento')%}
-				{% if agendado_ou_novo and medicao_ou_atendimento%}
-					<div class="form-row">
-						{% set list_size = pedido_servico.servico_props['agendamento']|length %}
-						{% if 'agendamento' in pedido_servico.servico_props %}
-							{% if list_size > 0 %}
-									{% for agendamento in pedido_servico.servico_props['agendamento'] %}
-										<div class="form-group col-sm-3">
-												<label>{{ loop.index }}<sup><small>a</small></sup> Medição</label>
-												<input type="text" name="agendamento" 
-												class="form-control form-control-lg datetimepicker" 
-												value="{{agendamento}}"
-												{{ 'readonly' if list_size > 1 and list_size != loop.index else '' }}>
-										</div>
-									{% endfor %}
-							{% endif %}
+				</div>
+			{% endif %}
+			{% set agendado_ou_novo = (pedido_servico.servico_props['status'] != 'novo' or pedido_servico.servico_props['status'] != 'agendado')%}
+			{% set medicao_ou_atendimento = (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento')%}
+			{% if agendado_ou_novo and medicao_ou_atendimento%}
+				<div class="form-row">
+					{% set list_size = pedido_servico.servico_props['agendamento']|length %}
+					{% if 'agendamento' in pedido_servico.servico_props %}
+						{% if list_size > 0 %}
+								{% for agendamento in pedido_servico.servico_props['agendamento'] %}
+									<div class="form-group col-sm-3">
+											<label>{{ loop.index }}<sup><small>a</small></sup> Medição</label>
+											<input type="text" name="agendamento" autocomplete="off"
+											class="form-control form-control-lg datetimepicker" 
+											value="{{agendamento}}"
+											{{ 'readonly' if list_size > 1 and list_size != loop.index else '' }}>
+									</div>
+								{% endfor %}
 						{% endif %}
-					</div>
-					{% if pedido_servico.servico_props['agendamento']|length == 0 and 
-						pedido_servico.servico_props['status'] == 'novo'%}
-						<div class="form-row add-medicao">
-							<div class="form-group">
-								<button 
-								class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
-							</div>
-						</div>
-					{% elif pedido_servico.servico_props['agendamento']|length < 3 and 
-						pedido_servico.servico_props['status'] == 'agendado'%}
-						<div class="form-row add-medicao">
-							<div class="form-group">
-								<button 
-								class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
-							</div>
-						</div>
 					{% endif %}
-				{# {% elif pedido_servico.servico_props['status'] == 'novo' and (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento') %}
+				</div>
+				{% if pedido_servico.servico_props['agendamento']|length == 0 and 
+					pedido_servico.servico_props['status'] == 'novo'%}
 					<div class="form-row add-medicao">
 						<div class="form-group">
 							<button 
 							class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
 						</div>
-					</div> #}
-				{% endif %}
-				<div class="form-row">
-					<div class="form-group form-control-lg col-sm-6">
-						<label>Comentario</label>
-						<textarea class="form-control form-control-lg" rows="3" name="comentario" form="pedido-servico" id="comentario">
-							{{ pedido_servico.servico_props['comentario'] if 'comentario' in pedido_servico.servico_props}}
-						</textarea>
 					</div>
-				</div>
-				<div class="form-row">
-					<div class="form-group">
-						{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
-						{% if pedido_servico.servico_props['status'] == 'novo' and
-								(pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.nome == 'atendimento') %}
-							<input type="submit" value="Agendar" name="acao" 
-							class="form-control form-control-lg btn btn-success">
-						{% elif pedido_servico.servico_props['status'] == 'novo' and 
-								(pedido_servico.servico_obj.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}	
-							
-							<input type="submit" value="Iniciar" name="acao" 
-							class="form-control form-control-lg btn btn-success">
-						{% elif pedido_servico.servico_props['status'] == 'agendado' or pedido_servico.servico_props['status'] == 'iniciado'%}
-							<input type="submit" value="Concluir" name="acao" 
-							class="form-control form-control-lg btn btn-success">
-						{% elif pedido_servico.servico_props['status'] == 'concluido' %}
-							<input type="submit" value="Reabrir" name="acao" 
-							class="form-control form-control-lg btn btn-success">
-						{% endif %}
-					</div>
-					{% if pedido_servico.servico_props['status'] != 'liberado' %}
+				{% elif pedido_servico.servico_props['agendamento']|length < 3 and 
+					pedido_servico.servico_props['status'] == 'agendado'%}
+					<div class="form-row add-medicao">
 						<div class="form-group">
-							<input type="submit" name="acao" value="Atualizar" class="btn btn-primary btn-margin">
+							<button 
+							class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
 						</div>
+					</div>
+				{% endif %}
+			{# {% elif pedido_servico.servico_props['status'] == 'novo' and (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento') %}
+				<div class="form-row add-medicao">
+					<div class="form-group">
+						<button 
+						class="form-control form-control-lg btn btn-info add-input">Adicionar agendamento</button>
+					</div>
+				</div> #}
+			{% endif %}
+			<div class="form-row">
+				<div class="form-group form-control-lg col-sm-6">
+					<label>Comentario</label>
+					<textarea class="form-control form-control-lg" rows="3" name="comentario" form="pedido-servico" id="comentario">
+						{{ pedido_servico.servico_props['comentario'] if 'comentario' in pedido_servico.servico_props}}
+					</textarea>
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group">
+					{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
+					{% if pedido_servico.servico_props['status'] == 'novo' and
+							(pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.nome == 'atendimento') %}
+						<input type="submit" value="Agendar" name="acao" 
+						class="form-control form-control-lg btn btn-success">
+					{% elif pedido_servico.servico_props['status'] == 'novo' and 
+							(pedido_servico.servico_obj.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}	
+						
+						<input type="submit" value="Iniciar" name="acao" 
+						class="form-control form-control-lg btn btn-success">
+					{% elif pedido_servico.servico_props['status'] == 'agendado' or pedido_servico.servico_props['status'] == 'iniciado'%}
+						<input type="submit" value="Concluir" name="acao" 
+						class="form-control form-control-lg btn btn-success">
+					{% elif pedido_servico.servico_props['status'] == 'concluido' %}
+						<input type="submit" value="Reabrir" name="acao" 
+						class="form-control form-control-lg btn btn-success">
 					{% endif %}
 				</div>
-			</fieldset>
-			
-			{# novo => em atendimento 
-			em atendimento => concluido
-			concluido => liberado #}
-			{# If status == 'novo', add a new medicao #}
-
-			{# Servico pode ter mais de uma data de agendamento 
-
-			novo -> Configuracao de funcinoario, data de agendamento
-			agendado -> 
-			em liberacao -> 
-			liberado -> 
-			finalizado -> /	 #}
-			
-		</form>
+				{% if pedido_servico.servico_props['status'] != 'liberado' %}
+					<div class="form-group">
+						<input type="submit" name="acao" value="Atualizar" class="btn btn-primary btn-margin">
+					</div>
+				{% endif %}
+			</div>
+		</fieldset>
+		
+	</form>
 {% endblock %}
 
 {% block script %}
@@ -194,7 +157,7 @@
 					var divGroupInput = $('<div></div>', {class : 'form-group col-sm-4'});
 					var labelDate = $('<label></label>', {text: 'Data de Agendamento'})
 					var inputDate = $('<input/>', {class: 'form-control form-control-lg datetimepicker', 
-						type: 'text', name: 'agendamento', id: 'data-agendamento'})
+						type: 'text', name: 'agendamento', id: 'data-agendamento', autocomplete: false})
 					var btnRemove = $('<button></button>', 
 						{class: 'btn form-control-lg btn-danger remove-input', text: 'Remove'})
 					var btnLabelGamb = $('<label></label>', {text: 'ss'})

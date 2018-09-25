@@ -5,7 +5,7 @@
 {% block header %} <h3>Pedidos available</h3> {% endblock %}
 
 {% block section %}
-	
+	{% include "layout/messages.html" %}
 	{{ pagination.info }}
 	<table class="table table-hover" id="pedidos">
 		<thead>
@@ -62,7 +62,7 @@
 
 					if(status === 'success'){
 						console.log(data)
-						var tbl = $('<table></table>', {class: 'table table-hover table-detail'})
+						var tbl = $('<table></table>', {class: 'table table-striped table-detail'})
 						var tBody = $('<tbody></tbody>')
 							
 						tbl.append(tBody);
@@ -75,7 +75,7 @@
 
 						data.map(function(elem) {
 							
-							var tRow= $('<tr></tr>');
+							var tRow= $('<tr></tr>', {scope: 'row'});
 							var tDataCodigoPedido = $('<td></td>', {text: elem.pedido, hidden: true, class: 'codigo-pedido'})
 							var tDataCodigoServico = $('<td></td>', {text: elem.servico, hidden: true,
 							 class: 'codigo-servico'})

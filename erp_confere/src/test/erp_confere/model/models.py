@@ -27,9 +27,9 @@ class User(db.Model, UserMixin):
     last_login_ip = db.Column('ds_ultimo_ip_login', db.String(100))
     current_login_ip = db.Column('ds_recente_ip_login', db.String(100))
     login_count = db.Column('nr_qtde_login', db.Integer)
-    active = db.Column('ativo', mysqldialect.TINYINT(1))
+    active = db.Column('ativo', mysqldialect.TINYINT(1), default=1)
     confirmed_at = db.Column('dt_hr_email_confirmado', mysqldialect.DATETIME)
-    roles = db.relationship('Role', secondary='funcao_usuario', 
+    roles = db.relationship('Role', secondary='funcao_usuario',
                          backref=db.backref('users'))
     funcionario = db.relationship('Funcionario', back_populates='usuario', uselist=False)
 

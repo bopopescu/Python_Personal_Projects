@@ -6,3 +6,7 @@ def query_all_lojas():
 
 def query_loja_by_id(codigo):
 	return Loja.query.filter_by(codigo=codigo).first()
+
+def insert_loja(loja):
+	db.session.add(loja)
+	db.session.commit()

@@ -19,4 +19,4 @@ def query_usuarios():
 
 
 def query_usuario_by_id(user_id):
-	return User.query.filter_by(user_id=user_id).one()
+	return User.query.filter_by(id=user_id).one()

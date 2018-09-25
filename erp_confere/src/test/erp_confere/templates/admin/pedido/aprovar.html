@@ -2,6 +2,7 @@
 
 {% block title %} Liberação de serviços {% endblock %}
 {% block section %}
+	{% include "layout/messages.html" %}
 	{% if pedido_servicos|length == 0%}
 		<h1>Não há serviços para liberar! =)</h1>
 	{% else %}

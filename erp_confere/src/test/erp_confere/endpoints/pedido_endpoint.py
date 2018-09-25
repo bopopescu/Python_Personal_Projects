@@ -40,7 +40,6 @@ def pedido_servico(codigo_pedido, codigo_servico):
 			servico_form = parse_form(request.form)
 
 			if request.form['acao'] == 'Atualizar':
-				print(servico_form)
 				pedido_servico_service.atualiza(**servico_form)
 				
 				flash('Atualizando com sucesso', 'success')
@@ -62,7 +61,6 @@ def pedido_servico(codigo_pedido, codigo_servico):
 					else:
 						flash('Serviço concluido!')
 				elif request.form['acao'] == 'Reabrir':
-					print(servico_form)
 					pedido_servico_service.reabrir(**servico_form)
 					flash('Serviço reaberto', 'success')
 				else:
@@ -97,7 +95,6 @@ def pedidos():
 def pedido_servicos(codigo_pedido):
 	
 	pedido_servicos = pedido_servico_service.query_partial_pedido_servico_by_pedido(codigo_pedido)
-	print(pedido_servicos)
 	return jsonify(pedido_servicos)
 
 
@@ -147,7 +144,7 @@ def ambientes_to_dict(form):
 
 @bp.route('/projetista', methods=['GET'])
 @login_required
-@roles_accepted('projetista')
+@roles_accepted('projetista', 'admin')
 def projetista():
 	pedido_servicos = pedido_servico_service.query_pedido_servico_projetista()
 	return render_template('projetista/index.html', pedido_servicos=pedido_servicos)
