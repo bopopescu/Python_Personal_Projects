@@ -39,28 +39,38 @@ def pedido_servico(codigo_pedido, codigo_servico):
 			
 			servico_form = parse_form(request.form)
 
-			if request.form['acao'] == 'Atualizar':
+			if servico_form['acao'] == 'Atualizar':
 				pedido_servico_service.atualiza(**servico_form)
 				
 				flash('Atualizando com sucesso', 'success')
 				return redirect(url_for('pedido.pedido_servico', 
 					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 			else:
-				if request.form['acao'] == 'Iniciar' or request.form['acao'] == 'Agendar':
+				print(request.form)
+				if servico_form['acao'] == 'Iniciar' or servico_form['acao'] == 'Agendar':
 					if validate_form_agendar_iniciar(request):
 						# update the status and others information
-						pedido_servico_service.agendar_iniciar(**servico_form)
-						flash('Serviço iniciado com sucesso' ,'success')
+						print(servico_form)
+						try:
+							pedido_servico_service.agendar_iniciar(**servico_form)
+						except Exception as e:
+							flash(str(e), 'error')
+						else:
+							flash('Serviço iniciado com sucesso' ,'success')
 					else:
 						flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
-				elif request.form['acao'] == 'Concluir':
-					try:
-						pedido_servico_service.concluir(**servico_form)
-					except ValueError as err:
-						flash(str(err), 'error')
+				elif servico_form['acao'] == 'Concluir':
+
+					if current_user.has_role('admin'):
+						try:
+							pedido_servico_service.concluir(**servico_form)
+						except ValueError as err:
+							flash(str(err), 'error')
+						else:
+							flash('Serviço concluido!')
 					else:
-						flash('Serviço concluido!')
-				elif request.form['acao'] == 'Reabrir':
+						abort(403, 'Sem acesso')				
+				elif servico_form['acao'] == 'Reabrir':
 					pedido_servico_service.reabrir(**servico_form)
 					flash('Serviço reaberto', 'success')
 				else:
@@ -70,7 +80,7 @@ def pedido_servico(codigo_pedido, codigo_servico):
 						codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 	else:
 		abort(403, 'Sem acesso')
-		
+
 
 @bp.route('/pedidos', methods=['GET', 'POST'])
 @login_required
@@ -149,12 +159,14 @@ def projetista():
 	pedido_servicos = pedido_servico_service.query_pedido_servico_projetista()
 	return render_template('projetista/index.html', pedido_servicos=pedido_servicos)
 
+
 @bp.route('/aprovar', methods=['GET'])
 @login_required
 @roles_accepted('admin')
 def aprovar():
 	pedido_servicos = pedido_servico_service.query_pedido_servico_concluido()
 	return render_template('admin/pedido/aprovar.html', pedido_servicos=pedido_servicos)
+
 
 @bp.route('/liberado/<int:codigo_pedido>/<int:codigo_servico>', methods=['GET'])
 @login_required
@@ -171,8 +183,8 @@ def validate_form_agendar_iniciar(request):
 		function validates if the required informations are present in the request
 		In this case: funcionario and data-medicao|medicao-0|medicao-1|medicao-2 
 	'''
-	if request.form['funcionario'] == '':
-		return False
+	if request.form['funcionario'] == '' and request.form['status'] in ['iniciado', 'agendado', 'novo']:
+		return True
 
 	if request.form['nome-servico'] == 'medicao' or request.form['nome-servico'] == 'atendimento':
 		if 'agendamento' in request.form:

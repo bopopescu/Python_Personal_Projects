@@ -52,64 +52,58 @@ def query_pedido_servico_concluido():
 	return db.session.query(PedidoServico).filter(PedidoServico.servico_props['status'] == 'concluido').all()
 
 
-def update_pedido_servico(pedido_servico):
-	if not pedido_servico:
-		raise ValueError('Pedido serviço não pode ser nulo')
-	if not pedido_servico.pedido:
-		raise ValueError('Pedido não pode ser nulo')
-	if not pedido_servico.servico:
-		raise ValueError('Serviço não pode ser nulo')
-	if not pedido_servico.funcionario_obj:
-		funcionario_obj = None
-	else:
-		funcionario_obj = pedido_servico.funcionario_obj
+def agendar_iniciar(**kwargs):	
+	pedido_servico_original = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
+	is_changeable = is_pedido_servico_status_changeable(pedido_servico_original)
 
-	db.session.commit()
+	if is_changeable:
+		if pedido_servico_original.servico_props['status'] == 'novo':
 
-
-def agendar_iniciar(**kwargs):
-	'''
-		Update pedido_servico's status
-		Novo -> Agendado/Iniciado -> Concluído -> Liberado
-		Medição/Atendimento:
-			data agendamento
-			funcionario
-		Subir Paredes/ Projeto / Liberação / Manual de montagem:
-			funcinoario
-	'''
-	print(kwargs)
-	if kwargs['status'] == 'novo':
-		if kwargs['funcionario']:
-			pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
-			pedido_serivco_changeable = is_pedido_servico_status_changeable(pedido_servico)
+			if kwargs['funcionario']:
+				pedido_servico_original.funcionario = kwargs['funcionario']
+			elif not kwargs['funcionario'] and pedido_servico_original.funcionario_obj:
+				pedido_servico_original.funcionario_obj = None
 			
-			if pedido_serivco_changeable:
-				# updated_pedido_servico = validate_from_form(pedido_servico, **kwargs)
-				validate_from_form(pedido_servico, **kwargs)
-				
-				is_medicao_or_atendimento = kwargs['nome_servico'] == 'medicao' or kwargs['nome_servico'] == 'atendimento'
-				if is_medicao_or_atendimento:
-					if 'medicao_0' in kwargs or 'agendamento' in kwargs:
-						pedido_servico.servico_props['status'] = 'agendado'
-					else:
-						raise ValueError('Favor informar a data de agendamento')
-				else:
-					pedido_servico.servico_props['status'] = 'iniciado'
+			if kwargs['comentario']:
+				pedido_servico_original.servico_props['comentario'] = kwargs['comentario']
+			
+			pedido_servico_original.data_inicio = datetime.date.today()
 
-				pedido_servico.data_inicio = datetime.date.today()
-				update_pedido_servico(pedido_servico)
-			else:
-				raise ValueError('Favor encerrar devidamente o serviço anterior')
-		else:
-			raise ValueError('Favor informar o funcionario')
-	else:
-		raise ValueError('Pedido foi solicitado o agendamento/inicialização, porém não está aberto')
+			if pedido_servico_original.servico_obj.nome in ['subir_paredes', 'liberacao']:
+				iniciar(pedido_servico_original, **kwargs)
+			elif pedido_servico_original.servico_obj.nome in ['medicao', 'atendimento']:
+				agendar(pedido_servico_original, **kwargs)
+
+			db.session.commit()
 
 
-def atualiza(**kwargs):
+def iniciar(pedido_servico, **kwargs):
+	if pedido_servico.servico_obj.nome == 'subir_paredes':
+		if kwargs['promob_inicial']:
+			pedido_servico.servico_props['promob_inicial'] = kwargs['promob_inicial']
+	elif pedido_servico.servico_obj.nome == 'liberacao':
+		if kwargs['promob_final']:
+			pedido_servico.servico_props['promob_final'] = kwargs['promob_final']
+
+	pedido_servico.servico_props['status'] = 'iniciado'
+
+
+def agendar(pedido_servico, **kwargs):
+	if 'agendamento' in kwargs:
+		pedido_servico.servico_props['agendamento'] = kwargs['agendamento']
+	elif 'agendamento' not in kwargs and 'agendamento' not in pedido_servico.servico_props: 
+		raise ValueError('Favor informar uma data de agendamento')
+
+	pedido_servico.servico_props['status'] = 'agendado'
+
+
+def atualiza(**kwargs):	
 	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
-	validate_from_form(pedido_servico, **kwargs)
-	update_pedido_servico(pedido_servico)
+	if pedido_servico.servico_props['status'] in ['novo', 'agendado', 'iniciado']:
+		validate_from_form(pedido_servico, **kwargs)
+		update_pedido_servico(pedido_servico)
+	else:
+		raise ValueError('Os dados só podem ser atualizados se o serviço não estiver concluído ou liberado')
 
 
 def concluir(**kwargs):
@@ -117,27 +111,51 @@ def concluir(**kwargs):
 	pedido_serivco_changeable = is_pedido_servico_status_changeable(pedido_servico)
 
 	if pedido_serivco_changeable:
-		if pedido_servico.servico_obj.nome == 'subir_paredes':
-			if not kwargs['promob_inicial']:
-				raise ValueError('Favor informar o promob inicial')
-		elif pedido_servico.servico_obj.nome == 'liberacao':
-			if not kwargs['promob_final']:
-				raise ValueError('Favor informar o promob final')
+		if pedido_servico.servico_props['status'] in ['agendado', 'iniciado']:
 
-		validate_from_form(pedido_servico, **kwargs)
-		pedido_servico.servico_props['status'] = 'concluido'
-		pedido_servico.data_fim = datetime.date.today()
+			if kwargs['funcionario']:
+				if  kwargs['funcionario'] != pedido_servico.funcionario:
+					pedido_servico.funcionario_obj = funcionario_service.query_funcionario_by_id(kwargs['funcionario'])
+			else:
+				raise ValueError('Favor informar o funcionário')
 
-		if pedido_servico.servico_obj.tipo_valor == 'rl':
-			pedido_servico.valor_comissao = pedido_servico.servico_obj.valor
-		elif pedido_servico.servico_obj.tipo_valor == 'pct':
-			pedido_servico.valor_comissao = pedido_servico.servico_obj.valor * pedido_servico.pedido_obj.valor
+			if kwargs['comentario']:
+				if kwargs['comentario'] != pedido_servico.servico_props['comentario']:
+					pedido_servico.servico_props['comentario'] = kwargs['comentario']
 
-		if is_pedido_finalizado(pedido_servico):
-			pedido_servico.pedido_obj.data_fim = datetime.date.today()
-		update_pedido_servico(pedido_servico)
-	else:
-		raise ValueError('Favor encerrar devidamente o serviço anterior')
+			if pedido_servico.servico_obj.nome in ['subir_paredes', 'liberacao']:
+
+				promob = 'promob_inicial' if pedido_servico.servico_obj.nome == 'subir_paredes' else 'promob_final'
+
+				if promob in kwargs:
+
+					if kwargs['promob'] 
+
+				elif promob not in pedido_servico.servico_props:
+
+
+				if pedido_servico.servico_obj.nome == 'subir_paredes':
+					
+					if promob not in kwargs and pedido_servico.servico_props[promob]:
+						update_inicial_condition_1 = kwargs[promob] and promob not in pedido_servico.servico_props
+						update_inicial_condition_2 = kwargs[promob] != pedido_servico.servico_props[promob]
+						raise_error_condition = kwargs[promob] is None and promob not in pedido_servico.servico_props
+
+						if update_inicial_condition_1 or update_inicial_condition_2:
+							pedido_servico.servico_props[promob] = kwargs[promob]
+						elif raise_error_condition:
+							raise ValueError('Favor informar o promob incial para concluir o serviço')
+
+			pedido_servico.servico_props['status'] = 'concluido'
+			pedido_servico.data_fim = datetime.date.today()
+			if pedido_servico.servico_obj.tipo_valor == 'rl':
+				pedido_servico.valor_comissao = pedido_servico.servico_obj.valor
+			elif pedido_servico.servico_obj.tipo_valor == 'pct':
+				pedido_servico.valor_comissao = pedido_servico.servico_obj.valor * pedido_servico.pedido_obj.valor
+			if is_pedido_finalizado(pedido_servico):
+				pedido_servico.pedido_obj.data_fim = datetime.date.today()
+
+			db.session.commit()
 
 
 def aprovar(**kwargs):
@@ -200,12 +218,12 @@ def is_pedido_servico_status_changeable(pedido_servico):
 			.one()[0]
 	except NoResultFound as e:
 		previous_state = None
-
-	print(previous_state)
+	
 	is_changeable = previous_state == 'concluido' or previous_state == 'liberado' or not previous_state
 	if is_changeable:
 		return True
-	return False
+	
+	raise ValueError('Favor encerrar devidamente o serviço anterior')
 
 
 def is_pedido_finalizado(pedido_servico):
@@ -244,7 +262,7 @@ def validate_from_form(pedido_servico, **kwargs):
 					pedido_servico.funcionario_obj = funcionario_service.query_funcionario_by_id(kwargs['funcionario'])
 			else:
 				pedido_servico.funcionario_obj = funcionario_service.query_funcionario_by_id(kwargs['funcionario'])
-		elif not kwargs['funcionario'] and kwargs['status'] == 'novo':
+		elif not kwargs['funcionario'] and kwargs['status'] in ['novo', 'iniciado', 'agendado']:
 			pedido_servico.funcionario_obj = None
 		else:
 			raise ValueError('Não é permitido ficar sem responsável quando já foi iniciado ')

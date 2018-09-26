@@ -6,7 +6,7 @@
 	{% if pedido_servicos|length == 0%}
 		<h1>Não há serviços para liberar! =)</h1>
 	{% else %}
-		<table>
+		<table class="table table-striped">
 			<thead>
 				<tr>
 					<th>Loja</th>
@@ -19,11 +19,11 @@
 			</thead>
 			<tbody>
 				{% for pedido_servico in pedido_servicos %}
-					<tr>
+					<tr row="scope">
 						<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
 						<td>{{ pedido_servico.pedido_obj.numero }}</td>
 						<td>{{ pedido_servico.pedido_obj.valor }}</td>
-						<td>{{ pedido_servico.servico.nome }}</td>
+						<td>{{ pedido_servico.servico_obj.nome_real }}</td>
 						<td>{{ pedido_servico.valor_comissao }}</td>
 						<td>{{ pedido_servico.data_fim }}</td>
 						<td>

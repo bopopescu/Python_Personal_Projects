@@ -129,7 +129,7 @@
 						class="form-control form-control-lg btn btn-success">
 					{% endif %}
 				</div>
-				{% if pedido_servico.servico_props['status'] != 'liberado' %}
+				{% if pedido_servico.servico_props['status'] not in ['liberado', 'concluido']  %}
 					<div class="form-group">
 						<input type="submit" name="acao" value="Atualizar" class="btn btn-primary btn-margin">
 					</div>
