@@ -47,10 +47,9 @@ def pedido_servico(codigo_pedido, codigo_servico):
 					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 			else:
 				print(request.form)
+				print(servico_form)
 				if servico_form['acao'] == 'Iniciar' or servico_form['acao'] == 'Agendar':
 					if validate_form_agendar_iniciar(request):
-						# update the status and others information
-						print(servico_form)
 						try:
 							pedido_servico_service.agendar_iniciar(**servico_form)
 						except Exception as e:

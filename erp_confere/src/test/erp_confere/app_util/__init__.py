@@ -38,7 +38,8 @@ class CustomDecimalField(DecimalField):
 		if valuelist:
 			is_pattern_ok = re.compile('^[0-9]+(,|.)[0-9]*$')
 			if is_pattern_ok:
-				valuelist[0] = valuelist[0].replace(',', '.')
+				if valuelist[0]: 
+					valuelist[0] = valuelist[0].replace(',', '.')
 
 				try:
 					if self.use_locale:

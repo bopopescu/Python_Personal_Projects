@@ -15,6 +15,9 @@
 				<th>Cliente</th>
 				<th>Valor</th>
 				<th>Data Entrada</th>
+				<th>Data Inicio</th>
+				<th>Data Término</th>
+				<th>Status</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -25,8 +28,12 @@
 					<td class="loja-nome">{{ pedido.loja_obj.nome }}</td>
 					<td class="pedido-numero">{{ pedido.numero }}</td>
 					<td class="cliente-nome">{{ pedido.cliente_endereco_obj.cliente_obj.nome + ' ' +  pedido.cliente_endereco_obj.cliente_obj.sobrenome}}</td>
-					<td class="pedido-valor">{{ 'R$ ' + pedido.valor|string|replace('.', ',') }}</td>
+					<td class="pedido-valor">{{ 'R' + "${:,.2f}".format(pedido.valor).maketrans(',.', '.,') }}</td>
+					<!-- <td class="pedido-valor">{{ 'R$ ' + pedido.valor|string|replace('.', ',') }}</td> -->
 					<td class="pedido-data">{{ pedido.data_entrada.strftime('%d/%m/%Y') }}</td>
+					<td>{{ pedido.data_inicio.strftime('%d/%m/%Y') }}</td>
+					<td>{{ pedido.data_fim.strftime('%d/%m/%Y') }}</td>
+					<td>{{ pedido.status.value|capitalize }}</td>
 				</tr>
 			{% endfor %}
 		</tbody>

@@ -22,10 +22,10 @@
 					<tr row="scope">
 						<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
 						<td>{{ pedido_servico.pedido_obj.numero }}</td>
-						<td>{{ pedido_servico.pedido_obj.valor }}</td>
+						<td>{{ pedido_servico.pedido_obj.valor|replace('.', ',') }}</td>
 						<td>{{ pedido_servico.servico_obj.nome_real }}</td>
-						<td>{{ pedido_servico.valor_comissao }}</td>
-						<td>{{ pedido_servico.data_fim }}</td>
+						<td>{{ pedido_servico.valor_comissao|replace('.', ',') }}</td>
+						<td>{{ pedido_servico.data_fim.strftime('%d/%m/%Y') }}</td>
 						<td>
 							<a href="{{ url_for('pedido.liberado', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}"
 							class="btn btn-primary">

@@ -143,11 +143,20 @@
 {% block script %}
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
+			
+			if($('.real-value').length){
+				if($('.real-value').val() != ''){
+					$('.real-value').val($('.real-value').val().replace('.', ','))
+					$('.real-value').val(parseFloat($('.real-value').val()).toFixed(2))
+					$('.real-value').numeric({decimalPlaces:2, decimal: ',', altDecimal:'.', negative: false});
+				}
+			}
+			
+			
 			if($('.datetimepicker[readonly]')){
 				$('.datetimepicker[readonly]').removeClass('datetimepicker')
 			}
 
-			$('.real-value').numeric({decimalPlaces:2, altDecimal: '.', decimal:',', negative: false});
 
 			$('#pedido-servico').on('click', '.add-input', function(event) {
 				event.preventDefault();

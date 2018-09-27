@@ -3,7 +3,33 @@ from flask_security import UserMixin, RoleMixin
 import sqlalchemy.dialects.mysql as mysqldialect
 import sqlalchemy.ext.mutable as mutable
 import datetime
+import enum
 from persistence.mysql_persistence import db
+
+class TipoValor(enum.Enum):
+	porcentagem = 'pct'
+	especie = 'rl'
+
+
+class StatusPedidoServico(enum.Enum):
+	novo = 'novo'
+	agendado = 'agendado'
+	iniciado = 'iniciado'
+	concluido = 'concluido'
+	liberado = 'liberado'
+
+
+class Cargo(enum.Enum):
+	socio = 'socio'
+	finalizador = 'finalizador'
+	projetista = 'projetista'
+	medidor = 'medidor'
+	secretaria = 'secretaria'
+
+class StatusPedido(enum.Enum):
+	novo = 'novo'
+	iniciado = 'iniciado'
+	concluido = 'concluido'
 
 class Role(db.Model, RoleMixin):
     __tablename__ = 'funcao'
@@ -141,6 +167,7 @@ class Pedido(db.Model):
 	data_entrada = db.Column('dt_entrada', mysqldialect.DATE, nullable=False)
 	data_inicio = db.Column('dt_inicio', mysqldialect.DATE)
 	data_fim = db.Column('dt_fim', mysqldialect.DATE)
+	status = db.Column('ds_status', mysqldialect.ENUM(StatusPedido))
 	ambientes = db.Column('ambientes', mutable.MutableDict.as_mutable(mysqldialect.JSON), nullable=False)
 
 
@@ -161,3 +188,4 @@ class PedidoServico(db.Model):
 	data_inicio = db.Column('dt_inicio', mysqldialect.DATE)
 	data_fim = db.Column('dt_fim', mysqldialect.DATE)
 	servico_props = db.Column('servico_props', mutable.MutableDict.as_mutable(mysqldialect.JSON))
+

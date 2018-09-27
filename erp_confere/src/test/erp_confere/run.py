@@ -36,6 +36,7 @@ app.register_blueprint(admin_endpoint.bp)
 app.register_blueprint(pedido_endpoint.bp)
 app.register_blueprint(loja_endpoint.bp)
 
+
 @app.route("/")
 @login_required
 def template_test():

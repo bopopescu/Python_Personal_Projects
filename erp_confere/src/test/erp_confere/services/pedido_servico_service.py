@@ -5,11 +5,12 @@ import services.servico_service as servico_service
 import copy
 import datetime
 import contextlib
-from model.models import PedidoServico, Servico 
+from model.models import PedidoServico, Servico, TipoValor, StatusPedido
 from services import funcionario_service
 from services import pedido_service
 from persistence.mysql_persistence import db
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import func
 
 def json_to_model(pedido, servico):
 	status = json_util.dict_to_str({'status': 'novo'})
@@ -20,15 +21,35 @@ def generate_pedido_servico(pedido, servico):
 	return PedidoServico(pedido_obj=pedido, servico_obj=servico, funcionario_obj=None, 
 		valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)	
 
+def query_first_pedido_servico_by_pedido(codigo_pedido):
+	return db.session.query(PedidoServico, Servico)\
+					.join(PedidoServico.servico_obj)\
+					.with_entities(func.min(PedidoServico.servico))\
+					.filter(PedidoServico.pedido == codigo_pedido)\
+					.order_by(Servico.sequencia.asc())\
+					.one()
+
+def query_last_pedido_servico_by_pedido(codigo_pedido):
+	return db.session.query(PedidoServico, Servico)\
+					.join(PedidoServico.servico_obj)\
+					.with_entities(func.max(PedidoServico.servico))\
+					.filter(PedidoServico.pedido == codigo_pedido)\
+					.order_by(Servico.sequencia.asc())\
+					.one()
+
+
 def query_pedido_servico_by_pedido(codigo_pedido):
 	return PedidoServico.query.filter_by(pedido=codigo_pedido).all()
+
 
 def query_pedido_servico_by_servico(codigo_pedido):
 	pedido_servicos = query_pedido_servico_by_pedido(codigo_pedido)
 	return pedido_servicos
 
+
 def query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
 	return PedidoServico.query.filter_by(pedido=codigo_pedido, servico=codigo_servico).one()
+
 
 def query_partial_pedido_servico_by_pedido(codigo_pedido):
 	result_set = (db.session.query(PedidoServico, Servico).join(PedidoServico.servico_obj) \
@@ -57,7 +78,14 @@ def agendar_iniciar(**kwargs):
 	is_changeable = is_pedido_servico_status_changeable(pedido_servico_original)
 
 	if is_changeable:
+
 		if pedido_servico_original.servico_props['status'] == 'novo':
+
+			codigo_primerio_servico = query_first_pedido_servico_by_pedido(pedido_servico_original.pedido)[0]
+
+			if codigo_primerio_servico == pedido_servico_original.servico:
+				pedido_servico_original.pedido_obj.status = StatusPedido.iniciado
+				pedido_servico_original.pedido_obj.data_inicio = datetime.date.today()
 
 			if kwargs['funcionario']:
 				pedido_servico_original.funcionario = kwargs['funcionario']
@@ -69,10 +97,11 @@ def agendar_iniciar(**kwargs):
 			
 			pedido_servico_original.data_inicio = datetime.date.today()
 
-			if pedido_servico_original.servico_obj.nome in ['subir_paredes', 'liberacao']:
-				iniciar(pedido_servico_original, **kwargs)
-			elif pedido_servico_original.servico_obj.nome in ['medicao', 'atendimento']:
+			
+			if pedido_servico_original.servico_obj.nome in ['medicao', 'atendimento']:
 				agendar(pedido_servico_original, **kwargs)
+			else:
+				iniciar(pedido_servico_original, **kwargs)
 
 			db.session.commit()
 
@@ -107,11 +136,18 @@ def atualiza(**kwargs):
 
 
 def concluir(**kwargs):
+
 	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 	pedido_serivco_changeable = is_pedido_servico_status_changeable(pedido_servico)
 
 	if pedido_serivco_changeable:
 		if pedido_servico.servico_props['status'] in ['agendado', 'iniciado']:
+
+			codigo_servico = query_last_pedido_servico_by_pedido(pedido_servico.pedido)[0]
+
+			if codigo_servico == pedido_servico.servico:
+				pedido_servico.pedido_obj.status = StatusPedido.concluido
+				pedido_servico.pedido_obj.data_fim = datetime.date.today()
 
 			if kwargs['funcionario']:
 				if  kwargs['funcionario'] != pedido_servico.funcionario:
@@ -124,33 +160,23 @@ def concluir(**kwargs):
 					pedido_servico.servico_props['comentario'] = kwargs['comentario']
 
 			if pedido_servico.servico_obj.nome in ['subir_paredes', 'liberacao']:
-
 				promob = 'promob_inicial' if pedido_servico.servico_obj.nome == 'subir_paredes' else 'promob_final'
 
 				if promob in kwargs:
-
-					if kwargs['promob'] 
-
-				elif promob not in pedido_servico.servico_props:
-
-
-				if pedido_servico.servico_obj.nome == 'subir_paredes':
-					
-					if promob not in kwargs and pedido_servico.servico_props[promob]:
-						update_inicial_condition_1 = kwargs[promob] and promob not in pedido_servico.servico_props
-						update_inicial_condition_2 = kwargs[promob] != pedido_servico.servico_props[promob]
-						raise_error_condition = kwargs[promob] is None and promob not in pedido_servico.servico_props
-
-						if update_inicial_condition_1 or update_inicial_condition_2:
-							pedido_servico.servico_props[promob] = kwargs[promob]
-						elif raise_error_condition:
-							raise ValueError('Favor informar o promob incial para concluir o serviço')
+					if kwargs[promob]:
+						pedido_servico.servico_props[promob] = kwargs[promob]
+					else:
+						if promob in pedido_servico.servico_props:
+							raise ValueError('Não é possível deixar o valor do promob em branco')
+				if promob not in pedido_servico.servico_props:
+						raise ValueError('Não é possível concluir sem o promob')
 
 			pedido_servico.servico_props['status'] = 'concluido'
 			pedido_servico.data_fim = datetime.date.today()
-			if pedido_servico.servico_obj.tipo_valor == 'rl':
+
+			if pedido_servico.servico_obj.tipo_valor == TipoValor.especie.value:
 				pedido_servico.valor_comissao = pedido_servico.servico_obj.valor
-			elif pedido_servico.servico_obj.tipo_valor == 'pct':
+			elif pedido_servico.servico_obj.tipo_valor == TipoValor.porcentagem.value:
 				pedido_servico.valor_comissao = pedido_servico.servico_obj.valor * pedido_servico.pedido_obj.valor
 			if is_pedido_finalizado(pedido_servico):
 				pedido_servico.pedido_obj.data_fim = datetime.date.today()
@@ -164,7 +190,8 @@ def aprovar(**kwargs):
 	if pedido_servico:
 		if pedido_servico.servico_props['status'] == 'concluido':
 			pedido_servico.servico_props['status'] = 'liberado'
-			update_pedido_servico(pedido_servico)
+			
+			db.session.commit()
 		else:
 			raise ValueError('Servico não está marcado como concluído')
 	else:
@@ -181,7 +208,8 @@ def reabrir(**kwargs):
 			pedido_servico.servico_props['status'] = 'agendado'
 		else:
 			pedido_servico.servico_props['status'] = 'iniciado'
-		update_pedido_servico(pedido_servico)
+		
+		db.session.commit()
 
 
 def validate_promob(**kwargs):
@@ -310,3 +338,5 @@ def validate_from_form(pedido_servico, **kwargs):
 	# 				pedido_servico.servico_props['agendamento'] = [kwargs[key_medicao]]
 
 	# return updated_values
+
+

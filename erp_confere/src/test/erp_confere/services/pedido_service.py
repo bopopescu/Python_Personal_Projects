@@ -1,4 +1,4 @@
-from model.models import Pedido
+from model.models import Pedido, StatusPedido
 import services.cliente_endereco_service as cliente_endereco_service
 import services.loja_service as loja_service
 import services.servico_service as servico_service
@@ -50,7 +50,7 @@ def jason_to_model(dic):
 	cliente_endereco = cliente_endereco_service.cliente_endereco_handler(dic)
 
 	return Pedido(cliente_endereco_obj=cliente_endereco, loja=loja, complemento=pedido_pai, 
-		numero=numero_pedido, valor=valor_pedido, data_entrada=data_entrada, data_inicio=data_inicio, data_fim=data_fim, ambientes=ambiente)
+		numero=numero_pedido, valor=valor_pedido, data_entrada=data_entrada, data_inicio=data_inicio, data_fim=data_fim, ambientes=ambiente, status=StatusPedido.novo)
 
 
 def query_pedido_by_id(codigo):
