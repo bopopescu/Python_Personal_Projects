@@ -114,24 +114,25 @@
 					{% set action_type  = 'Agendar' if pedido_servico.servico_props['status'] == 'novo' else 'Atualizar'%}
 					{% if pedido_servico.servico_props['status'] == 'novo' and
 							(pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.nome == 'atendimento') %}
-						<input type="submit" value="Agendar" name="acao" 
+						<input type="submit" value="Agendar" name="acao"  id="agendar-btn"
 						class="form-control form-control-lg btn btn-success">
 					{% elif pedido_servico.servico_props['status'] == 'novo' and 
 							(pedido_servico.servico_obj.nome != 'medicao' or pedido_servico.nome != 'atendimento') %}	
 						
-						<input type="submit" value="Iniciar" name="acao" 
+						<input type="submit" value="Iniciar" name="acao" id="iniciar-btn"
 						class="form-control form-control-lg btn btn-success">
 					{% elif pedido_servico.servico_props['status'] == 'agendado' or pedido_servico.servico_props['status'] == 'iniciado'%}
-						<input type="submit" value="Concluir" name="acao" 
+						<input type="submit" value="Concluir" name="acao"  id="concluir-btn"
 						class="form-control form-control-lg btn btn-success">
 					{% elif pedido_servico.servico_props['status'] == 'concluido' %}
-						<input type="submit" value="Reabrir" name="acao" 
+						<input type="submit" value="Reabrir" name="acao" id="reabrir-btn" 
 						class="form-control form-control-lg btn btn-success">
 					{% endif %}
 				</div>
 				{% if pedido_servico.servico_props['status'] not in ['liberado', 'concluido']  %}
 					<div class="form-group">
-						<input type="submit" name="acao" value="Atualizar" class="btn btn-primary btn-margin">
+						<input type="submit" name="acao" value="Atualizar" id="atualizar-btn"
+						 class="btn btn-primary btn-margin">
 					</div>
 				{% endif %}
 			</div>
@@ -152,11 +153,9 @@
 				}
 			}
 			
-			
 			if($('.datetimepicker[readonly]')){
 				$('.datetimepicker[readonly]').removeClass('datetimepicker')
 			}
-
 
 			$('#pedido-servico').on('click', '.add-input', function(event) {
 				event.preventDefault();
@@ -183,7 +182,8 @@
 					spanBtn.append(btnRemove)
 					divInputGroup.append(spanBtn)
 					
-					$('.add-medicao').after(divRow)		
+					$('.add-medicao').after(divRow)
+					$('.add-medicao').attr('hidden', 'true');
 				} 
 
 				$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05',
@@ -195,6 +195,7 @@
 				event.preventDefault();
 				
 				$('.novo-agendamento').remove()
+				$('.add-medicao').removeAttr('hidden')
 
 			});
 			if($('input[name=status]').val() == 'concluido' || $('input[name=status]').val() == 'liberado'){
@@ -205,19 +206,22 @@
 				});
 
 			}
-			$('#pedido-servico').on('click', 'input[type=submit]', function(event) {
-				
-				var status = $('input[name=status][value!=Atualizar]').val()
-				if(status == 'concluido'){
-					$(':input').each(function(index, el) {
-						$(this).removeAttr('disabled')		
-					});
-				} else if(status == 'agendado' || status == 'iniciado'){
-					alert('Você tem certeza de que quer fechar o serviço?')
-				}
+
+			$('#pedido-servico').on('click', '#reabrir-btn', function(event) {
+				$(':input').each(function(index, el) {
+						$(this).removeAttr('disabled')
+				});
 			});
+
+			$('#pedido-servico').on('click', '#concluir-btn', function(event) {
+				
+				confirm('Você tem certeza de que quer fechar o serviço?')
+			});
+
 			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false, scrollInput: false})
+			
 			var removeWhitespace = $('#comentario').val().trim()
+
 			$('#comentario').val(removeWhitespace)
 
 			$('.datetimepicker').datetimepicker({ format: 'd/m/Y H:i', step: 5, minTime: '09:00', maxTime: '19:05',

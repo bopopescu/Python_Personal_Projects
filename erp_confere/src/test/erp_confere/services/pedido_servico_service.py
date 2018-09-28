@@ -129,8 +129,33 @@ def agendar(pedido_servico, **kwargs):
 def atualiza(**kwargs):	
 	pedido_servico = query_pedido_servico_by_pedido_servico(kwargs['codigo_pedido'], kwargs['codigo_servico'])
 	if pedido_servico.servico_props['status'] in ['novo', 'agendado', 'iniciado']:
-		validate_from_form(pedido_servico, **kwargs)
-		update_pedido_servico(pedido_servico)
+		
+		pedido_servico.funcionario_obj = funcionario_service.query_funcionario_by_id(kwargs['funcionario'])
+		
+		if 'comentario' in pedido_servico.servico_props:
+			if kwargs['comentario']:
+				pedido_servico.servico_props['comentario'] = kwargs['comentario']
+			else:
+				pedido_servico.servico_props.pop('comentario', None)
+		else:
+			if kwargs['comentario'] is not None:
+				pedido_servico.servico_props['comentario'] = kwargs['comentario']
+
+		if pedido_servico.servico_obj.nome in ['medicao', 'atendimento']:
+			pedido_servico.servico_props['agendamento'] = kwargs['agendamento']
+
+		if pedido_servico.servico_obj.nome in ['subir_paredes', 'liberacao']:
+			promob = 'promob_inicial' if pedido_servico.servico_obj.nome == 'subir_paredes' else 'promob_final'
+			if promob in pedido_servico.servico_props:
+				if kwargs[promob]:
+					pedido_servico.servico_props[promob] = kwargs[promob]
+				else:
+					pedido_servico.servico_props.pop(promob, None)
+			else:
+				if kwargs[promob] is not None:
+					pedido_servico.servico_props[promob] = kwargs[promob]
+
+		db.session.commit()
 	else:
 		raise ValueError('Os dados só podem ser atualizados se o serviço não estiver concluído ou liberado')
 
