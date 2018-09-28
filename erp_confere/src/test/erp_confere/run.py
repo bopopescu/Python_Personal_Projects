@@ -17,8 +17,8 @@ from endpoints.forms import trocar_senha_form
 
 
 # this will change
-# LOCAL_PATH = '/home/vyosiura/config-files/'
-LOCAL_PATH = '/home/vinicius/config-files/'
+LOCAL_PATH = '/home/vyosiura/config-files/'
+# LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)

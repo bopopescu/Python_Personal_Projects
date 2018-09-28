@@ -26,10 +26,12 @@ class Cargo(enum.Enum):
 	medidor = 'medidor'
 	secretaria = 'secretaria'
 
+
 class StatusPedido(enum.Enum):
 	novo = 'novo'
 	iniciado = 'iniciado'
 	concluido = 'concluido'
+
 
 class Role(db.Model, RoleMixin):
     __tablename__ = 'funcao'
@@ -38,6 +40,7 @@ class Role(db.Model, RoleMixin):
     id = db.Column('cd_funcao', db.Integer, nullable=False)
     name = db.Column('nm_funcao', db.String(80), nullable=False)
     description = db.Column('ds_funcao', db.String(255))
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'usuario'
@@ -166,7 +169,9 @@ class Pedido(db.Model):
 	valor = db.Column('vl_pedido', mysqldialect.DECIMAL(precision=10,scale=2), nullable=False)
 	data_entrada = db.Column('dt_entrada', mysqldialect.DATE, nullable=False)
 	data_inicio = db.Column('dt_inicio', mysqldialect.DATE)
+	data_inicio_previsao = db.Column('dt_inicio_previsao', mysqldialect.DATE)
 	data_fim = db.Column('dt_fim', mysqldialect.DATE)
+	data_fim_previsao = db.Column('dt_fim_previsao', mysqldialect.DATE)
 	status = db.Column('ds_status', mysqldialect.ENUM(StatusPedido))
 	ambientes = db.Column('ambientes', mutable.MutableDict.as_mutable(mysqldialect.JSON), nullable=False)
 
@@ -186,6 +191,20 @@ class PedidoServico(db.Model):
 	funcionario_obj = db.relationship('Funcionario')
 	valor_comissao = db.Column('vl_comissao', mysqldialect.DECIMAL(precision=10,scale=2), nullable=False, default=0)
 	data_inicio = db.Column('dt_inicio', mysqldialect.DATE)
+	data_inicio_previsao = db.Column('dt_inicio_previsao', mysqldialect.DATE)
 	data_fim = db.Column('dt_fim', mysqldialect.DATE)
+	data_fim_previsao = db.Column('dt_fim_previsao', mysqldialect.DATE)
 	servico_props = db.Column('servico_props', mutable.MutableDict.as_mutable(mysqldialect.JSON))
+
+
+class Feriado(db.Model):
+	__tablename__ = 'feriado'
+	__table_args__ = (db.PrimaryKeyConstraint('cd_feriado', name="pk_feriado"),
+		db.UniqueConstraint('dt_feriado', name="uq_dt_feriado"))
+
+	codigo = db.Column('cd_feriado', db.Integer, nullable=False)
+	data = db.Column('dt_feriado', mysqldialect.DATE, nullable=False)
+	numero_dia_semana = db.Column('nr_dia_semana', db.Integer, nullable=False)
+	dia_semana = db.Column('ds_dia_semana', db.String(50), nullable=False)
+	descricao = db.Column('ds_feriado', db.String(60), nullable=False)
 

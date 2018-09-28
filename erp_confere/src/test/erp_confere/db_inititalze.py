@@ -3,7 +3,7 @@
 from run import app, user_datastore
 from persistence.mysql_persistence import db
 from datetime import date
-
+from app_util.feriados import feriados
 
 if __name__ == '__main__':
 
@@ -41,12 +41,15 @@ if __name__ == '__main__':
 				Servico(codigo=6, nome='manual_de_montagem', nome_real='Manual de Montagem', valor='0.0025', 
 					sequencia=6, tipo_valor='pct')
 			]
+	
 	funcoes = [
 		Role(name='admin', description='Administrador do sistema'),
 		Role(name='medidor', description='Realiza a medição'),
 		Role(name='projetista', description='Realiza os projetos'),
 		Role(name='controladora', description='Controla os pedidos servicos')
 	]
+
+
 
 	new_user = User(email='vinicius.yosiura@gmail.com', username='vinicius.yosiura', roles=[funcoes[0]],
 		password='password')
@@ -56,6 +59,7 @@ if __name__ == '__main__':
 	db.session.add_all(ambientes)
 	db.session.add_all(servicos)
 	db.session.add_all(funcoes)
+	db.session.add_all(feriados)
 	db.session.add(new_user)
 	db.session.add(new_funcionario)
 
