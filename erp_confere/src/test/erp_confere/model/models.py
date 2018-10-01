@@ -151,6 +151,7 @@ class Servico(db.Model):
 	valor = db.Column('vl_servico', mysqldialect.DECIMAL(precision=12,scale=6), nullable=False, default=0)
 	sequencia = db.Column('nr_sequencia', db.Integer, nullable=False)
 	tipo_valor = db.Column('tp_vl_servico', mysqldialect.ENUM('pct', 'rl'), default='pct', nullable=False)
+	dias_servico = db.Column('nr_dias_execucao', mysqldialect.TINYINT, nullable=False)
 
 
 class Pedido(db.Model):
@@ -203,7 +204,7 @@ class Feriado(db.Model):
 		db.UniqueConstraint('dt_feriado', name="uq_dt_feriado"))
 
 	codigo = db.Column('cd_feriado', db.Integer, nullable=False)
-	data = db.Column('dt_feriado', mysqldialect.DATE, nullable=False)
+	data_feriado = db.Column('dt_feriado', mysqldialect.DATE, nullable=False)
 	numero_dia_semana = db.Column('nr_dia_semana', db.Integer, nullable=False)
 	dia_semana = db.Column('ds_dia_semana', db.String(50), nullable=False)
 	descricao = db.Column('ds_feriado', db.String(60), nullable=False)

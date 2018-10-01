@@ -12,5 +12,5 @@
 {% endmacro %}
 
 {% macro render_field(field) %}
-  <p>{{ field(**kwargs)|safe }}</p>
+ {{ field(**kwargs)|safe }}
 {% endmacro %}

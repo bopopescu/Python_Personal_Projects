@@ -5,6 +5,7 @@ from flask_security import Security, login_required, SQLAlchemySessionUserDatast
 from endpoints import pedido_endpoint, admin_endpoint, loja_endpoint
 import persistence.mysql_persistence as mysql_persistence
 from app_util.flask_util import FlaskUtilJs
+from app_util import format_datetime
 from model.models import User, Role
 from endpoints.forms import trocar_senha_form
 # import endpoints.pedido_endpoint as pedido_endpoint
@@ -17,8 +18,8 @@ from endpoints.forms import trocar_senha_form
 
 
 # this will change
-LOCAL_PATH = '/home/vyosiura/config-files/'
-# LOCAL_PATH = '/home/vinicius/config-files/'
+# LOCAL_PATH = '/home/vyosiura/config-files/'
+LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)
@@ -36,6 +37,7 @@ app.register_blueprint(admin_endpoint.bp)
 app.register_blueprint(pedido_endpoint.bp)
 app.register_blueprint(loja_endpoint.bp)
 
+app.jinja_env.filters['datetime_pretty'] = format_datetime
 
 @app.route("/")
 @login_required

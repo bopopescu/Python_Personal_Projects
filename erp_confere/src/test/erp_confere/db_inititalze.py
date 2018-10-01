@@ -29,17 +29,17 @@ if __name__ == '__main__':
 			]
 
 	servicos = [
-				Servico(codigo=1, nome='medicao', nome_real='Medição', valor='80', sequencia=1, tipo_valor='rl'),
+				Servico(codigo=1, nome='medicao', nome_real='Medição', valor='80', sequencia=1, tipo_valor='rl', dias_servico=3),
 				Servico(codigo=2, nome='subir_paredes', nome_real='Subir Paredes', valor='0.002', 
-					sequencia=2, tipo_valor='pct'),
+					sequencia=2, tipo_valor='pct', dias_servico=5),
 				Servico(codigo=3, nome='projeto', nome_real='Projeto', valor='0.003', 
-					sequencia=3, tipo_valor='pct'),
+					sequencia=3, tipo_valor='pct', dias_servico=4),
 				Servico(codigo=4, nome='atendimento', nome_real='Atendimento', valor='0.003', 
-					sequencia=4, tipo_valor='pct'),
+					sequencia=4, tipo_valor='pct', dias_servico=6),
 				Servico(codigo=5, nome='liberacao', nome_real='Liberação', valor='0.003', 
-					sequencia=5, tipo_valor='pct'),
+					sequencia=5, tipo_valor='pct', dias_servico=7),
 				Servico(codigo=6, nome='manual_de_montagem', nome_real='Manual de Montagem', valor='0.0025', 
-					sequencia=6, tipo_valor='pct')
+					sequencia=6, tipo_valor='pct', dias_servico=10)
 			]
 	
 	funcoes = [

@@ -5,8 +5,18 @@
 {% block header %} <h3>Pedidos available</h3> {% endblock %}
 
 {% block section %}
+	{% from 'security/_macros.html' import render_field %}
 	{% include "layout/messages.html" %}
-	{{ pagination.info }}
+	<form class="form-inline" id="filtro-form">
+		{# {{ filter_form.csrf_token }}
+		{{ filter_form.hidden_tag() }} #}
+		<input type="hidden" name="page" value="1">
+		<p class="form-control-label mb-3 mr-sm-3">{{ filter_form.filtrar_por.label }}</p>
+		{{ render_field(filter_form.filtrar_por, class_="form-control mb-3 mr-sm-3") }}
+		{{ render_field(filter_form.loja_filtro, class_="form-control mb-3 mr-sm-3", hidden=True, disabled=True) }}
+		{{ render_field(filter_form.status_filtro, class_="form-control mb-3 mr-sm-3", hidden=True, disabled=True) }}
+		{{ render_field(filter_form.filtrar, class_="form-control btn btn-primary mb-2 mr-sm-2") }}
+	</form>
 	<table class="table table-hover" id="pedidos">
 		<thead>
 			<tr>
@@ -21,30 +31,62 @@
 			</tr>
 		</thead>
 		<tbody>
-			<!-- .maketrans(',.', '.,') -->
-			{% for pedido in pedidos %}
+			{% for pedido in pedidos.items %}
 				<tr class="pedido">
-					<!-- <td>{{ loop.index + (pagination.page - 1) * pagination.per_page}}</td> -->
 					<td class="pedido-codigo hide-tag">{{ pedido.codigo }}</td>
 					<td class="loja-nome">{{ pedido.loja_obj.nome }}</td>
 					<td class="pedido-numero">{{ pedido.numero }}</td>
 					<td class="cliente-nome">{{ pedido.cliente_endereco_obj.cliente_obj.nome + ' ' +  pedido.cliente_endereco_obj.cliente_obj.sobrenome}}</td>
 					<td class="pedido-valor">{{ 'R' + "${:,.2f}".format(pedido.valor) }}</td>
-					<!-- <td class="pedido-valor">{{ 'R$ ' + pedido.valor|string|replace('.', ',') }}</td> -->
-					<td class="pedido-data">{{ pedido.data_entrada.strftime('%d/%m/%Y') }}</td>
-					<td>{{ pedido.data_inicio.strftime('%d/%m/%Y') if pedido.data_inicio else 'N/A' }}</td>
-					<td>{{ pedido.data_fim.strftime('%d/%m/%Y') if pedido.data_fim else 'N/A' }}</td>
+					<td class="pedido-data">{{ pedido.data_entrada|datetime_pretty('date') }}</td>
+					<td>{{ 'N/A' if not pedido.data_inicio else pedido.data_inicio|datetime_pretty('date') }}</td>
+					<td>{{ 'N/A' if not pedido.data_fim else pedido.data_fim|datetime_pretty('date') }}</td>
 					<td>{{ pedido.status.value|capitalize }}</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
-	{{ pagination.links }}
+	{% if pedidos.has_prev %}
+		<a href="{{ url_for('pedido.pedidos', page=pedidos.prev_num, **argumentos) }}">&lt;&lt; Anterior</a>
+	{% endif %}
+	{% if pedidos.has_next %}
+		<a href="{{ url_for('pedido.pedidos', page=pedidos.next_num, **argumentos) }}">Próximo &gt;&gt; </a>
+	{% endif %}
 {% endblock %}
+
 
 {% block script %} 
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
+
+
+		$("#filtro-form").on('change', '#filtrar_por', function(event) {
+			event.preventDefault();
+			valueSelected = $(this).val()
+			if(valueSelected == 'loja'){
+				$('#loja_filtro').removeAttr('hidden')
+				$('#loja_filtro').removeAttr('disabled')
+
+				if(!$('#status_filtro').attr('hidden')){
+					$('#status_filtro').attr('hidden', true);
+					$('#status_filtro').attr('disabled', true);
+				}
+
+			} else if(valueSelected == 'status'){
+				$('#status_filtro').removeAttr('hidden')
+				$('#status_filtro').removeAttr('disabled')
+				if(!$('#loja_filtro').attr('hidden')){
+					$('#loja_filtro').attr('hidden', true);
+					$('#loja_filtro').attr('disabled', true);
+				}
+			}
+			if(valueSelected == ''){
+				$('#status_filtro').attr('hidden', true);
+				$('#status_filtro').attr('disabled', true);
+				$('#loja_filtro').attr('hidden', true);
+				$('#loja_filtro').attr('disabled', true);
+			}
+		});
 
 		$('.pedido-codigo').hide();
 
@@ -70,9 +112,19 @@
 
 					if(status === 'success'){
 						console.log(data)
-						var tbl = $('<table></table>', {class: 'table table-striped table-detail table-sm'})
+						var tbl = $('<table></table>', {class: 'table table-sm table-striped table-detail'})
+						var tHead = $('<thead></thead>')
 						var tBody = $('<tbody></tbody>')
-							
+						var tRowHeader = $('<tr></tr>')
+						cabecalho = ['Servico', 'Funcionario', 'Status', 'Previsão Início', 'Previsão Término']
+						
+						for(let item = 0; item < cabecalho.length; item++){
+							console.log(cabecalho[item])
+							var tDataHeader = $('<th></th>', {text: cabecalho[item], scope: 'col'})
+							tRowHeader.append(tDataHeader)
+						}
+						tHead.append(tRowHeader)
+						tbl.append(tHead)
 						tbl.append(tBody);
 
 						/*pedidos = data.map(function(elem) {
@@ -91,7 +143,7 @@
 							var tDataServicoProps = $('<td></td>', {text: elem.servico_props.status });
 							var tDataButton = $('<td></td>')
 							var tButton = $('<a></a>', {
-								text: 'atualizar', 
+								text: 'Atualizar', 
 								class: 'btn btn-outline-primary btn-small btn-pedido-servico', 
 								href: SCRIPT_ROOT + '/pedido/' + elem.pedido + '/servico/' + elem.servico
 							})
@@ -105,6 +157,8 @@
 							tBody.append(tRow);
 						});
 						
+
+
 						workingElem.after(tbl);
 					}
 					

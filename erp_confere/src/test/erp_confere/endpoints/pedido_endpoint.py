@@ -10,6 +10,7 @@ from flask_paginate import Pagination, get_page_args
 from marshmallow import pprint
 from flask_security import roles_accepted, login_required, current_user
 from endpoints.exception_handler import http_error
+from endpoints.forms.pedido_filter_form import PedidoFilterForm
 import copy
 import decimal
 import jsonpickle 
@@ -81,22 +82,33 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		abort(403, 'Sem acesso')
 
 
+# @bp.route('/pedidos/<int:page>', methods=['GET', 'POST'])
 @bp.route('/pedidos', methods=['GET', 'POST'])
 @login_required
-@roles_accepted('admin', 'controladora')
+@roles_accepted('admin')
 def pedidos():
-	search = False
-	page, per_page, offset = get_page_args(page_parameter='page', per_page_parameter='page_parameter')
-	q = request.args.get('q')
-	if q:
-		search = True
 	
-	pedidos = pedido_service.query_pedidos()
-	pagination = Pagination(page=page, total=len(pedidos), per_page=per_page, search=search, record_name='pedidos',
-		css_framework='bootstrap4') 
+	filter_form = PedidoFilterForm()
+	filter_form.loja_filtro.choices = loja_service.query_loja_codigo_nome()
+	filter_form.loja_filtro.default = None
+	per_page = 5
+	page = int(request.args.get('page')) if 'page' in request.args else 1
 
-	return render_template('admin/pedido/pedidos.html', pedidos=pedidos, pagination=pagination)
+	info = {}
 
+	if 'loja_filtro' in request.args:
+		loja_filtro = request.args.get('loja_filtro')
+		pedidos = pedido_service.query_pedidos_by_loja_paginated(page, per_page, loja_filtro)
+		info['loja_filtro'] = loja_filtro
+	elif 'status_filtro' in request.args:
+		status_filtro = request.args.get('status_filtro')
+		pedidos = pedido_service.query_pedidos_by_status_paginated(page, per_page, status_filtro)
+		info['status_filtro'] = status_filtro
+	else:
+		pedidos = pedido_service.query_all_pedidos_paginated(page, per_page)
+
+	print(info)
+	return render_template('/admin/pedido/pedidos.html', pedidos=pedidos, filter_form=filter_form, argumentos=info)
 
 @bp.route('/<int:codigo_pedido>/pedido_servico')
 @login_required
@@ -155,7 +167,13 @@ def ambientes_to_dict(form):
 @login_required
 @roles_accepted('projetista', 'admin')
 def projetista():
-	pedido_servicos = pedido_servico_service.query_pedido_servico_projetista()
+	per_page = 10
+	if 'page' in request.args:
+		page = int(request.args['page'])
+	else:
+		page = 1
+
+	pedido_servicos = pedido_servico_service.query_all_pedido_servicos_projetista(page, per_page)
 	return render_template('projetista/index.html', pedido_servicos=pedido_servicos)
 
 

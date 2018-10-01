@@ -7,17 +7,25 @@
 				<tr>
 					<th scope="col">#</th>
 					<th scope="col">Loja</th>
-					<th scope="col">Numero</th>
+					<th scope="col">Código</th>
+					<th scope="col">Servico</th>
 					<th scope="col">Data Inicio</th>
+					<th scope="col">Data Fim</th>
+					<th scope="col">Previsão Inicio</th>
+					<th scope="col">Previsão Fim</th>
 				</tr>
 			</thead>
 			<tbody>
-				{% for pedido_servico in pedido_servicos %}
+				{% for pedido_servico in pedido_servicos.items %}
 					<tr>
 						<th scope="row"></th>
 						<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
 						<td>{{ pedido_servico.pedido_obj.numero }}</td>
-						<td>{{ '' if not pedido_servico.data_inicio else pedido_servico.data_inicio }}</td>
+						<td>{{ pedido_servico.servico_obj.nome_real }}</td>
+						<td>{{ 'N/A' if not pedido_servico.data_inicio else pedido_servico.data_inicio|datetime_pretty('date') }}</td>
+						<td>{{ 'N/A' if not pedido_servico.data_fim else pedido_servico.data_fim|datetime_pretty('date') }}</td>
+						<td>{{ 'N/A' if not pedido_servico.data_inicio_previsao else pedido_servico.data_inicio_previsao|datetime_pretty('date') }}</td>
+						<td>{{ 'N/A' if not pedido_servico.data_fim_previsao else pedido_servico.data_fim_previsao|datetime_pretty('date') }}</td>
 						<td><a class="btn btn-primary"
 							href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">
 								Atualizar
@@ -27,4 +35,10 @@
 				{% endfor %}
 			</tbody>
 		</table>
+	{% if pedido_servicos.has_prev %}
+		<a href="{{ url_for('pedido.projetista', page=pedido_servicos.prev_num) }}">&lt;&lt; Anterior</a>
+	{% endif %}
+	{% if pedido_servicos.has_next %}
+		<a href="{{ url_for('pedido.projetista', page=pedido_servicos.next_num) }}">Próximo &gt;&gt; </a>
+	{% endif %}
 {% endblock %}

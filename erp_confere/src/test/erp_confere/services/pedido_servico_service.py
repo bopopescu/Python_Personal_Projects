@@ -8,6 +8,7 @@ import contextlib
 from model.models import PedidoServico, Servico, TipoValor, StatusPedido
 from services import funcionario_service
 from services import pedido_service
+from services import feriado_service
 from persistence.mysql_persistence import db
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import func
@@ -49,6 +50,17 @@ def query_pedido_servico_by_servico(codigo_pedido):
 
 def query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico):
 	return PedidoServico.query.filter_by(pedido=codigo_pedido, servico=codigo_servico).one()
+
+
+def query_all_pedido_servicos_projetista(page, per_page):
+	return db.session.query(PedidoServico)\
+		.filter(PedidoServico.servico.in_([2, 3, 5, 6]), PedidoServico.servico_props['status'] == 'novo')\
+		.paginate(page=page, per_page=per_page, error_out=False)
+
+
+def query_pedido_servico_medicao():
+	return db.session.query(PedidoServico).filter(PedidoServico.servico == 1, 
+		((PedidoServico.servico_props['status'] == 'agendado'))).all()
 
 
 def query_partial_pedido_servico_by_pedido(codigo_pedido):
@@ -237,19 +249,38 @@ def reabrir(**kwargs):
 		db.session.commit()
 
 
-def validate_promob(**kwargs):
-	return 'promob_inicial' in kwargs or 'promob_final' in kwargs
+# def validate_promob(**kwargs):
+# 	return 'promob_inicial' in kwargs or 'promob_final' in kwargs
 
 
-def query_pedido_servico_projetista():
-	return db.session.query(PedidoServico)\
-		.filter(PedidoServico.servico.in_([2, 3, 5, 6]), PedidoServico.servico_props['status'] == 'novo')\
-		.all()
+def calculate_end_date_pedido_servico(data_corrente, dias_servico):
+	feriados = feriado_service.query_feriados_to_come(data_corrente)
 
+	data_final = data_corrente + datetime.timedelta(days=1)
 
-def query_pedido_servico_medicao():
-	return db.session.query(PedidoServico).filter(PedidoServico.servico == 1, 
-		((PedidoServico.servico_props['status'] == 'agendado'))).all()
+	dias_restantes_para_verificar = 0
+	while dias_restantes_para_verificar < dias_servico:
+		
+		if data_final not in feriados or data_final.weekday() != 6: # 6 stands for Sunday
+			dias_restantes_para_verificar += 1 
+
+		data_final = data_final + datetime.timedelta(days=1)
+
+	return data_final
+
+def calculate_start_date_pedido_servico(data_corrente):
+	feriados = feriado_service.query_feriados_to_come(data_corrente, 5)
+
+	data_inicio = copy.copy(data_corrente)
+	dias_restantes_para_verificar = 0
+	while dias_restantes_para_verificar < 1:
+		if data_inicio not in feriados or data_inicio.weekday() != 6: # 6 stands for Sunday
+			dias_restantes_para_verificar += 1 
+
+		data_inicio = data_inicio + datetime.timedelta(days=1)
+
+	return data_inicio
+
 
 
 def validate_agendamento(**kwargs):

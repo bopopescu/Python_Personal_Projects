@@ -19,7 +19,7 @@
 					<th scope="row"></th>
 					<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
 					<td>{{ pedido_servico.pedido_obj.numero }}</td>
-					<td>{{ pedido_servico.data_inicio.strftime('%d/%m/%Y') }}</td>
+					<td>{{ pedido_servico.data_inicio|datetime_pretty('date') }}</td>
 					<td>{{ pedido_servico.servico_props['agendamento'][-1] }}</td>
 					<td><a class="btn btn-primary"
 						href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">

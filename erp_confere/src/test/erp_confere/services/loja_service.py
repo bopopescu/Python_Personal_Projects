@@ -10,3 +10,9 @@ def query_loja_by_id(codigo):
 def insert_loja(loja):
 	db.session.add(loja)
 	db.session.commit()
+
+
+def query_loja_codigo_nome():
+	return db.session.query(Loja)\
+			.with_entities(Loja.codigo, Loja.nome)\
+			.all()

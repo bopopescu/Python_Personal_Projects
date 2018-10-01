@@ -51,3 +51,10 @@ class CustomDecimalField(DecimalField):
 					raise ValueError(self.gettext("Valor incorreto no campo Decimal, favor verificar"))
 
 
+def format_datetime(value, expression):
+	if expression == 'datetime':
+		expression_formatted = value.strftime('%d/%m/%Y %H:%M')
+	elif expression == 'date':
+		expression_formatted = value.strftime('%d/%m/%Y')
+
+	return expression_formatted
