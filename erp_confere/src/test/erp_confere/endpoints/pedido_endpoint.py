@@ -35,7 +35,7 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		if request.method == 'GET':
 			pedido_servico = pedido_servico_service.query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
 			funcionarios = funcionario_service.query_funcionarios()
-			return render_template('admin/pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
+			return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
 		elif request.method == 'POST':
 			
 			servico_form = parse_form(request.form)
@@ -82,6 +82,14 @@ def pedido_servico(codigo_pedido, codigo_servico):
 		abort(403, 'Sem acesso')
 
 
+@bp.route('/atrados', methods=['GET'])
+@login_required
+@roles_accepted('admin')
+def pedido_servico_atrasado():
+	pedidos_servicos = pedido_servico_service.query_pedidos_servicos_late()
+	return render_template('admin/index.html', pedidos_servicos=pedidos_servicos)	
+
+
 # @bp.route('/pedidos/<int:page>', methods=['GET', 'POST'])
 @bp.route('/pedidos', methods=['GET', 'POST'])
 @login_required
@@ -108,7 +116,7 @@ def pedidos():
 		pedidos = pedido_service.query_all_pedidos_paginated(page, per_page)
 
 	print(info)
-	return render_template('/admin/pedido/pedidos.html', pedidos=pedidos, filter_form=filter_form, argumentos=info)
+	return render_template('/pedido/pedidos.html', pedidos=pedidos, filter_form=filter_form, argumentos=info)
 
 @bp.route('/<int:codigo_pedido>/pedido_servico')
 @login_required
@@ -137,7 +145,7 @@ def cadastrar():
 		ambientes = ambiente_service.query_all_ambientes()
 		lojas = loja_service.query_all_lojas()
 
-		return render_template('admin/pedido/cadastrar.html', servicos=servicos, ambientes=ambientes, lojas=lojas)
+		return render_template('pedido/cadastrar.html', servicos=servicos, ambientes=ambientes, lojas=lojas)
 
 
 @bp.route('/medicao', methods=['GET', 'POST'])
@@ -182,7 +190,7 @@ def projetista():
 @roles_accepted('admin')
 def aprovar():
 	pedido_servicos = pedido_servico_service.query_pedido_servico_concluido()
-	return render_template('admin/pedido/aprovar.html', pedido_servicos=pedido_servicos)
+	return render_template('pedido/aprovar.html', pedido_servicos=pedido_servicos)
 
 
 @bp.route('/liberado/<int:codigo_pedido>/<int:codigo_servico>', methods=['GET'])

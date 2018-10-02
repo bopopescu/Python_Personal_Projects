@@ -8,6 +8,30 @@
 
 {% block section %}
 {% include "layout/messages.html" %}
-<a href="{{ url_for('security.logout') }}">LOGOUT</a> 
-<h1>Hello, World!</h1>
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Loja</th>
+				<th>Nome Cliente</th>
+				<th>Previsao Término</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pedido_servico in pedidos_servicos %}
+				<tr class="table-danger">
+					<th>{{ pedido_servico.pedido_obj.loja_obj.nome }}</th>
+					<th>{{ pedido_servico.pedido_obj.cliente_obj.nome }}</th>
+					<th>{{ pedido_servico.data_fim_previsao|datetime_pretty('date') }}</th>
+					<th>{{ 'Atrasado' }}</th>
+					<th>
+						<a class="btn btn-primary"
+							href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">
+							Atualizar
+						</a>
+					</th>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 {% endblock %}

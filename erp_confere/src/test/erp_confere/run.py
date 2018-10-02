@@ -18,8 +18,8 @@ from endpoints.forms import trocar_senha_form
 
 
 # this will change
-# LOCAL_PATH = '/home/vyosiura/config-files/'
-LOCAL_PATH = '/home/vinicius/config-files/'
+LOCAL_PATH = '/home/vyosiura/config-files/'
+# LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)
@@ -43,7 +43,7 @@ app.jinja_env.filters['datetime_pretty'] = format_datetime
 @login_required
 def template_test():
 	if current_user.roles[0].name == 'admin':
-		return render_template('admin/index.html', my_string="Wheeee!", my_list=[0, 1, 2, 3, 4, 5])
+		return redirect(url_for('admin.index'))
 	elif current_user.roles[0].name == 'medidor': # See only 
 		return redirect(url_for('pedido.medicao'))
 	elif current_user.roles[0].name == 'projetista': # See only the pedido_servico which are 'Liberacao', 'Subir Paredes' e 'Projetos'

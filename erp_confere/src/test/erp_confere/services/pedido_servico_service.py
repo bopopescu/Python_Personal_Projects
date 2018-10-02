@@ -39,6 +39,12 @@ def query_last_pedido_servico_by_pedido(codigo_pedido):
 					.one()
 
 
+def query_pedidos_servicos_late():
+	return db.session.query(PedidoServico)\
+		.filter(PedidoServico.data_fim_previsao > datetime.date.today(), PedidoServico.data_fim is None)\
+		.all()
+
+
 def query_pedido_servico_by_pedido(codigo_pedido):
 	return PedidoServico.query.filter_by(pedido=codigo_pedido).all()
 

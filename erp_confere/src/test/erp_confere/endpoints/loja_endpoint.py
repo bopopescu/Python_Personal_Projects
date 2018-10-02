@@ -22,6 +22,8 @@ def cadastrar():
 			flash('Loja criada com sucesso', 'success')
 		else:
 			flash(form.errors, 'error')
+
+	db.session.close()
 		
 		return redirect(url_for('loja.cadastrar'))
 
