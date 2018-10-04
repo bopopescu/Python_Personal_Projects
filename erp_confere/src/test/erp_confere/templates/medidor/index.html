@@ -9,6 +9,7 @@
 				<th scope="col">#</th>
 				<th scope="col">Loja</th>
 				<th scope="col">Numero</th>
+				<th scope="col">Status</th>
 				<th scope="col">Data inicio</th>
 				<th scope="col">Data agendada</th>
 			</tr>
@@ -19,7 +20,8 @@
 					<th scope="row"></th>
 					<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
 					<td>{{ pedido_servico.pedido_obj.numero }}</td>
-					<td>{{ pedido_servico.data_inicio|datetime_pretty('date') }}</td>
+					<td>{{ pedido_servico.servico_props['status']|capitalize }}</td>
+					<td>{{ 'N/A' if not pedido_servico.data_inicio else pedido_servico.data_inicio|datetime_pretty('date') }}</td>
 					<td>{{ pedido_servico.servico_props['agendamento'][-1] }}</td>
 					<td><a class="btn btn-primary"
 						href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">

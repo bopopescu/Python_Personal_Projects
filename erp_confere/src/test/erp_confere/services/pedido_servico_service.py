@@ -17,10 +17,12 @@ def json_to_model(pedido, servico):
 	status = json_util.dict_to_str({'status': 'novo'})
 	return PedidoServicoModel(pedido, servico, None, 0, None, None, status)	
 
+
 def generate_pedido_servico(pedido, servico):
 	status = {'status': 'novo'}
 	return PedidoServico(pedido_obj=pedido, servico_obj=servico, funcionario_obj=None, 
 		valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)	
+
 
 def query_first_pedido_servico_by_pedido(codigo_pedido):
 	return db.session.query(PedidoServico, Servico)\
@@ -29,6 +31,7 @@ def query_first_pedido_servico_by_pedido(codigo_pedido):
 					.filter(PedidoServico.pedido == codigo_pedido)\
 					.order_by(Servico.sequencia.asc())\
 					.one()
+
 
 def query_last_pedido_servico_by_pedido(codigo_pedido):
 	return db.session.query(PedidoServico, Servico)\
@@ -66,7 +69,7 @@ def query_all_pedido_servicos_projetista(page, per_page):
 
 def query_pedido_servico_medicao():
 	return db.session.query(PedidoServico).filter(PedidoServico.servico == 1, 
-		((PedidoServico.servico_props['status'] == 'agendado'))).all()
+		((PedidoServico.servico_props['status'] == 'agendado') | (PedidoServico.servico_props['status'] == 'novo'))).all()
 
 
 def query_partial_pedido_servico_by_pedido(codigo_pedido):

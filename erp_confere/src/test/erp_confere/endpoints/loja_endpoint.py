@@ -25,7 +25,7 @@ def cadastrar():
 
 	db.session.close()
 		
-		return redirect(url_for('loja.cadastrar'))
+	return redirect(url_for('loja.cadastrar'))
 
 @bp.route('/lojas', methods=['GET', 'POST'])
 @login_required
