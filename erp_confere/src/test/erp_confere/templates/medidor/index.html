@@ -22,7 +22,7 @@
 					<td>{{ pedido_servico.pedido_obj.numero }}</td>
 					<td>{{ pedido_servico.servico_props['status']|capitalize }}</td>
 					<td>{{ 'N/A' if not pedido_servico.data_inicio else pedido_servico.data_inicio|datetime_pretty('date') }}</td>
-					<td>{{ pedido_servico.servico_props['agendamento'][-1] }}</td>
+					<td>{{ 'N/A' if 'agendamento' not in pedido_servico.servico_props else pedido_servico.servico_props['agendamento'][-1] }}</td>
 					<td><a class="btn btn-primary"
 						href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">
 							Atualizar

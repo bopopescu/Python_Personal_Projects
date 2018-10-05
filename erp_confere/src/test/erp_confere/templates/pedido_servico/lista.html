@@ -1,0 +1,79 @@
+{% extends 'template.html' %}
+
+{% block section %}
+	{% from 'security/_macros.html' import render_field %}
+	{% include "layout/messages.html" %}
+	<form class="form-inline" id="form-filtro-lista">
+		<input type="hidden" name="page" value="1">
+		<p class="form-control-label mb-3 mr-sm-3">{{ form.filtrar_por.label }}</p>
+		{{ render_field(form.filtrar_por, class_="form-control form-control-sm mb-3 mr-sm-3") }}
+		{{ render_field(form.status, class_="form-control form-control-sm mb-3 choosable mr-sm-3", hidden=True, disabled=True) }}
+		{{ render_field(form.loja, class_="form-control form-control-sm choosable mb-3 mr-sm-3", hidden=True, disabled=True) }}
+		{{ render_field(form.pedido_codigo, class_="form-control form-control-sm choosable mb-3 mr-sm-3", hidden=True, disabled=True) }}
+		{{ render_field(form.filtrar, class_="form-control form-control-sm mb-3 mr-sm-3 btn btn-primary") }}
+	</form>
+	<table class="table table-striped table-bordered table-sm">
+		<thead>
+			<tr>
+				<th>Loja</th>
+				<th>Código Pedido</th>
+				<th>Servico</th>
+				<th>Data Inicio</th>
+				<th>Data Fim</th>
+				<th>Data Inicio Previsao</th>
+				<th>Data Fim Previsao</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for pedido_servico in pedidos_servicos.items %}
+				<tr>
+					<td>{{ pedido_servico.pedido_obj.loja_obj.nome }}</td>
+					<td>{{ pedido_servico.pedido_obj.numero }}</td>
+					<td>{{ pedido_servico.servico_obj.nome_real }}</td>
+					<td>{{ 'N/A' if not pedido_servico.data_inicio else pedido_servico.data_inicio|datetime_pretty('date') }}</td>
+					<td>{{ 'N/A' if not pedido_servico.data_fim else pedido_servico.data_fim|datetime_pretty('date') }}</td>
+					<td>{{ 'N/A' if not pedido_servico.data_inicio_previsao else pedido_servico.data_inicio_previsao|datetime_pretty('date') }}</td>
+					<td>{{ 'N/A' if not pedido_servico.data_fim_previsao else pedido_servico.data_fim_previsao|datetime_pretty('date') }}</td>
+					<td>{{ pedido_servico.servico_props['status']|capitalize }}</td>
+					<td>
+						<a class="btn btn-primary"
+							href="{{ url_for('pedido.pedido_servico', codigo_pedido=pedido_servico.pedido, codigo_servico=pedido_servico.servico) }}">
+							Visualizar
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	{% if pedidos_servicos.has_prev %}
+		<a href="{{ url_for('pedido_servico.lista', page=pedidos_servicos.prev_num, **arguments) }}">&lt;&lt; Anterior</a>
+	{% endif %}
+	{% if pedidos_servicos.has_next %}
+		<a href="{{ url_for('pedido_servico.lista', page=pedidos_servicos.next_num, **arguments) }}">Próximo &gt;&gt; </a>
+	{% endif %}
+{% endblock %}
+{% block script %}
+	<script type="text/javascript">
+		jQuery(document).ready(function($){
+
+			$('#form-filtro-lista').on('change', '#filtrar_por', function(event){
+
+				var escolhido = $('#filtrar_por').val()
+
+				if(escolhido != ''){
+					var id = '#' + escolhido  
+					$('.choosable').attr('disabled', true).attr('hidden', true)
+					$(id + '.choosable').removeAttr('disabled').removeAttr('hidden')
+				} else{
+					$('.choosable').attr('disabled', true).attr('hidden', true)
+				}
+
+				
+
+			})
+
+		})
+	</script>
+{% endblock %}

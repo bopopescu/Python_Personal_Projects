@@ -86,7 +86,14 @@ def pedido_servico(codigo_pedido, codigo_servico):
 @login_required
 @roles_accepted('admin')
 def pedido_servico_atrasado():
-	pedidos_servicos = pedido_servico_service.query_pedidos_servicos_late()
+	
+	per_page = 5;
+	if 'page' in request.args:
+		page = request.args['pages']
+	else:
+		page = 1
+
+	pedidos_servicos = pedido_servico_service.query_pedidos_servicos_late(page, per_page)
 	return render_template('admin/index.html', pedidos_servicos=pedidos_servicos)	
 
 

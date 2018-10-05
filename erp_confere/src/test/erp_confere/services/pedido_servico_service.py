@@ -5,7 +5,7 @@ import services.servico_service as servico_service
 import copy
 import datetime
 import contextlib
-from model.models import PedidoServico, Servico, TipoValor, StatusPedido
+from model.models import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido
 from services import funcionario_service
 from services import pedido_service
 from services import feriado_service
@@ -45,7 +45,7 @@ def query_last_pedido_servico_by_pedido(codigo_pedido):
 def query_pedidos_servicos_late():
 	return db.session.query(PedidoServico)\
 		.filter(PedidoServico.data_fim_previsao > datetime.date.today(), PedidoServico.data_fim is None)\
-		.all()
+		.paginate()
 
 
 def query_pedido_servico_by_pedido(codigo_pedido):
@@ -67,9 +67,34 @@ def query_all_pedido_servicos_projetista(page, per_page):
 		.paginate(page=page, per_page=per_page, error_out=False)
 
 
+def query_all_pedido_servicos(page, per_page):
+	return db.session.query(PedidoServico)\
+		.paginate(page=page, per_page=per_page, error_out=False)
+
+
 def query_pedido_servico_medicao():
 	return db.session.query(PedidoServico).filter(PedidoServico.servico == 1, 
 		((PedidoServico.servico_props['status'] == 'agendado') | (PedidoServico.servico_props['status'] == 'novo'))).all()
+
+def query_pedido_servico_status(page, per_page, status):
+	return db.session.query(PedidoServico)\
+			.filter(PedidoServico.servico_props['status'] == status)\
+			.paginate(page=page, per_page=per_page, error_out=False)
+
+
+def query_pedido_servico_loja(page, per_page, loja):
+	return db.session.query(PedidoServico)\
+			.join(PedidoServico.pedido_obj)\
+			.join(Loja)\
+			.filter(Loja.codigo == loja)\
+			.paginate(page=page, per_page=per_page, error_out=False)
+
+
+def query_pedido_servico_pedido(page, per_page, numero):
+	return db.session.query(PedidoServico)\
+			.join(PedidoServico.pedido_obj)\
+			.filter(Pedido.numero == numero)\
+			.paginate(page=page, per_page=per_page, error_out=False)
 
 
 def query_partial_pedido_servico_by_pedido(codigo_pedido):

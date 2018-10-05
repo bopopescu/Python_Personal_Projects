@@ -83,12 +83,12 @@
               <li class="active">
                   <a href="{{ url_for('security.change_password') }}"><i class="fa fa-link"></i> <span>Trocar senha</span></a>
               </li>
-              {%  if current_user.roles[0].name == 'admin' or current_user.roles[0].name == 'medidor' %}
+              {%  if current_user.roles[0].name == 'medidor' %}
                 <li class="active">
                   <a href="{{ url_for('pedido.medicao') }}"><i class="fa fa-link"></i> <span>Medições</span></a>
                 </li>
               {% endif %}
-              {% if current_user.has_role('projetista') or current_user.has_role('admin') %}
+              {% if current_user.has_role('projetista') %}
                 <li>
                   <a href="{{ url_for('pedido.projetista') }}">
                     <i class="fa fa-link"></i><span>Serviços</span>
@@ -133,6 +133,31 @@
                   </ul>
                 </li>
               {% endif %}
+              {% if current_user.has_role('admin') %}
+                <li class="treeview">
+                    <a href="#"><i class="fa fa-link"></i> <span>Serviços</span>
+                      <span class="pull-right-container">
+                          <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                      <li><a href="{{ url_for('pedido_servico.lista') }}">Todos</a></li>
+                      <li><a href="{{ url_for('pedido.medicao') }}">Visão Medidor</a></li>
+                      <li><a href="{{ url_for('pedido.projetista') }}">Visão Projetista</a></li>
+                    </ul>
+                  </li>
+                  <li class="treeview">
+                    <a href="#"><i class="fa fa-link"></i> <span>Administrador</span>
+                      <span class="pull-right-container">
+                          <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                      <li><a href="{{ url_for('admin.registrar_usuario') }}">Novo funcionário</a></li>
+                      <li><a href="{{ url_for('admin.usuarios') }}">Funcionários</a></li>
+                    </ul>
+                  </li>
+                {% endif %}
             </ul>
           </section>
         </aside>
