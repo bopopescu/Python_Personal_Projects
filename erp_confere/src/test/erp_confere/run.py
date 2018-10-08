@@ -8,6 +8,7 @@ from app_util.flask_util import FlaskUtilJs
 from app_util import format_datetime
 from model.models import User, Role
 from endpoints.forms import trocar_senha_form
+from sqlalchemy import text
 # import endpoints.pedido_endpoint as pedido_endpoint
 # import endpoints.loja_endpoint as loja_endpoint
 # from app_util.flask_util import FlaskUtilJs
@@ -18,8 +19,8 @@ from endpoints.forms import trocar_senha_form
 
 
 # this will change
-LOCAL_PATH = '/home/vyosiura/config-files/'
-# LOCAL_PATH = '/home/vinicius/config-files/'
+# LOCAL_PATH = '/home/vyosiura/config-files/'
+LOCAL_PATH = '/home/vinicius/config-files/'
 
 app = Flask(__name__, instance_path=LOCAL_PATH)
 fujs = FlaskUtilJs(app)
@@ -42,7 +43,8 @@ app.jinja_env.filters['datetime_pretty'] = format_datetime
 
 @app.route("/")
 @login_required
-def template_test():
+def index():
+
 	if current_user.roles[0].name == 'admin':
 		return redirect(url_for('admin.index'))
 	elif current_user.roles[0].name == 'medidor': # See only 

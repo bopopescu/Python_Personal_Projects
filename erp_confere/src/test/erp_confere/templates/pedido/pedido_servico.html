@@ -56,6 +56,21 @@
 						</select>
 					</div>
 				</div>
+			{% else %}
+				
+				{% if pedido_servico.servico_props['status'] != 'novo' %}
+					<div class="form-row">
+						<div class="form-group col-sm-6">
+							<label>Funcionario</label>
+							<select class="form-control form-control-lg" form="pedido-servico" name="funcionario" disabled>
+								<option value="{{pedido_servico.funcionario_obj.codigo}}" selected>
+									{{ pedido_servico.funcionario_obj.nome + ' ' + pedido_servico.funcionario_obj.sobrenome }}
+								</option>
+							</select>
+						</div>
+					</div>
+				{% endif %}
+
 			{% endif %}
 			{% set agendado_ou_novo = (pedido_servico.servico_props['status'] != 'novo' or pedido_servico.servico_props['status'] != 'agendado')%}
 			{% set medicao_ou_atendimento = (pedido_servico.servico_obj.nome == 'medicao' or pedido_servico.servico_obj.nome == 'atendimento')%}
@@ -125,8 +140,10 @@
 						<input type="submit" value="Concluir" name="acao"  id="concluir-btn"
 						class="form-control form-control-lg btn btn-success">
 					{% elif pedido_servico.servico_props['status'] == 'concluido' %}
-						<input type="submit" value="Reabrir" name="acao" id="reabrir-btn" 
-						class="form-control form-control-lg btn btn-success">
+						{% if current_user.has_role('admin') %}
+							<input type="submit" value="Reabrir" name="acao" id="reabrir-btn" 
+							class="form-control form-control-lg btn btn-success">
+						{% endif %}
 					{% endif %}
 				</div>
 				{% if pedido_servico.servico_props['status'] not in ['liberado', 'concluido']  %}

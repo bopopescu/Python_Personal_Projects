@@ -20,6 +20,8 @@ def index():
 @login_required
 @roles_accepted('admin')
 def registrar_usuario(**kwargs):
+
+
 	if 'user_id' in kwargs:
 		user = admin_service.query_usuario_by_id(kwargs['user_id'])
 		form = UsuarioRegistration(nome=user.funcionario.nome, sobrenome=user.funcionario.sobrenome, 

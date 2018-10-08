@@ -18,7 +18,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{% for pedido_servico in pedidos_servicos %}
+			{% for pedido_servico in pedidos_servicos.items %}
 				<tr class="table-danger">
 					<th>{{ pedido_servico.pedido_obj.loja_obj.nome }}</th>
 					<th>{{ pedido_servico.pedido_obj.cliente_obj.nome }}</th>

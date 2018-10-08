@@ -47,8 +47,11 @@ def pedido_servico(codigo_pedido, codigo_servico):
 				return redirect(url_for('pedido.pedido_servico', 
 					codigo_pedido=servico_form['codigo_pedido'], codigo_servico=servico_form['codigo_servico']))
 			else:
-				print(request.form)
-				print(servico_form)
+				# print(request.form)
+				# print(servico_form)
+				if not current_user.has_role('admin'):
+						servico_form['funcionario'] = current_user.id
+						
 				if servico_form['acao'] == 'Iniciar' or servico_form['acao'] == 'Agendar':
 					if validate_form_agendar_iniciar(request):
 						try:
@@ -61,15 +64,13 @@ def pedido_servico(codigo_pedido, codigo_servico):
 						flash('Informações necessárias: funcionário e data de agendamento (no caso de Medição e Atendimento)', 'error')
 				elif servico_form['acao'] == 'Concluir':
 
-					if current_user.has_role('admin'):
-						try:
-							pedido_servico_service.concluir(**servico_form)
-						except ValueError as err:
-							flash(str(err), 'error')
-						else:
-							flash('Serviço concluido!')
+					try:
+						pedido_servico_service.concluir(**servico_form)
+					except ValueError as err:
+						flash(str(err), 'error')
 					else:
-						abort(403, 'Sem acesso')				
+						flash('Serviço concluido!')
+					
 				elif servico_form['acao'] == 'Reabrir':
 					pedido_servico_service.reabrir(**servico_form)
 					flash('Serviço reaberto', 'success')
@@ -87,9 +88,9 @@ def pedido_servico(codigo_pedido, codigo_servico):
 @roles_accepted('admin')
 def pedido_servico_atrasado():
 	
-	per_page = 5;
+	per_page = 10;
 	if 'page' in request.args:
-		page = request.args['pages']
+		page = int(request.args['pages'])
 	else:
 		page = 1
 
@@ -122,7 +123,7 @@ def pedidos():
 	else:
 		pedidos = pedido_service.query_all_pedidos_paginated(page, per_page)
 
-	print(info)
+	# print(info)
 	return render_template('/pedido/pedidos.html', pedidos=pedidos, filter_form=filter_form, argumentos=info)
 
 @bp.route('/<int:codigo_pedido>/pedido_servico')
@@ -159,7 +160,15 @@ def cadastrar():
 @login_required
 @roles_accepted('medidor', 'admin')
 def medicao():
-	pedido_servicos = pedido_servico_service.query_pedido_servico_medicao()
+	per_page = 10
+	page = 1 if 'page' not in request.args else int(request.args['page'])
+
+
+	if current_user.has_role('admin'):
+		pedido_servicos = pedido_servico_service.query_pedido_servico_medicao(page, per_page)
+	elif current_user.has_role('medidor'):
+		pedido_servicos = pedido_servico_service.query_pedido_servico_medicao_by_funcionar(page, per_page, current_user.id)
+
 	return render_template('medidor/index.html', pedido_servicos=pedido_servicos)
 
 
@@ -188,7 +197,7 @@ def projetista():
 	else:
 		page = 1
 
-	pedido_servicos = pedido_servico_service.query_all_pedido_servicos_projetista(page, per_page)
+	pedido_servicos = pedido_servico_service.query_pedido_servico_available_to_start(page, per_page)
 	return render_template('projetista/index.html', pedido_servicos=pedido_servicos)
 
 
@@ -215,8 +224,12 @@ def validate_form_agendar_iniciar(request):
 		function validates if the required informations are present in the request
 		In this case: funcionario and data-medicao|medicao-0|medicao-1|medicao-2 
 	'''
-	if request.form['funcionario'] == '' and request.form['status'] in ['iniciado', 'agendado', 'novo']:
+	if 'funcionario' in request.form:
+		if request.form['funcionario'] == '' and request.form['status'] in ['iniciado', 'agendado', 'novo']:
+			return True
+	elif not current_user.has_role('admin'):
 		return True
+
 
 	if request.form['nome-servico'] == 'medicao' or request.form['nome-servico'] == 'atendimento':
 		if 'agendamento' in request.form:

@@ -5,13 +5,13 @@ import services.servico_service as servico_service
 import copy
 import datetime
 import contextlib
-from model.models import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido
+from model.models import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido, Funcionario
 from services import funcionario_service
 from services import pedido_service
 from services import feriado_service
 from persistence.mysql_persistence import db
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import func
+from sqlalchemy import func, text
 
 def json_to_model(pedido, servico):
 	status = json_util.dict_to_str({'status': 'novo'})
@@ -42,14 +42,52 @@ def query_last_pedido_servico_by_pedido(codigo_pedido):
 					.one()
 
 
-def query_pedidos_servicos_late():
+def query_pedido_servico_medicao_by_funcionar(page, per_page, codigo_funcionario):
+	return db.session.query(PedidoServico)\
+					.filter(((PedidoServico.funcionario == codigo_funcionario) | (PedidoServico.funcionario == None)),
+						PedidoServico.servico == 1,
+						((PedidoServico.servico_props['status'] == 'agendado') | (PedidoServico.servico_props['status'] == 'novo')))\
+					.paginate(page=page, per_page=per_page, error_out=False)
+
+
+def query_pedidos_servicos_late(page, per_page):
 	return db.session.query(PedidoServico)\
 		.filter(PedidoServico.data_fim_previsao > datetime.date.today(), PedidoServico.data_fim is None)\
-		.paginate()
+		.paginate(page=page, per_page=per_page, error_out=False)
 
 
 def query_pedido_servico_by_pedido(codigo_pedido):
 	return PedidoServico.query.filter_by(pedido=codigo_pedido).all()
+
+
+def query_pedido_servico_available_to_start(page, per_page):
+	# SQL_QUERY = text(
+	# 	"SELECT 															\
+	# 		* 																\
+	# 	FROM 																\
+	# 		(SELECT 														\
+ #             	   *, 														\
+ #                	dense_rank() over w as 'next_service' 					\
+ #        	FROM 															\
+ #                alchemy.pedido_servico 										\
+ #        	WHERE 															\
+ #                dt_fim IS NULL 												\
+ #        	AND 															\
+ #                servico_props->>'$.status' = 'novo'							\
+ #            AND 															\
+ #            	cd_servico != 1 											\
+ #        	WINDOW w AS (partition by cd_pedido order by cd_servico) 		\
+	# 	) AS t 																\
+	# 	WHERE 																\
+ #        	next_service = 1")
+
+	subqry = db.session\
+			.query(PedidoServico, func.dense_rank(partition_by=PedidoServico.pedido, order_by=PedidoServico.servico))\
+			.filter(PedidoServico.servico_props['status'] == 'novo', PedidoServico.data_fim == None)\
+			.subquery()
+	print(subqry)
+	return db.session.query()
+
 
 
 def query_pedido_servico_by_servico(codigo_pedido):
@@ -72,9 +110,11 @@ def query_all_pedido_servicos(page, per_page):
 		.paginate(page=page, per_page=per_page, error_out=False)
 
 
-def query_pedido_servico_medicao():
+def query_pedido_servico_medicao(page, per_page):
 	return db.session.query(PedidoServico).filter(PedidoServico.servico == 1, 
-		((PedidoServico.servico_props['status'] == 'agendado') | (PedidoServico.servico_props['status'] == 'novo'))).all()
+		((PedidoServico.servico_props['status'] == 'agendado') | (PedidoServico.servico_props['status'] == 'novo')))\
+		.paginate(page=page, per_page=per_page, error_out=False)
+
 
 def query_pedido_servico_status(page, per_page, status):
 	return db.session.query(PedidoServico)\
@@ -98,8 +138,11 @@ def query_pedido_servico_pedido(page, per_page, numero):
 
 
 def query_partial_pedido_servico_by_pedido(codigo_pedido):
-	result_set = (db.session.query(PedidoServico, Servico).join(PedidoServico.servico_obj) \
-		.with_entities(PedidoServico.pedido, PedidoServico.servico, Servico.nome_real, PedidoServico.servico_props) \
+	result_set = (db.session.query(PedidoServico, Servico)\
+		.join(PedidoServico.servico_obj) \
+		.join(PedidoServico.funcionario_obj, isouter=True)\
+		.with_entities(PedidoServico.pedido, PedidoServico.servico, Servico.nome_real, PedidoServico.servico_props, 
+			Funcionario.nome + ' ' + Funcionario.sobrenome, PedidoServico.data_fim_previsao, PedidoServico.data_inicio_previsao) \
 		.filter(PedidoServico.pedido == codigo_pedido).all())
 
 	retorno = []
@@ -108,7 +151,10 @@ def query_partial_pedido_servico_by_pedido(codigo_pedido):
 		linha['pedido'] = row[0]
 		linha['servico'] = row[1]
 		linha['nome'] = row[2]
-		linha['servico_props'] = row[3]
+		linha['status'] = row[3]['status'].capitalize()
+		linha['nome_funcionario'] = row[4]
+		linha['data_inicio_previsao'] = row[5].strftime('%d/%m/%Y')
+		linha['data_fim_previsao'] = row[6].strftime('%d/%m/%Y')
 		retorno.append(linha) 
 
 	db.session.close()

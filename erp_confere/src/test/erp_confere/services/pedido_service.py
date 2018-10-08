@@ -44,7 +44,6 @@ def create_pedido_handler(dic):
 		pedido_servico.data_inicio_previsao = data_inicio
 		pedido_servico.data_fim_previsao = data_fim
 
-		print('Codigo do servico do pedido %s' % pedido_servico.servico)
 		if codigo_first_pedido_servico == pedido_servico.servico:
 			pedido.data_inicio = data_inicio
 
@@ -85,8 +84,10 @@ def jason_to_model(dic):
 def query_pedido_by_id(codigo):
 	return Pedido.query.filter_by(codigo=codigo).first()
 
+
 def query_pedidos():
 	return Pedido.query.all()
+
 
 def query_all_pedidos_paginated(page, per_page):
 	return Pedido.query.order_by(Pedido.data_entrada.asc()).paginate(page=page, per_page=per_page, error_out=False)
@@ -96,6 +97,7 @@ def query_pedidos_by_status_paginated(page, per_page, status):
 	return Pedido.query.order_by(Pedido.data_entrada.asc())\
 					.filter(Pedido.status == status)\
 					.paginate(page=page, per_page=per_page, error_out=False)	
+
 
 def query_pedidos_by_loja_paginated(page, per_page, codigo_loja):
 	return Pedido.query.order_by(Pedido.data_entrada.asc())\

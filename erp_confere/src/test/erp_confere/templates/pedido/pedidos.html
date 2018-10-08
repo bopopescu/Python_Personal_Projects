@@ -49,6 +49,7 @@
 	{% if pedidos.has_prev %}
 		<a href="{{ url_for('pedido.pedidos', page=pedidos.prev_num, **argumentos) }}">&lt;&lt; Anterior</a>
 	{% endif %}
+	<span> | </span>
 	{% if pedidos.has_next %}
 		<a href="{{ url_for('pedido.pedidos', page=pedidos.next_num, **argumentos) }}">Próximo &gt;&gt; </a>
 	{% endif %}
@@ -112,13 +113,13 @@
 
 					if(status === 'success'){
 						console.log(data)
-						var tbl = $('<table></table>', {class: 'table table-sm table-striped table-detail'})
+						var tbl = $('<table></table>', {class: 'table table-sm table-striped table-detail', id: 'table-pedido-servico'})
 						var tHead = $('<thead></thead>')
 						var tBody = $('<tbody></tbody>')
 						var tRowHeader = $('<tr></tr>')
 						cabecalho = ['Servico', 'Funcionario', 'Status', 'Previsão Início', 'Previsão Término']
 						
-						for(let item = 0; item < cabecalho.length; item++){
+						for(let item = 0; item <= cabecalho.length; item++){
 							console.log(cabecalho[item])
 							var tDataHeader = $('<th></th>', {text: cabecalho[item], scope: 'col'})
 							tRowHeader.append(tDataHeader)
@@ -136,11 +137,14 @@
 						data.map(function(elem) {
 							
 							var tRow= $('<tr></tr>', {scope: 'row'});
-							var tDataCodigoPedido = $('<td></td>', {text: elem.pedido, hidden: true, class: 'codigo-pedido'})
+							var tDataCodigoPedido = $('<td></td>', {text: elem.pedido, hidden: true, class: 'codigo-pedido space-between-elements'})
 							var tDataCodigoServico = $('<td></td>', {text: elem.servico, hidden: true,
-							 class: 'codigo-servico'})
- 							var tDataServicoNome = $('<td></td>',{text: elem.nome});
-							var tDataServicoProps = $('<td></td>', {text: elem.servico_props.status });
+							 class: 'codigo-servico space-between-elements'})
+ 							var tDataServicoNome = $('<td></td>',{text: elem.nome, class: 'space-between-elements'});
+ 							var tDataFuncionario = $('<td></td>', {text: elem.nome_funcionario })
+							var tDataServicoProps = $('<td></td>', {text: elem.status });
+							var tDataServicoDataInicio = $('<td></td>', {text: elem.data_inicio_previsao });
+							var tDataServicoDataFim = $('<td></td>', {text: elem.data_fim_previsao });
 							var tDataButton = $('<td></td>')
 							var tButton = $('<a></a>', {
 								text: 'Atualizar', 
@@ -149,9 +153,12 @@
 							})
 
 							tRow.append(tDataCodigoPedido);
-							tRow.append(tDataCodigoServico)
+							tRow.append(tDataCodigoServico);
 							tRow.append(tDataServicoNome);
+							tRow.append(tDataFuncionario);
 							tRow.append(tDataServicoProps);
+							tRow.append(tDataServicoDataInicio);
+							tRow.append(tDataServicoDataFim);
 							tRow.append(tDataButton)
 							tDataButton.append(tButton)
 							tBody.append(tRow);

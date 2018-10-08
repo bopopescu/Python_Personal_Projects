@@ -20,3 +20,32 @@ html,body{
   align-items: center;
   justify-content: center;
 }
+
+.stretch {
+	width: 600px;
+}
+
+.space-between-elements{
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#table-pedido-servico {
+	padding-left: 20px;
+	padding-right: 20px; 
+}
+
+#table-pedido-servico td{
+	white-space: nowrap;
+	word-break: keep-all;
+	padding-left: 20px;
+	padding-right: 20px; 
+}
+
+#table-pedido-servico th{
+	white-space: nowrap;
+	word-break: keep-all;
+	width: 100%;
+	padding-left: 20px;
+	padding-right: 20px; 
+}

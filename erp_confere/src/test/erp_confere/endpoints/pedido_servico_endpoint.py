@@ -21,27 +21,21 @@ def lista():
 	filter_form.loja.choices = loja_service.query_loja_codigo_nome()
 	filter_form.loja.default = None
 
-	if 'filtrar_por' in request.args:
-		filtro_utilizado = request.args['filtrar_por']
-	else:
-		filtro_utilizado = ''
-
 	arguments = {}
 
-	if filtro_utilizado == 'loja':
+	if 'loja' in request.args:
 		pedidos_servicos = pedido_servico_service.query_pedido_servico_loja(page, per_page, request.args['loja'])
 		arguments['loja'] = request.args['loja']
-	elif filtro_utilizado == 'status':
-		if filtro_utilizado == 'atrasdo':
+	elif 'status' in request.args:
+		if request.args['status'] == 'atrasado':
 			pedidos_servicos = pedido_servico_service.query_pedidos_servicos_late(page, per_page)
 		else:
 			pedidos_servicos = pedido_servico_service.query_pedido_servico_status(page, per_page, request.args['status'])
 
 		arguments['status'] = request.args['status']
-	elif filtro_utilizado == 'pedido_codigo':
+	elif 'pedido_codigo' in request.args:
 		pedidos_servicos = pedido_servico_service.query_pedido_servico_pedido(page, per_page, request.args['pedido_codigo'])
 		arguments['pedido_codigo'] = request.args['pedido_codigo']
-
 	else:
 		pedidos_servicos = pedido_servico_service.query_all_pedido_servicos(page, per_page)	
 	
