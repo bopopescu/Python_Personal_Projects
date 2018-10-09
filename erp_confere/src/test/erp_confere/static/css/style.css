@@ -49,3 +49,11 @@ html,body{
 	padding-left: 20px;
 	padding-right: 20px; 
 }
+
+#tabela-pedidos {
+	table-layout: fixed;
+}
+
+#tabela-pedidos td {
+	word-break: keep-all;
+}

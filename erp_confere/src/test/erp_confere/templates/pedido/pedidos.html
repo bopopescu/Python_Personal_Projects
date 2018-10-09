@@ -17,7 +17,7 @@
 		{{ render_field(filter_form.status_filtro, class_="form-control mb-3 mr-sm-3", hidden=True, disabled=True) }}
 		{{ render_field(filter_form.filtrar, class_="form-control btn btn-primary mb-2 mr-sm-2") }}
 	</form>
-	<table class="table table-hover" id="pedidos">
+	<table class="table table-hover" id="tabela-pedidos">
 		<thead>
 			<tr>
 				<th>Loja</th>
@@ -35,7 +35,7 @@
 				<tr class="pedido">
 					<td class="pedido-codigo hide-tag">{{ pedido.codigo }}</td>
 					<td class="loja-nome">{{ pedido.loja_obj.nome }}</td>
-					<td class="pedido-numero">{{ pedido.numero }}</td>
+					<td class="pedido-numero col-sm-1">{{ pedido.numero }}</td>
 					<td class="cliente-nome">{{ pedido.cliente_endereco_obj.cliente_obj.nome + ' ' +  pedido.cliente_endereco_obj.cliente_obj.sobrenome}}</td>
 					<td class="pedido-valor">{{ 'R' + "${:,.2f}".format(pedido.valor) }}</td>
 					<td class="pedido-data">{{ pedido.data_entrada|datetime_pretty('date') }}</td>
@@ -46,12 +46,14 @@
 			{% endfor %}
 		</tbody>
 	</table>
-	{% if pedidos.has_prev %}
-		<a href="{{ url_for('pedido.pedidos', page=pedidos.prev_num, **argumentos) }}">&lt;&lt; Anterior</a>
-	{% endif %}
-	<span> | </span>
-	{% if pedidos.has_next %}
-		<a href="{{ url_for('pedido.pedidos', page=pedidos.next_num, **argumentos) }}">Próximo &gt;&gt; </a>
+	{% if pedidos.pages > 1 %}
+		{% if pedidos.has_prev %}
+			<a href="{{ url_for('pedido.pedidos', page=pedidos.prev_num, **argumentos) }}">&lt;&lt; Anterior</a>
+		{% endif %}
+		<span> | </span>
+		{% if pedidos.has_next %}
+			<a href="{{ url_for('pedido.pedidos', page=pedidos.next_num, **argumentos) }}">Próximo &gt;&gt; </a>
+		{% endif %}
 	{% endif %}
 {% endblock %}
 
@@ -93,14 +95,14 @@
 
 		$('.real-value').numeric({decimalPlaces:2, altDecimal: '.', decimal:',', negative: false});
 		
-		$('#pedidos').on('click', '.tesss', function(event) {
+		$('#tabela-pedidos').on('click', '.tesss', function(event) {
 			event.preventDefault();
 			
 			$(this).hide();
 		});
 
 		// Toda vez que clicar em uma linha, expandir os serviços
-		$('#pedidos tbody').on('click', '.pedido', function(event) {
+		$('#tabela-pedidos tbody').on('click', '.pedido', function(event) {
 			event.preventDefault();
 			/* Act on the event */
 			var codigo = $(this).children('.pedido-codigo').text()
@@ -124,15 +126,10 @@
 							var tDataHeader = $('<th></th>', {text: cabecalho[item], scope: 'col'})
 							tRowHeader.append(tDataHeader)
 						}
+
 						tHead.append(tRowHeader)
 						tbl.append(tHead)
 						tbl.append(tBody);
-
-						/*pedidos = data.map(function(elem) {
-							return JSON.parse(elem);
-						})*/
-
-						/*console.log(pedidos);*/
 
 						data.map(function(elem) {
 							
@@ -162,10 +159,9 @@
 							tRow.append(tDataButton)
 							tDataButton.append(tButton)
 							tBody.append(tRow);
+
 						});
 						
-
-
 						workingElem.after(tbl);
 					}
 					

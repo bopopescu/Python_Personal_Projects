@@ -61,33 +61,14 @@ def query_pedido_servico_by_pedido(codigo_pedido):
 
 
 def query_pedido_servico_available_to_start(page, per_page):
-	# SQL_QUERY = text(
-	# 	"SELECT 															\
-	# 		* 																\
-	# 	FROM 																\
-	# 		(SELECT 														\
- #             	   *, 														\
- #                	dense_rank() over w as 'next_service' 					\
- #        	FROM 															\
- #                alchemy.pedido_servico 										\
- #        	WHERE 															\
- #                dt_fim IS NULL 												\
- #        	AND 															\
- #                servico_props->>'$.status' = 'novo'							\
- #            AND 															\
- #            	cd_servico != 1 											\
- #        	WINDOW w AS (partition by cd_pedido order by cd_servico) 		\
-	# 	) AS t 																\
-	# 	WHERE 																\
- #        	next_service = 1")
 
-	subqry = db.session\
-			.query(PedidoServico, func.dense_rank(partition_by=PedidoServico.pedido, order_by=PedidoServico.servico))\
-			.filter(PedidoServico.servico_props['status'] == 'novo', PedidoServico.data_fim == None)\
-			.subquery()
-	print(subqry)
-	return db.session.query()
+	subqueri = db.session.query(PedidoServico.pedido.label('pedido'), func.min(PedidoServico.servico).label('servico'))\
+ 					.filter(PedidoServico.data_fim == None, PedidoServico.servico_props['status'] == 'novo')\
+ 					.group_by(PedidoServico.pedido).subquery()
 
+	return db.session.query(PedidoServico)\
+			.filter(PedidoServico.pedido == subqueri.c.pedido, PedidoServico.servico == subqueri.c.servico)\
+			.paginate(page=page,per_page=per_page,error_out=False)
 
 
 def query_pedido_servico_by_servico(codigo_pedido):
