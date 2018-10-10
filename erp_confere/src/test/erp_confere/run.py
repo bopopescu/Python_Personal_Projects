@@ -3,10 +3,10 @@ from urllib.parse import quote_plus
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, login_required, SQLAlchemySessionUserDatastore, current_user, roles_accepted
 from endpoints import pedido_endpoint, admin_endpoint, loja_endpoint, pedido_servico_endpoint
-import persistence.mysql_persistence as mysql_persistence
+import persistence as mysql_persistence
 from app_util.flask_util import FlaskUtilJs
 from app_util import format_datetime
-from model.models import User, Role
+from model import User, Role
 from endpoints.forms import trocar_senha_form
 from sqlalchemy import text
 # import endpoints.pedido_endpoint as pedido_endpoint

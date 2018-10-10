@@ -1,5 +1,5 @@
-from persistence.mysql_persistence import db
-from model.models import Funcionario
+from persistence import db
+from model import Funcionario
 from sqlalchemy.orm.exc import NoResultFound
 
 def query_funcionario_by_id(codigo_funcionario): 

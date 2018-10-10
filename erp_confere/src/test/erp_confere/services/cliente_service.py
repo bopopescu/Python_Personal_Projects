@@ -1,6 +1,6 @@
-from model.models import Cliente
+from model import Cliente
 import app_util.constants as const
-from persistence.mysql_persistence import db
+from persistence import db
 
 def cliente_handler(dic):
 	cliente = verify_cliente(dic)

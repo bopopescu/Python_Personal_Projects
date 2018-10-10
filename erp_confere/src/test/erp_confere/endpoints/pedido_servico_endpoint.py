@@ -1,8 +1,8 @@
 from flask import Blueprint, Flask, render_template, flash, request, redirect, url_for
 from flask_security import login_required, roles_accepted
-from model.models import PedidoServico
+from model import PedidoServico
 from services import pedido_service, loja_service, pedido_servico_service
-from endpoints.forms.pedido_servico_filtro_form import PedidoServicoListaFiltroForm
+from endpoints.forms import PedidoServicoListaFiltroForm
 
 bp = Blueprint('pedido_servico', __name__, url_prefix='/pedido_servico')
 

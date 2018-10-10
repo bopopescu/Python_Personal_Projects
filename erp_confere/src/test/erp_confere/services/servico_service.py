@@ -1,5 +1,5 @@
-from model.models import Servico
-from persistence.mysql_persistence import db
+from model import Servico
+from persistence import db
 
 def servico_handler(dic):
 	pass

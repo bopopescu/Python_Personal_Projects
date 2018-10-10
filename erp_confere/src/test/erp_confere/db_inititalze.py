@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from run import app, user_datastore
-from persistence.mysql_persistence import db
+from persistence import db
 from datetime import date
 from app_util.feriados import feriados
 
@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
 	app.app_context().push()
 
-	from model.models import *
+	from model import *
 
 	db.drop_all()
 	db.create_all()

@@ -10,7 +10,7 @@ from flask_paginate import Pagination, get_page_args
 from marshmallow import pprint
 from flask_security import roles_accepted, login_required, current_user
 from endpoints.exception_handler import http_error
-from endpoints.forms.pedido_filter_form import PedidoFilterForm
+from endpoints.forms import PedidoFilterForm
 import copy
 import decimal
 import jsonpickle 

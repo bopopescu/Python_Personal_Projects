@@ -1,5 +1,5 @@
-from model.models import Feriado
-from persistence.mysql_persistence import db
+from model import Feriado
+from persistence import db
 
 def query_feriado_by_data(data_corrente):
 	return Feriado.query.filter_by(data = data_corrente).all()

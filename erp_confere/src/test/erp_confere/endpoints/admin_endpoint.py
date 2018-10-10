@@ -1,9 +1,9 @@
 from flask import Blueprint, url_for, render_template, redirect, flash, request
 from flask_security import login_required, roles_accepted, current_user
 from datetime import date
-from endpoints.forms.usuario import UsuarioRegistration
+from endpoints.forms import UsuarioRegistration
 from services import funcao_service, admin_service
-from model.models import User, Funcionario
+from model import User, Funcionario
 from app_util import create_system_user
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')

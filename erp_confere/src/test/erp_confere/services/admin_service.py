@@ -1,6 +1,6 @@
-from model.models import Funcionario, User, RolesUsers
+from model import Funcionario, User, RolesUsers
 from services import role_service
-from persistence.mysql_persistence import db
+from persistence import db
 from app_util import password_generator
 
 def new_user_handler(user, funcionario, role_id):

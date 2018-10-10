@@ -1,9 +1,9 @@
-from model.models import Pedido, StatusPedido
+from model import Pedido, StatusPedido
 import services.cliente_endereco_service as cliente_endereco_service
 import services.loja_service as loja_service
 import services.servico_service as servico_service
 import services.pedido_servico_service as pedido_servico_service
-from persistence.mysql_persistence import db
+from persistence import db
 import datetime
 import json
 import copy

@@ -1,9 +1,7 @@
 import services.cep_service as cep_service
 import services.cliente_service as cliente_service
-from model.models import ClienteEndereco
-from model.models import Cep
-from model.models import Cliente
-from persistence.mysql_persistence import db
+from model import ClienteEndereco, Cep, Cliente
+from persistence import db
 
 def cliente_endereco_handler(dic):
 		

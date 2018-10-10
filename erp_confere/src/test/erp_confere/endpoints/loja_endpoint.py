@@ -1,7 +1,7 @@
 from flask import Blueprint, Flask, render_template, flash, request, redirect, url_for
 from flask_security import login_required, roles_accepted
-from endpoints.forms.loja_form import LojaCadastrarForm
-from model.models import Loja
+from endpoints.forms import LojaCadastrarForm
+from model import Loja
 from services import loja_service
 
 bp = Blueprint('loja', __name__, url_prefix='/loja')

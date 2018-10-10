@@ -1,6 +1,6 @@
-from model.models import Cep
+from model import Cep
 import app_util.cep_request as viacep
-from persistence.mysql_persistence import db
+from persistence import db
 
 
 def cep_handler(cep_from_client):

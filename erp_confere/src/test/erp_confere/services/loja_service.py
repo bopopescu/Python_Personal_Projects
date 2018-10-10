@@ -1,5 +1,5 @@
-from model.models import Loja
-from persistence.mysql_persistence import db
+from model import Loja
+from persistence import db
 
 def query_all_lojas():
 	return Loja.query.all()

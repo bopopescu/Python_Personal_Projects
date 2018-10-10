@@ -5,11 +5,11 @@ import services.servico_service as servico_service
 import copy
 import datetime
 import contextlib
-from model.models import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido, Funcionario
+from model import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido, Funcionario
 from services import funcionario_service
 from services import pedido_service
 from services import feriado_service
-from persistence.mysql_persistence import db
+from persistence import db
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import func, text
 
