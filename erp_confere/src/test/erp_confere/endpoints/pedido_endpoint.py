@@ -9,8 +9,10 @@ from services import pedido_servico_service
 from flask_paginate import Pagination, get_page_args
 from marshmallow import pprint
 from flask_security import roles_accepted, login_required, current_user
-from endpoints.exception_handler import http_error
+import endpoints.exception_handler as http_error
 from endpoints.forms import PedidoFilterForm
+from model import ServicoEnum, FuncaoEnum
+from datetime import date
 import copy
 import decimal
 import jsonpickle 
@@ -32,10 +34,21 @@ def pedido_servico(codigo_pedido, codigo_servico):
 	is_controladora = current_user.roles[0].name == 'controladora'
 
 	if is_medidor_and_medicao or is_projetista or is_admin or is_controladora:
+
 		if request.method == 'GET':
+			
 			pedido_servico = pedido_servico_service.query_pedido_servico_by_pedido_servico(codigo_pedido, codigo_servico)
-			funcionarios = funcionario_service.query_funcionarios()
+
+			if codigo_servico == ServicoEnum.MEDICAO.value:
+				funcionarios = funcionario_service.query_funcionario_by_role((FuncaoEnum.MEDIDOR.value, ))
+			elif codigo_servico == ServicoEnum.ATENDIMENTO.value:
+				funcionarios = funcionario_service.query_funcionario_by_role((FuncaoEnum.ADMIN.value, ))
+			elif codigo_servico in (ServicoEnum.PROJETO.value, ServicoEnum.SUBIR_PAREDES.value, 
+				ServicoEnum.MANUAL_DE_MONTAGEM.value, ServicoEnum.LIBERACAO.value):
+				funcionarios = funcionario_service.query_funcionario_by_role((FuncaoEnum.PROJETISTA.value, FuncaoEnum.ADMIN.value))
+
 			return render_template('pedido/pedido_servico.html', pedido_servico=pedido_servico, funcionarios=funcionarios)
+
 		elif request.method == 'POST':
 			
 			servico_form = parse_form(request.form)
@@ -93,7 +106,7 @@ def pedido_servico_atrasado():
 		page = int(request.args['pages'])
 	else:
 		page = 1
-
+		
 	pedidos_servicos = pedido_servico_service.query_pedidos_servicos_late(page, per_page)
 	return render_template('admin/index.html', pedidos_servicos=pedidos_servicos)	
 

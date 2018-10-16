@@ -11,6 +11,21 @@ class TipoValor(enum.Enum):
 	especie = 'rl'
 
 
+class ServicoEnum(enum.Enum):
+	MEDICAO = 1
+	SUBIR_PAREDES = 2
+	PROJETO = 3
+	ATENDIMENTO = 4
+	LIBERACAO = 5
+	MANUAL_DE_MONTAGEM = 6
+
+
+class FuncaoEnum(enum.Enum):
+	ADMIN = 1
+	MEDIDOR = 2
+	PROJETISTA = 3
+	CONTROLADORA = 4
+
 class StatusPedidoServico(enum.Enum):
 	novo = 'novo'
 	agendado = 'agendado'

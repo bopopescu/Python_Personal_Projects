@@ -5,7 +5,7 @@ import services.servico_service as servico_service
 import copy
 import datetime
 import contextlib
-from model import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido, Funcionario
+from model import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido, Funcionario, ServicoEnum
 from services import funcionario_service
 from services import pedido_service
 from services import feriado_service
@@ -41,6 +41,19 @@ def query_last_pedido_servico_by_pedido(codigo_pedido):
 					.order_by(Servico.sequencia.asc())\
 					.one()
 
+def query_count_pedidos_servicos_by_loja(data_inicio, data_fim):
+
+	print(db.session.query(Loja.nome, func.count(1).label('quantidade')) \
+					.join(Pedido) \
+					.filter(Pedido.data_entrada.between(data_inicio, data_fim)) \
+					.group_by(Loja.nome)\
+					.all())
+	return db.session.query(Loja.nome, func.count(1).label('quantidade')) \
+					.join(Pedido) \
+					.filter(Pedido.data_entrada.between(data_inicio, data_fim)) \
+					.group_by(Loja.nome) \
+					.all()
+
 
 def query_pedido_servico_medicao_by_funcionar(page, per_page, codigo_funcionario):
 	return db.session.query(PedidoServico)\
@@ -63,7 +76,9 @@ def query_pedido_servico_by_pedido(codigo_pedido):
 def query_pedido_servico_available_to_start(page, per_page):
 
 	subqueri = db.session.query(PedidoServico.pedido.label('pedido'), func.min(PedidoServico.servico).label('servico'))\
- 					.filter(PedidoServico.data_fim == None, PedidoServico.servico_props['status'] == 'novo')\
+					.join(Servico)\
+ 					.filter(PedidoServico.data_fim == None, PedidoServico.servico_props['status'] == 'novo', 
+ 						Servico.codigo.notin_((ServicoEnum.MEDICAO.value, ServicoEnum.ATENDIMENTO.value)))\
  					.group_by(PedidoServico.pedido).subquery()
 
 	return db.session.query(PedidoServico)\

@@ -21,27 +21,29 @@ def index():
 @roles_accepted('admin')
 def registrar_usuario(**kwargs):
 
-
-	if 'user_id' in kwargs:
-		user = admin_service.query_usuario_by_id(kwargs['user_id'])
-		form = UsuarioRegistration(nome=user.funcionario.nome, sobrenome=user.funcionario.sobrenome, 
-			email=user.email, numero_residencial=user.funcionario.telefone_residencial, 
-			numero_celular=user.funcionario.telefone_celular, ativo=user.active)
-	else:	
-		form = UsuarioRegistration()
-	
-	form.funcao.choices = [(funcao.id, funcao.name.capitalize()) for funcao in funcao_service.query_funcoes()]
-	if request.method == 'GET':
-		return render_template('admin/cadastrar_usuario.html', form=form)
-	elif request.method == 'POST':
-		if form.validate_on_submit():
-			obj_dict = handle_form_user_registration(form)
-			admin_service.new_user_handler(obj_dict['usuario'], obj_dict['funcionario'], form.data['funcao'])
-			flash('Usuario criado com sucesso. Senha: %s' % obj_dict['usuario'].password, 
-					'success')
-			return redirect(url_for('admin.registrar_usuario'))
-		else:
+	try:
+		if 'user_id' in kwargs:
+			user = admin_service.query_usuario_by_id(kwargs['user_id'])
+			form = UsuarioRegistration(nome=user.funcionario.nome, sobrenome=user.funcionario.sobrenome, 
+				email=user.email, numero_residencial=user.funcionario.telefone_residencial, 
+				numero_celular=user.funcionario.telefone_celular, ativo=user.active)
+		else:	
+			form = UsuarioRegistration()
+		
+		form.funcao.choices = [(funcao.id, funcao.name.capitalize()) for funcao in funcao_service.query_funcoes()]
+		if request.method == 'GET':
 			return render_template('admin/cadastrar_usuario.html', form=form)
+		elif request.method == 'POST':
+			if form.validate_on_submit():
+				obj_dict = handle_form_user_registration(form)
+				admin_service.new_user_handler(obj_dict['usuario'], obj_dict['funcionario'], form.data['funcao'])
+				flash('Usuario criado com sucesso. Senha: %s' % obj_dict['usuario'].password, 
+						'success')
+				return redirect(url_for('admin.registrar_usuario'))
+			else:
+				return render_template('admin/cadastrar_usuario.html', form=form)
+	except Exception as e:
+		pass # Erro 500
 
 
 @bp.route('/usuarios', methods=['GET', 'POST'])

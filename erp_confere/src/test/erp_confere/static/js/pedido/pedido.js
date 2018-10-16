@@ -1,5 +1,7 @@
 jQuery(document).ready(function($) {
 
+	$('#pedido-cadastrar').parsley()
+
 	$('.datepicker').datepicker({dateFormat: 'dd/mm/yy', minDate: 0})
 
 	$('#cep').focusout(function(){
@@ -41,6 +43,7 @@ jQuery(document).ready(function($) {
 	function reloadProps(){
 		$('.numeric').numeric({negative: false});
 		$('.real-value').numeric({decimalPlaces:2, altDecimal: '.', decimal:',', negative: false})		
+		$('#pedido-cadastrar').parsley()
 	}
 
 	$('#pedido-cadastrar').on('click', '.minus-quantidade-form', function(event) {
@@ -94,6 +97,8 @@ jQuery(document).ready(function($) {
 			var btnAdd = $('<button></button>', {class: 'btn btn-default add-quantidade-form', text: '+'})
 			var spanSbtBtn = $('<span></span>', {class: 'input-group-btn'})
 			var btnSbt = $('<button></button>', {class: 'btn btn-default minus-quantidade-form', text: '-'})
+
+			inputQuantidade.attr('data-parsley-errors-messages-disabled', true)
 
 			rootDiv.append(firstChildDiv)
 			rootDiv.append(secondChildDiv)

@@ -1,5 +1,5 @@
 import requests
-from model.models import Cep
+from model import Cep
 import app_util.constants as const
 
 VIACEP_URL = 'https://viacep.com.br/ws/:cep:/json/'

@@ -1,5 +1,5 @@
 from persistence import db
-from model import Funcionario
+from model import *
 from sqlalchemy.orm.exc import NoResultFound
 
 def query_funcionario_by_id(codigo_funcionario): 
@@ -13,3 +13,13 @@ def query_funcionario_by_id(codigo_funcionario):
 
 def query_funcionarios():
 	return Funcionario.query.all()
+
+
+def query_funcionario_by_role(codigos_role):
+
+	return db.session.query(Funcionario)\
+				.join(User)\
+				.join(RolesUsers)\
+				.join(Role)\
+				.filter(Role.id.in_(codigos_role))\
+				.all()

@@ -1,6 +1,7 @@
 from wtforms import DecimalField, StringField, SubmitField, validators, \
-BooleanField, ChangePasswordForm, SelectField, PasswordField, IntegerField
+BooleanField, SelectField, PasswordField, IntegerField
 from flask_wtf import FlaskForm
+from flask_security.forms import ChangePasswordForm
 from app_util import CustomDecimalField
 import services.funcao_service as funcao_service
 
