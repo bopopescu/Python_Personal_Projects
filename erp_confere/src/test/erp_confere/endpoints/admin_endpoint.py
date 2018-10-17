@@ -5,6 +5,7 @@ from endpoints.forms import UsuarioRegistration
 from services import funcao_service, admin_service
 from model import User, Funcionario
 from app_util import create_system_user
+from endpoints.charts import pedidos_cliente_bar_chart
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -13,7 +14,17 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @login_required
 @roles_accepted('admin')
 def index():
-	return redirect(url_for('pedido.pedido_servico_atrasado'))
+
+	loja_quantidade = pedido_servico_service.query_count_pedidos_servicos_by_loja(date(2018, 9, 1), date(2019, 9, 1))
+
+	data = {}
+	for column in loja_quantidade:
+		data['loja'] = column[0]
+		data['quantidade'] = column[1]
+
+	script, div = pedidos_cliente_bar_chart(data)
+	
+	return render_template('admin/index.html', the_script=script, the_div=div)
 
 @bp.route('/registrar/<int:user_id>', methods=['GET'])
 @bp.route('/registrar', methods=['GET', 'POST'])

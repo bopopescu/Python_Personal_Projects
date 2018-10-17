@@ -47,9 +47,9 @@ def index():
 
 	if current_user.roles[0].name == 'admin':
 		return redirect(url_for('admin.index'))
-	elif current_user.roles[0].name == 'medidor': # See only 
+	elif current_user.roles[0].name == 'medidor':  
 		return redirect(url_for('pedido.medicao'))
-	elif current_user.roles[0].name == 'projetista': # See only the pedido_servico which are 'Liberacao', 'Subir Paredes' e 'Projetos'
+	elif current_user.roles[0].name == 'projetista': 
 		return redirect(url_for('pedido.projetista'))
 	elif current_user.roles[0].name == 'controladora':
 		return redirect(url_for('pedido.pedidos'))
