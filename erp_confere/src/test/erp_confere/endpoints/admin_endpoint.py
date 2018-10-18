@@ -2,10 +2,10 @@ from flask import Blueprint, url_for, render_template, redirect, flash, request
 from flask_security import login_required, roles_accepted, current_user
 from datetime import date
 from endpoints.forms import UsuarioRegistration
-from services import funcao_service, admin_service
+from services import funcao_service, admin_service, pedido_servico_service
 from model import User, Funcionario
 from app_util import create_system_user
-from endpoints.charts import pedidos_cliente_bar_chart
+from endpoints.charts import pedido_loja_bar_char
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -17,12 +17,12 @@ def index():
 
 	loja_quantidade = pedido_servico_service.query_count_pedidos_servicos_by_loja(date(2018, 9, 1), date(2019, 9, 1))
 
-	data = {}
+	data = {'lojas': [], 'quantidade': []}
 	for column in loja_quantidade:
-		data['loja'] = column[0]
-		data['quantidade'] = column[1]
+		data['lojas'].append(column[0])
+		data['quantidade'].append(column[1])
 
-	script, div = pedidos_cliente_bar_chart(data)
+	script, div = pedido_loja_bar_char(data)
 	
 	return render_template('admin/index.html', the_script=script, the_div=div)
 
