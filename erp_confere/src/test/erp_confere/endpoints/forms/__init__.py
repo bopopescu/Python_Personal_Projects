@@ -54,3 +54,5 @@ class UsuarioRegistration(FlaskForm):
 		choices=[('Socio', 'Sócio'), ('Finalizador', 'Finalizador'), ('Projetista', 'Projetista'),
 		 ('Medidor', 'Medidor'), ('Secretaria', 'Secretária')])
 	ativo = BooleanField('Ativo', [validators.DataRequired(message="Escolher se deve estar ativo ou não")])
+
+

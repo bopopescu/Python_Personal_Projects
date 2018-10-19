@@ -5,7 +5,7 @@ from endpoints.forms import UsuarioRegistration
 from services import funcao_service, admin_service, pedido_servico_service
 from model import User, Funcionario
 from app_util import create_system_user
-from endpoints.charts import pedido_loja_bar_char
+from endpoints.charts import pedido_loja_bar_char, funcionario_pedido_mes_pie_chart
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -15,14 +15,31 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @roles_accepted('admin')
 def index():
 
-	loja_quantidade = pedido_servico_service.query_count_pedidos_servicos_by_loja(date(2018, 9, 1), date(2019, 9, 1))
+	data_fim = date(2019, 9, 1)
+	data_inicio = date(2018, 9, 1)
+	# loja_quantidade = pedido_servico_service.query_count_pedidos_servicos_by_loja(data_inicio, data_fim)
 
-	data = {'lojas': [], 'quantidade': []}
-	for column in loja_quantidade:
-		data['lojas'].append(column[0])
-		data['quantidade'].append(column[1])
+	result_set = pedido_servico_service.query_count_pedido_servico_by_funcionario(data_inicio, data_fim)
 
-	script, div = pedido_loja_bar_char(data)
+	data = {'data_fim': data_fim, 'data_inicio': data_inicio}
+
+	for row in result_set:
+		nome_completo = row[1].split(' ')
+		nome = nome_completo[0]
+		sobrenome = nome_completo[-1]
+
+		fullname = nome + ' ' + sobrenome
+		data[fullname] = row[2]
+
+	# data = {'lojas': [], 'quantidade': [], 'data_inicio': data_inicio, 'data_fim': data_fim}
+
+	# for column in loja_quantidade:
+	# 	data['lojas'].append(column[0])
+	# 	data['quantidade'].append(column[1])
+
+	script, div = funcionario_pedido_mes_pie_chart(data)
+
+	print(script)
 	
 	return render_template('admin/index.html', the_script=script, the_div=div)
 

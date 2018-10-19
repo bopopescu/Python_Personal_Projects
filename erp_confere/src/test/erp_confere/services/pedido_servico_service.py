@@ -43,16 +43,24 @@ def query_last_pedido_servico_by_pedido(codigo_pedido):
 
 def query_count_pedidos_servicos_by_loja(data_inicio, data_fim):
 
-	print(db.session.query(Loja.nome, func.count(1).label('quantidade')) \
-					.join(Pedido) \
-					.filter(Pedido.data_entrada.between(data_inicio, data_fim)) \
-					.group_by(Loja.nome)\
-					.all())
 	return db.session.query(Loja.nome, func.count(1).label('quantidade')) \
 					.join(Pedido) \
 					.filter(Pedido.data_entrada.between(data_inicio, data_fim)) \
 					.group_by(Loja.nome) \
-					.all()
+					.all()# .order_by(func.count(1).label('quantidade').desc())\
+					
+def query_count_pedido_servico_by_funcionario(data_inicio, data_fim):
+
+	#, PedidoServico.servico_props['status'] == StatusPedidoServico.CONCLUIDO.value\
+
+	return db.session.query(Funcionario.codigo, 
+							Funcionario.nome + ' ' + Funcionario.sobrenome, 
+							func.count(1).label('quantidade'))\
+				.join(PedidoServico) \
+				.join(Pedido) \
+				.filter(Pedido.data_entrada.between(data_inicio, data_fim)) \
+				.group_by(Funcionario.codigo) \
+				.all()
 
 
 def query_pedido_servico_medicao_by_funcionar(page, per_page, codigo_funcionario):

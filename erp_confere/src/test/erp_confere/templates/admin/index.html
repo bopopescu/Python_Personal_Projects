@@ -8,9 +8,10 @@
 
 
 {% block extra_script %}
- 	<link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-0.12.16.min.css') }}">
- 	<script type="text/javascript" src="{{ url_for('static', filename='js/bokeh-0.12.16.min.js') }}"></script>
- 	<script type="text/javascript" src="{{ url_for('static', filename='js/bokeh-api-0.12.16.min.js') }}"></script>
+ 	<link rel="stylesheet" href="{{ url_for('static', filename='css/bokeh-0.13.0.min.css') }}">
+ 	<script type="text/javascript" src="{{ url_for('static', filename='js/bokeh-0.13.0.min.js') }}"></script>
+ 	<script type="text/javascript" src="{{ url_for('static', filename='js/bokeh-api-0.13.0.min.js') }}"></script>
+
 {% endblock %}
 
 
@@ -19,8 +20,11 @@
 	{% include "layout/messages.html" %}
 	
 	
-	{{ the_script }}
+	{{ the_div|safe }}
 
-	{{ the_div }}
+{% endblock %}
 
+
+{% block script %}
+	{{ the_script|safe }}
 {% endblock %}

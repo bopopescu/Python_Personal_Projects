@@ -27,11 +27,11 @@ class FuncaoEnum(enum.Enum):
 	CONTROLADORA = 4
 
 class StatusPedidoServico(enum.Enum):
-	novo = 'novo'
-	agendado = 'agendado'
-	iniciado = 'iniciado'
-	concluido = 'concluido'
-	liberado = 'liberado'
+	NOVO = 'novo'
+	AGENDADO = 'agendado'
+	INICIADO = 'iniciado'
+	CONCLUIDO = 'concluido'
+	LIBERADO = 'liberado'
 
 
 class Cargo(enum.Enum):
