@@ -47,11 +47,9 @@ def query_count_pedidos_servicos_by_loja(data_inicio, data_fim):
 					.join(Pedido) \
 					.filter(Pedido.data_entrada.between(data_inicio, data_fim)) \
 					.group_by(Loja.nome) \
-					.all()# .order_by(func.count(1).label('quantidade').desc())\
+					.all()
 					
 def query_count_pedido_servico_by_funcionario(data_inicio, data_fim):
-
-	#, PedidoServico.servico_props['status'] == StatusPedidoServico.CONCLUIDO.value\
 
 	return db.session.query(Funcionario.codigo, 
 							Funcionario.nome + ' ' + Funcionario.sobrenome, 
@@ -85,9 +83,14 @@ def query_pedido_servico_available_to_start(page, per_page):
 
 	subqueri = db.session.query(PedidoServico.pedido.label('pedido'), func.min(PedidoServico.servico).label('servico'))\
 					.join(Servico)\
- 					.filter(PedidoServico.data_fim == None, PedidoServico.servico_props['status'] == 'novo', 
+ 					.filter(PedidoServico.data_fim == None, PedidoServico.servico_props['status'] == 'novo',
  						Servico.codigo.notin_((ServicoEnum.MEDICAO.value, ServicoEnum.ATENDIMENTO.value)))\
  					.group_by(PedidoServico.pedido).subquery()
+
+
+ 	print(db.session.query(PedidoServico)\
+			.filter(PedidoServico.pedido == subqueri.c.pedido, PedidoServico.servico == subqueri.c.servico)\
+			.paginate(page=page,per_page=per_page,error_out=False))
 
 	return db.session.query(PedidoServico)\
 			.filter(PedidoServico.pedido == subqueri.c.pedido, PedidoServico.servico == subqueri.c.servico)\

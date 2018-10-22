@@ -19,9 +19,16 @@
 
 	{% include "layout/messages.html" %}
 	
+	<div class="container">
+		<div class="row">
+			{% for div in the_div %}
+				<div class="col-sm-6">
+					{{ div|safe }}
+				</div>
+			{% endfor %}
+		</div>
+	</div>
 	
-	{{ the_div|safe }}
-
 {% endblock %}
 
 

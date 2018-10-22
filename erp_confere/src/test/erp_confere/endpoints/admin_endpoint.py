@@ -5,7 +5,7 @@ from endpoints.forms import UsuarioRegistration
 from services import funcao_service, admin_service, pedido_servico_service
 from model import User, Funcionario
 from app_util import create_system_user
-from endpoints.charts import pedido_loja_bar_char, funcionario_pedido_mes_pie_chart
+from endpoints.charts import pedido_loja_bar_char, funcionario_pedido_mes_pie_chart, render_graphics
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -17,30 +17,37 @@ def index():
 
 	data_fim = date(2019, 9, 1)
 	data_inicio = date(2018, 9, 1)
-	# loja_quantidade = pedido_servico_service.query_count_pedidos_servicos_by_loja(data_inicio, data_fim)
-
-	result_set = pedido_servico_service.query_count_pedido_servico_by_funcionario(data_inicio, data_fim)
-
-	data = {'data_fim': data_fim, 'data_inicio': data_inicio}
-
-	for row in result_set:
-		nome_completo = row[1].split(' ')
-		nome = nome_completo[0]
-		sobrenome = nome_completo[-1]
-
-		fullname = nome + ' ' + sobrenome
-		data[fullname] = row[2]
-
-	# data = {'lojas': [], 'quantidade': [], 'data_inicio': data_inicio, 'data_fim': data_fim}
-
-	# for column in loja_quantidade:
-	# 	data['lojas'].append(column[0])
-	# 	data['quantidade'].append(column[1])
-
-	script, div = funcionario_pedido_mes_pie_chart(data)
-
-	print(script)
 	
+	lojas_quantidade = pedido_servico_service.query_count_pedidos_servicos_by_loja(data_inicio, data_fim)
+	funcionarios = pedido_servico_service.query_count_pedido_servico_by_funcionario(data_inicio, data_fim)
+
+	retorno = []
+
+	if len(lojas_quantidade) > 0:
+		dados_loja = {'data_fim': data_fim, 'data_inicio': data_inicio, 'lojas': [], 'quantidade': []}
+		for row in lojas_quantidade:
+			dados_loja['lojas'].append(row[0])
+			dados_loja['quantidade'].append(row[1])
+
+		graphic2 = pedido_loja_bar_char(dados_loja)
+		retorno.append(graphic2)
+
+	print(funcionarios)
+	if len(funcionarios) > 0:
+		dados_funcionario = {'data_fim': data_fim, 'data_inicio': data_inicio}
+		for row in funcionarios:
+			nome_completo = row[1].split(' ')
+			nome = nome_completo[0]
+			sobrenome = nome_completo[-1]
+
+			fullname = nome + ' ' + sobrenome
+			dados_funcionario[fullname] = row[2]
+
+		graphic1 = funcionario_pedido_mes_pie_chart(dados_funcionario)
+		retorno.append(graphic1)
+
+	script, div = render_graphics(retorno)
+
 	return render_template('admin/index.html', the_script=script, the_div=div)
 
 @bp.route('/registrar/<int:user_id>', methods=['GET'])
