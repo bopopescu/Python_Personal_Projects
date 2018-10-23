@@ -87,11 +87,6 @@ def query_pedido_servico_available_to_start(page, per_page):
  						Servico.codigo.notin_((ServicoEnum.MEDICAO.value, ServicoEnum.ATENDIMENTO.value)))\
  					.group_by(PedidoServico.pedido).subquery()
 
-
- 	print(db.session.query(PedidoServico)\
-			.filter(PedidoServico.pedido == subqueri.c.pedido, PedidoServico.servico == subqueri.c.servico)\
-			.paginate(page=page,per_page=per_page,error_out=False))
-
 	return db.session.query(PedidoServico)\
 			.filter(PedidoServico.pedido == subqueri.c.pedido, PedidoServico.servico == subqueri.c.servico)\
 			.paginate(page=page,per_page=per_page,error_out=False)

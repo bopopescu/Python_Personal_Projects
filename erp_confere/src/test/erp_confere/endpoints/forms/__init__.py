@@ -1,5 +1,5 @@
 from wtforms import DecimalField, StringField, SubmitField, validators, \
-BooleanField, SelectField, PasswordField, IntegerField
+BooleanField, SelectField, PasswordField, IntegerField, DateField
 from flask_wtf import FlaskForm
 from flask_security.forms import ChangePasswordForm
 from app_util import CustomDecimalField
@@ -56,3 +56,10 @@ class UsuarioRegistration(FlaskForm):
 	ativo = BooleanField('Ativo', [validators.DataRequired(message="Escolher se deve estar ativo ou não")])
 
 
+class DashFilterForm(FlaskForm):
+	'''
+		Create a form to filter the date in flask form
+	'''
+	data_inicio = DateField('Data inicio', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
+	data_fim = DateField('Data fim', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
+	filtrar = SubmitField('Filtrar')
