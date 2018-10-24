@@ -50,12 +50,14 @@ Serviços
 		</tbody>
 	</table>
 
-	{% if pedidos_servicos.has_prev %}
-		<a href="{{ url_for('pedido_servico.lista', page=pedidos_servicos.prev_num, **arguments) }}">&lt;&lt; Anterior</a>
-	{% endif %}
-	<span>    |   </span>
-	{% if pedidos_servicos.has_next %}
-		<a href="{{ url_for('pedido_servico.lista', page=pedidos_servicos.next_num, **arguments) }}">Próximo &gt;&gt; </a>
+	{% if pedidos_servicos.pages > 1 %}
+		{% if pedidos_servicos.has_prev %}
+			<a href="{{ url_for('pedido_servico.lista', page=pedidos_servicos.prev_num, **arguments) }}">&lt;&lt; Anterior</a>
+		{% endif %}
+		<span>    |   </span>
+		{% if pedidos_servicos.has_next %}
+			<a href="{{ url_for('pedido_servico.lista', page=pedidos_servicos.next_num, **arguments) }}">Próximo &gt;&gt; </a>
+		{% endif %}
 	{% endif %}
 {% endblock %}
 {% block script %}

@@ -19,26 +19,28 @@
 
 	{% include "layout/messages.html" %}
 	{% from 'security/_macros.html' import render_field %}
-	<form class="form-inline" id="form-filter">
-		<div class="row">
-			<div class="input-group">
-				<i class="fa fa-calendar icon" style="font-size: 24px"></i>
-				{{ render_field(the_form.data_inicio, class_="form-control form-control-sm col-sm-5 mb-3 mr-sm-3 datetimepicker", autocomplete="off", placeholder="Data Inicio") }}
-			</div>
-			<div class="input-group">
-				<i class="fa fa-calendar icon" style="font-size: 24px"></i>
-				{{ render_field(the_form.data_fim, class_="form-control form-control-sm mb-3 col-sm-5 mr-sm-3 datetimepicker", autocomplete="off", placeholder="Data Fim") }}
-			</div>
-			{{ render_field(the_form.filtrar, class_="form-control form-control-sm mb-3 mr-sm-3") }}
-		</div>
-		
-	</form>
 	
+	<div class="container-fluid">
+		<form class="form-inline" id="form-filter">
+			<div class="row">
+				<div class="input-group">
+					<i class="fa fa-calendar icon" style="font-size: 24px"></i>
+					{{ render_field(the_form.data_inicio, class_="form-control form-control-sm col-sm-5 mb-3 mr-sm-3 datetimepicker", autocomplete="off", placeholder="Data Inicio") }}
+				</div>
+				<div class="input-group">
+					<i class="fa fa-calendar icon" style="font-size: 24px"></i>
+					{{ render_field(the_form.data_fim, class_="form-control form-control-sm mb-3 col-sm-5 mr-sm-3 datetimepicker", autocomplete="off", placeholder="Data Fim") }}
+				</div>
+				{{ render_field(the_form.filtrar, class_="form-control form-control-sm mb-3 mr-sm-3") }}
+			</div>
+			
+		</form>
+	</div>
 	{% if the_div|length > 0 %}
-		<div class="container">
+		<div class="container-fluid">
 			<div class="row">
 				{% for div in the_div %}
-					<div class="col-sm-6">
+					<div style="padding: 10px">
 						{{ div|safe }}
 					</div>
 				{% endfor %}
