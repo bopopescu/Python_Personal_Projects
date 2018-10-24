@@ -12,6 +12,12 @@ import calendar
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 
+@bp.route('/relatorios', methods=['GET'])
+@login_required
+@roles_accepted('admin')
+def relatorios():
+	pass
+
 @bp.route('/', methods=['GET'])
 @login_required
 @roles_accepted('admin')

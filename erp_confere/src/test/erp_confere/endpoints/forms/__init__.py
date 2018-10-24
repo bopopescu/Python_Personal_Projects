@@ -41,6 +41,9 @@ class CustomizedChangePasswordForm(ChangePasswordForm):
 
 
 class UsuarioRegistration(FlaskForm):
+	'''
+
+	'''
 	nome = StringField('Nome*', [validators.length(max=45), validators.DataRequired(message="Campo obrigatório")])
 	sobrenome  = StringField('Sobrenome*', [validators.length(max=45), validators.DataRequired(message="Campo obrigatório")])
 	email = StringField('Email*', [validators.Email(message="Endereço de e-mail inválido"), validators.DataRequired()])
@@ -63,3 +66,9 @@ class DashFilterForm(FlaskForm):
 	data_inicio = DateField('Data inicio', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
 	data_fim = DateField('Data fim', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
 	filtrar = SubmitField('Filtrar')
+
+
+class ReportForm(FlaskForm):
+
+	report = SelectField('Relatório', [validators.DataRequired()])
+	gerar = SubmitField('Gerar')
