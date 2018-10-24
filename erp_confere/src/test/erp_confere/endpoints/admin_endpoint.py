@@ -32,15 +32,13 @@ def index():
 	else:
 		curdate = date.today()
 		last_day_of_month = calendar.monthrange(curdate.year, curdate.month)[1]
-		data_fim = date(curdate.year, curdate.month, last_day_of_month)
+		data_fim = date(curdate.year, curdate.month, curdate.day)
 		data_inicio = date(curdate.year, curdate.month, 1)
-		
 	
 	lojas_quantidade = pedido_servico_service.query_count_pedidos_servicos_by_loja(data_inicio, data_fim)
 	funcionarios = pedido_servico_service.query_count_pedido_servico_by_funcionario(data_inicio, data_fim)
 
 	retorno = []
-
 	
 	is_ok_render = False
 
