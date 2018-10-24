@@ -1,9 +1,11 @@
 from model import Pedido, StatusPedido
+from sqlalchemy import func, text
+from persistence import db
+
 import services.cliente_endereco_service as cliente_endereco_service
 import services.loja_service as loja_service
 import services.servico_service as servico_service
 import services.pedido_servico_service as pedido_servico_service
-from persistence import db
 import datetime
 import json
 import copy
@@ -79,6 +81,19 @@ def jason_to_model(dic):
 
 	return Pedido(cliente_endereco_obj=cliente_endereco, loja=loja, complemento=pedido_pai, 
 		numero=numero_pedido, valor=valor_pedido, data_entrada=data_entrada, data_inicio=data_inicio, data_fim=data_fim, ambientes=ambiente, status=StatusPedido.novo)
+
+
+def report_pedido_loja_periodo(page, per_page, data_inicio, data_fim):
+	return Pedido.query.filter(Pedido.data_entrada.between(data_inicio, data_fim))\
+					.paginate(page=page, per_page=per_page, error_out=False)
+
+
+# Add the status concluido for pedido
+def report_pedido_loja_pedido(page, per_page, data_inicio, data_fim):
+	return db.session.query(Loja.nome, func.sum(Pedido.valor).label('Total'))\
+					.filter(Pedido.data_entrada.between(data_inicio, data_fim))\
+					.group_by(Loja.nome)\
+					.paginate(page=page, per_page=per_page, error_out=False)
 
 
 def query_pedido_by_id(codigo):

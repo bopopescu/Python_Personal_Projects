@@ -112,8 +112,8 @@
 			<legend>Serviços</legend>
 			{% for servico in servicos %}
 				<div class="form-check form-check-inline">
-					<label class="form-check-label">{{ servico.nome }}</label>
-					<input class="form-check-input" type="checkbox" name="servicos" value="{{ servico.codigo }}" checked>
+					<label style="padding: 10px;" class="form-check-label" for="{{ servico.nome }}">{{ servico.nome_real }}</label>
+					<input class="form-check-input" type="checkbox" name="servicos" id="{{ servico.nome }}" value="{{ servico.codigo }}" checked>
 				</div>
 			{% endfor %}
 		</fieldset>

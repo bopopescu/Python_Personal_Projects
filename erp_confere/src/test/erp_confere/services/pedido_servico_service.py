@@ -5,7 +5,7 @@ import services.servico_service as servico_service
 import copy
 import datetime
 import contextlib
-from model import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido, Funcionario, ServicoEnum
+from model import PedidoServico, Servico, TipoValor, StatusPedido, Loja, Pedido, Funcionario, ServicoEnum, StatusPedidoServico
 from services import funcionario_service
 from services import pedido_service
 from services import feriado_service
@@ -21,8 +21,28 @@ def json_to_model(pedido, servico):
 def generate_pedido_servico(pedido, servico):
 	status = {'status': 'novo'}
 	return PedidoServico(pedido_obj=pedido, servico_obj=servico, funcionario_obj=None, 
-		valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)	
+		valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)
 
+
+def report_pedido_servico_funcionario_periodo(page, per_page, codigo_funcionario, data_inicio, data_fim):
+	return db.session.query(PedidoServico)\
+					.join(Pedido)
+					.join(Funcionario)\
+					.filter(Funcionario.codigo == codigo_funcionario, Pedido.data_entrada.between(data_inicio, data_fim))
+
+
+def report_pedido_servico_comissao_funcionario_period(page, per_page, codigo_funcionario, data_inicio, data_fim):
+	return db.session.query(Funcionario.codigo, 
+							func.concat(Funcionario.nome + ' ' + Funcionario.sobrenome).label('Funcionario'),
+							func.sum(PedidoServico.valor_comissao))\
+					.join(PedidoServico)\
+					.join(Pedido)\
+					.filter(Pedido.data_entrada.between(data_inicio, data_fim), 
+							Funcionario.codigo == codigo_funcionario,
+							PedidoServico.servico_props['status'] == StatusPedidoServico.LIBERADO.value)\
+					.group_by(Funcionario.codigo, 
+							func.concat(Funcionario.nome + ' ' + Funcionario.sobrenome).label('Funcionario'))\
+					.paginate(page=page, per_page=per_page, error_out=False)
 
 def query_first_pedido_servico_by_pedido(codigo_pedido):
 	return db.session.query(PedidoServico, Servico)\
