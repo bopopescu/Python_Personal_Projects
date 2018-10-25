@@ -32,7 +32,7 @@ def pedido_loja_bar_char(data):
 
 def funcionario_pedido_mes_pie_chart(dictionary):
 
-	title = "Funcionarios x Serviços: {} - {}".format(dictionary.pop('data_inicio').strftime('%d/%m%Y'), dictionary.pop('data_fim').strftime('%d/%m/%Y'))
+	title = "Funcionarios x Serviços: {} - {}".format(dictionary.pop('data_inicio').strftime('%d/%m/%Y'), dictionary.pop('data_fim').strftime('%d/%m/%Y'))
 	
 	x = Counter(dictionary)
 

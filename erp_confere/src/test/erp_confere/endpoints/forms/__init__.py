@@ -3,7 +3,10 @@ BooleanField, SelectField, PasswordField, IntegerField, DateField
 from flask_wtf import FlaskForm
 from flask_security.forms import ChangePasswordForm
 from app_util import CustomDecimalField
+from datetime import date
+
 import services.funcao_service as funcao_service
+import calendar
 
 class LojaCadastrarForm(FlaskForm):
 
@@ -64,11 +67,19 @@ class DashFilterForm(FlaskForm):
 		Create a form to filter the date in flask form
 	'''
 	data_inicio = DateField('Data inicio', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
-	data_fim = DateField('Data fim', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
+	data_fim = DateField('Data fim', [validators.DataRequired(message="Favor informar a data final")], format="%Y-%m-%d")
 	filtrar = SubmitField('Filtrar')
 
 
 class ReportForm(FlaskForm):
 
 	report = SelectField('Relatório', [validators.DataRequired()])
+	filtro = SelectField('Filtrar por', [validators.DataRequired()], choices=[(1, 'Período'), (2, 'Mensal')])
+	data_inicio = DateField('Data início', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
+	data_fim = DateField('Data fim', [validators.DataRequired(message="Favor informar a data final")], format="%Y-%m-%d")
+	mes = SelectField('Mês', [validators.DataRequired()], 
+			choices=[(key[0], key[0]) for key in enumerate(calendar.month_abbr) if key[0] > 0], default=date.today().month)
+	ano = SelectField('Ano', [validators.DataRequired()], 
+			choices=[(year, year) for year in range(2013, date.today().year)], default=date.today().year)
 	gerar = SubmitField('Gerar')
+
