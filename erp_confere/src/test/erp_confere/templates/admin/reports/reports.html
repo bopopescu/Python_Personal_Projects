@@ -1,0 +1,82 @@
+{% extends 'template.html' %}
+
+{% block title %} Relatórios {% endblock %}
+
+{% block section %}
+
+	{% include "layout/messages.html" %}
+	{% from 'security/_macros.html' import render_field %}
+	
+	{# #}
+	<form id="form-report-filtro" style="padding-left: 20px">
+		<div class="row">
+			<div class="form-group col-sm-12">
+				{{ form.report.label }}
+				{{ render_field(form.report, class_="form-control") }}
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group col-sm-4">
+				{{ form.filtro.label }} 
+				{{ render_field(form.filtro, class_="form-control") }}
+			</div>
+		</div>
+		<div class="row intervalo-div">
+			<div class="form-group col-sm-2">
+				{{ form.data_inicio.label }}
+				{{ render_field(form.data_inicio, class_="form-control datepicker intervalo-div intervalo-div-form", autocomplete="off") }}		
+			</div>
+			<div class="form-group col-sm-2">
+				{{ form.data_fim.label }}
+				{{ render_field(form.data_fim, class_="form-control datepicker intervalo-div intervalo-div-form", autocomplete="off") }}
+			</div>
+		</div>
+		<div class="row mensal-div" hidden>
+			<div class="form-group col-sm-2">
+				{{ form.mes.label }}
+				{{ render_field(form.mes, class_="form-control mensal-div mensal-div-form", disabled=True) }}
+				
+			</div>
+			<div class="form-group col-sm-2">
+				{{ form.ano.label }}
+				{{ render_field(form.ano, class_="form-control mensal-div mensal-div-form", disabled=True) }}
+			</div>
+		</div>
+		{{ render_field(form.gerar, class_="btn btn-success") }}
+	</form>
+
+{% endblock %}
+
+{% block script %}
+	
+	<script type="text/javascript">
+		jQuery(document).ready(function($) {
+
+			$('.datepicker').datetimepicker({format: 'd/m/Y', timepicker: false, scrollInput: false})
+
+			$('#form-report-filtro').on("change", "#filtro", function(event){
+				event.preventDefault();
+
+				var valueChosen = $('#filtro').val();
+
+				if(valueChosen == 1){ // Periodo
+					$('.mensal-div').attr('hidden', true)
+					$('.mensal-div-form').attr('disabled', true)
+
+					$('.intervalo-div').removeAttr('hidden')
+					$('.intervalo-div-form').removeAttr('disabled')
+				} else if(valueChosen == 2){
+					$('.intervalo-div').attr('hidden', true)
+					$('.intervalo-div-form').attr('disabled', true)
+
+					$('.mensal-div').removeAttr('hidden')
+					$('.mensal-div-form').removeAttr('disabled')
+				}
+
+			});
+
+		})
+	</script>
+		
+
+{% endblock %}

@@ -1,7 +1,7 @@
 from flask import Blueprint, url_for, render_template, redirect, flash, request
 from flask_security import login_required, roles_accepted, current_user
 from datetime import date, datetime
-from endpoints.forms import UsuarioRegistration, DashFilterForm
+from endpoints.forms import UsuarioRegistration, DashFilterForm, ReportForm
 from services import funcao_service, admin_service, pedido_servico_service
 from model import User, Funcionario
 from app_util import create_system_user
@@ -16,7 +16,21 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @login_required
 @roles_accepted('admin')
 def relatorios():
-	pass
+	form = ReportForm()
+
+	if 'report' in request.args:
+		if request.args.get('filtro') == 1:
+			data_inicio = datetime.strptime(request.args.get('data_inicio'), '%d/%m/%Y'.date())
+			data_fim = datetime.strptime(request.args.get('data_fim'), '%d/%m/%Y'.date())
+		else:
+			ano = request.args.get('ano')
+			mes = request.args.get('mes')
+			ultimo_dia_mes = calendar.monthrange(ano, mes)[1]
+			
+			data_inicio = datetime.date(ano, mes, 1)
+			data_fim = datetime.date(ano, mes, ultimo_dia_mes)
+
+	return render_template('admin/reports/reports.html', form=form)
 
 @bp.route('/', methods=['GET'])
 @login_required
@@ -24,7 +38,7 @@ def relatorios():
 def index():
 
 	form = DashFilterForm()
-	print(form.is_submitted())
+
 	if all(key in request.args for key in ['data_inicio', 'data_fim']):
 
 		# Transform the string into date 
@@ -127,3 +141,13 @@ def handle_form_user_registration(form):
 	usuario = User(email=form.data['email'], username=username, active=form.data['ativo'])
 
 	return {'funcionario': funcionario, 'usuario': usuario}
+
+
+
+
+@bp.route('/relatorios/pedidos', methods=['GET'])
+@login_required
+@roles_accepted('admin')
+
+
+

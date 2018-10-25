@@ -73,13 +73,13 @@ class DashFilterForm(FlaskForm):
 
 class ReportForm(FlaskForm):
 
-	report = SelectField('Relatório', [validators.DataRequired()])
-	filtro = SelectField('Filtrar por', [validators.DataRequired()], choices=[(1, 'Período'), (2, 'Mensal')])
+	report = SelectField('Relatório', [validators.DataRequired()], choices=[(1, 'Todos os pedidos')])
+	filtro = SelectField('Filtrar por', [validators.DataRequired()], choices=[(1, 'Período'), (2, 'Mês')])
 	data_inicio = DateField('Data início', [validators.DataRequired(message="Favor informar a data início")], format="%Y-%m-%d")
 	data_fim = DateField('Data fim', [validators.DataRequired(message="Favor informar a data final")], format="%Y-%m-%d")
 	mes = SelectField('Mês', [validators.DataRequired()], 
 			choices=[(key[0], key[0]) for key in enumerate(calendar.month_abbr) if key[0] > 0], default=date.today().month)
 	ano = SelectField('Ano', [validators.DataRequired()], 
-			choices=[(year, year) for year in range(2013, date.today().year)], default=date.today().year)
+			choices=[(year, year) for year in range(2013, date.today().year + 1)], default=date.today().year)
 	gerar = SubmitField('Gerar')
 

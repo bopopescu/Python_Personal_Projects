@@ -24,6 +24,15 @@ def generate_pedido_servico(pedido, servico):
 		valor_comissao=0, data_inicio=None, data_fim=None, servico_props=status)
 
 
+def report_pedidos(page, per_page, data_inicio, data_fim, status=None):
+	queri = db.session.query(Pedido).filter(data_entrada.between(data_inicio, data_fim))
+
+	if status:
+		queri.filter(Pedido.status == status)
+	
+	return queri.paginate(page=page, per_page=per_page, error_out=False)
+
+
 def report_pedido_servico_funcionario_periodo(page, per_page, codigo_funcionario, data_inicio, data_fim):
 	return db.session.query(PedidoServico)\
 					.join(Pedido)\
@@ -42,6 +51,7 @@ def report_pedido_servico_comissao_funcionario_period(page, per_page, data_inici
 					.group_by(Funcionario.codigo, 
 							func.concat(Funcionario.nome + ' ' + Funcionario.sobrenome).label('Funcionario'))\
 					.paginate(page=page, per_page=per_page, error_out=False)
+
 
 def query_first_pedido_servico_by_pedido(codigo_pedido):
 	return db.session.query(PedidoServico, Servico)\
